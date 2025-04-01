@@ -39,11 +39,12 @@
 #define ID_TEX_MARIO 0
 #define ID_TEX_ENEMY 10
 #define ID_TEX_MISC 20
-
+#define ID_TEX_BBOX 100
 #define TEXTURES_DIR L"textures"
 #define TEXTURE_PATH_MARIO TEXTURES_DIR "\\mario.png"
 #define TEXTURE_PATH_MISC TEXTURES_DIR "\\misc_transparent.png"
 #define TEXTURE_PATH_ENEMIES TEXTURES_DIR "\\enemies-Photoroom.png"
+#define TEXTURE_PATH_BBOX TEXTURES_DIR "\\bbox.png"
 
 #define MARIO_START_X 10.0f
 #define MARIO_START_Y 130.0f
@@ -77,6 +78,7 @@ void LoadResources()
 	textures->Add(ID_TEX_MARIO, TEXTURE_PATH_MARIO);
 	textures->Add(ID_TEX_ENEMY, TEXTURE_PATH_ENEMIES);
 	textures->Add(ID_TEX_MISC, TEXTURE_PATH_MISC);
+	textures->Add(ID_TEX_BBOX, TEXTURE_PATH_BBOX);
 
 
 	CSprites * sprites = CSprites::GetInstance();
@@ -335,7 +337,7 @@ int WINAPI WinMain(
 	HWND hWnd = CreateGameWindow(hInstance, nCmdShow, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	CGame *game = CGame::GetInstance();
-	game->Init(hWnd);
+	game->Init(hWnd, hInstance);
 
 	LoadResources();
 

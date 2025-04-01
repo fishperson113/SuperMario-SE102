@@ -41,12 +41,15 @@ void MarioController::Awake()
 {
 	auto transform = parentObject->AddComponent<TransformComponent>();
 	transform->SetPosition(10.0f, 130.0f);
+
 	auto velocity=parentObject->AddComponent<VelocityComponent>();
 	parentObject->AddComponent<AnimationComponent>();
 	moveSpeed = 100.0f;
-
 	velocity->SetSpeed(moveSpeed);
 	velocity->SetVelocity(0.0f, 0.0f);
+
+	auto collider = parentObject->AddComponent<ColliderComponent>();
+	collider->SetBoundingBox(0, 0, 25, 25);
 }
 
 void MarioController::Start()

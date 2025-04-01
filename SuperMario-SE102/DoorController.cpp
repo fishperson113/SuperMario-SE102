@@ -33,6 +33,8 @@ void DoorController::Awake()
 {
     animComponent = parentObject->GetComponent<AnimationComponent>();
     SetState(DoorState::Closed);
+    auto collider = parentObject->AddComponent<ColliderComponent>();
+    collider->SetBoundingBox(0, 0, 10, 60);
 }
 
 void DoorController::Start()

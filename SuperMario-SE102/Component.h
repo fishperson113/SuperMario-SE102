@@ -2,7 +2,8 @@
 
 #include"GameObject.h"
 #include"Game.h"
-
+#include"Collision.h"
+#define ID_TEX_BBOX 100
 class VECTOR2
 {
 public:
@@ -65,6 +66,12 @@ public:
     virtual void Awake()=0;
     virtual void Start()=0;
 	virtual void Render() = 0;
+
+    // When no collision has been detected (triggered by CCollision::Process)
+    virtual void OnNoCollision(DWORD dt) {};
+
+    // When collision with an object has been detected (triggered by CCollision::Process)
+    virtual void OnCollisionWith(LPCOLLISIONEVENT e) {};
 };
 
 class AnimationComponent : public Component
@@ -103,4 +110,57 @@ public:
 
 private:
     LPSPRITE sprite;
+};
+class ColliderComponent : public Component
+{
+public:
+    ColliderComponent()
+        : left(0), top(0), width(0), height(0), isBlocking(true),
+        isCollidable(true),
+        collidableFromTop(true), collidableFromBottom(true),
+        collidableFromLeft(true), collidableFromRight(true),
+        isActivatedRenderBoundingBox(true) {}
+    ~ColliderComponent() override = default;
+
+    void Update(float dt) override {};
+    void Render() override;
+
+    void SetBoundingBox(float left, float top, float width, float height);
+    void GetBoundingBox(float& left, float& top, float& right, float& bottom) const;
+
+    bool IsBlocking() const { return isBlocking; }
+    void SetBlocking(bool blocking) { isBlocking = blocking; }
+
+    bool IsCollidable() const { return isCollidable; }
+    void SetCollidable(bool collidable) { isCollidable = collidable; }
+
+    void SetCollidableDirections(bool top, bool bottom, bool left, bool right) {
+        collidableFromTop = top;
+        collidableFromBottom = bottom;
+        collidableFromLeft = left;
+        collidableFromRight = right;
+    }
+
+    void SetAsPlatform() {
+        SetCollidableDirections(true, false, false, false);
+    }
+
+    void SetAsFullCollider() {
+        SetCollidableDirections(true, true, true, true);
+    }
+
+
+    int IsDirectionColliable(float nx, float ny) const;
+
+private:
+    float left, top, width, height;
+    bool isBlocking;
+    bool isCollidable;
+
+	bool isActivatedRenderBoundingBox;
+
+    bool collidableFromTop;     // ny = -1
+    bool collidableFromBottom;  // ny = 1
+    bool collidableFromLeft;    // nx = -1
+    bool collidableFromRight;   // nx = 1
 };

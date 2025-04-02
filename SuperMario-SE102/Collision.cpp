@@ -131,21 +131,17 @@ LPCOLLISIONEVENT CCollision::SweptAABB(LPGAMEOBJECT objSrc, DWORD dt, LPGAMEOBJE
 	float ml, mt, mr, mb;		// moving object bbox
 	float t, nx, ny;
 
-	float mvx, mvy;
+	float mvx=0, mvy=0;
 	auto velocitySrc = objSrc->GetComponent<VelocityComponent>();
-	if (velocitySrc) {
-		mvx = velocitySrc->GetVelocity().x;
-		mvy = velocitySrc->GetVelocity().y;
-	}
+	if (!velocitySrc) return new CCollisionEvent(0, 0, 0, 0, 0, objDest, objSrc);
+	mvx = velocitySrc->GetVelocity().x;
+	mvy = velocitySrc->GetVelocity().y;
 	float mdx = mvx * dt;
 	float mdy = mvy * dt;
 
-	float svx, svy;
+	float svx = 0, svy = 0;
 	auto velocityDest = objDest->GetComponent<VelocityComponent>();
-	if (velocityDest) {
-		svx = velocityDest->GetVelocity().x;
-		svy = velocityDest->GetVelocity().y;
-	}
+	if (!velocityDest) return new CCollisionEvent(0, 0, 0, 0, 0, objDest, objSrc);
 	float sdx = svx * dt;
 	float sdy = svy * dt;
 
@@ -240,6 +236,8 @@ void CCollision::Filter( LPGAMEOBJECT objSrc,
 *  Simple/Sample collision framework 
 *  NOTE: Student might need to improve this based on game logic 
 */
+
+//TODO: Object collision doesnt follow the correct logic of velocity speed
 void CCollision::Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	vector<LPCOLLISIONEVENT> coEvents;

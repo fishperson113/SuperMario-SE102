@@ -8,6 +8,7 @@ public:
 	void Awake() override;
 	void Start() override;
 	void Render() override {};
+	void OnCollisionWith(LPCOLLISIONEVENT e) override;
 private:
 	int rightAnimId;
 	int leftAnimId;

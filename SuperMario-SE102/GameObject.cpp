@@ -8,6 +8,7 @@
 /*
 	Initialize game object 
 */
+extern vector<LPGAMEOBJECT>* coObjects;
 CGameObject::CGameObject()
 {
 	active = true;
@@ -19,6 +20,8 @@ void CGameObject::Update(DWORD dt)
 	{
 		component->Update(dt);
 	}
+
+	CCollision::GetInstance()->Process(this, dt, coObjects);
 }
 
 void CGameObject::Render()

@@ -35,6 +35,7 @@ void MarioController::Update(float dt)
 	if (ani!=nullptr&&animation!=nullptr) {
 		animation->SetCurrentAnimation(ani);
 	}
+
 }
 
 void MarioController::Awake()
@@ -44,7 +45,7 @@ void MarioController::Awake()
 
 	auto velocity=parentObject->AddComponent<VelocityComponent>();
 	parentObject->AddComponent<AnimationComponent>();
-	moveSpeed = 100.0f;
+	moveSpeed = 10.0f;
 	velocity->SetSpeed(moveSpeed);
 	velocity->SetVelocity(0.0f, 0.0f);
 
@@ -54,4 +55,8 @@ void MarioController::Awake()
 
 void MarioController::Start()
 {
+}
+void MarioController::OnCollisionWith(LPCOLLISIONEVENT e)
+{
+	if (!e->obj->GetComponent<ColliderComponent>()->IsBlocking()) return;
 }

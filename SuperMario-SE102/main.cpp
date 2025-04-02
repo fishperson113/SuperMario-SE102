@@ -53,6 +53,7 @@
 CGameObject* mario;
 CGameObject* brick;
 CGameObject* door;
+vector<LPGAMEOBJECT>* coObjects;
 
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -198,6 +199,11 @@ void LoadResources()
 	auto doorController = door->AddComponent<DoorController>();
 	auto anims =door->AddComponent<AnimationComponent>();
 	doorController->Awake();
+
+	coObjects = new vector<LPGAMEOBJECT>();
+	coObjects->push_back(brick);
+	coObjects->push_back(door);
+	coObjects->push_back(mario);
 }
 
 /*
@@ -206,8 +212,10 @@ void LoadResources()
 */
 void Update(DWORD dt)
 {
-	mario->Update(dt);
-	door->Update(dt);
+	for (auto obj : *coObjects)
+	{
+		obj->Update(dt);
+	}
 }
 
 void Render()
@@ -230,9 +238,10 @@ void Render()
 		FLOAT NewBlendFactor[4] = { 0,0,0,0 };
 		pD3DDevice->OMSetBlendState(g->GetAlphaBlending(), NewBlendFactor, 0xffffffff);
 
-		brick->Render();
-		mario->Render();
-		door->Render();
+		for (auto obj : *coObjects)
+		{
+			obj->Render();
+		}
 
 		// Uncomment this line to see how to draw a porttion of a texture  
 		//g->Draw(10, 10, texMisc, 300, 117, 316, 133);

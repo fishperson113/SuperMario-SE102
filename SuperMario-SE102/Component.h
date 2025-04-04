@@ -20,8 +20,12 @@ public:
 
 	virtual void Update(float dt) = 0;
     virtual void Render() = 0;
+
+    void SetEnabled(bool enabled) { isEnabled = enabled; }
+    bool IsEnabled() const { return isEnabled; }
 protected:
     CGameObject* parentObject = nullptr;
+    bool isEnabled = true;
 };
 
 class TransformComponent : public Component
@@ -54,6 +58,8 @@ public:
     float GetSpeed() const { return speed; }
     void Update(float dt) override;
 	void Render() override {}
+
+    void MoveToPosition(float x, float y);
 private:
     float velX, velY;
     float speed;

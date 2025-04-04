@@ -127,37 +127,49 @@ void CCollision::SweptAABB(
 */
 LPCOLLISIONEVENT CCollision::SweptAABB(LPGAMEOBJECT objSrc, DWORD dt, LPGAMEOBJECT objDest)
 {
-	float sl, st, sr, sb;		// static object bbox
-	float ml, mt, mr, mb;		// moving object bbox
-	float t, nx, ny;
+	if (objSrc == objDest) return new CCollisionEvent(-1.0f, 0, 0, 0, 0, objDest, objSrc);
+
+	float sl=0, st=0, sr=0, sb=0;		// static object bbox
+	float ml=0, mt=0, mr=0, mb=0;		// moving object bbox
+	float t = 1.0f, nx = 0, ny = 0;
 
 	float mvx=0, mvy=0;
 	auto velocitySrc = objSrc->GetComponent<VelocityComponent>();
-	if (!velocitySrc) return new CCollisionEvent(0, 0, 0, 0, 0, objDest, objSrc);
-	mvx = velocitySrc->GetVelocity().x;
-	mvy = velocitySrc->GetVelocity().y;
-	float mdx = mvx * dt;
-	float mdy = mvy * dt;
+	if (!velocitySrc) return new CCollisionEvent(-1.0f, 0, 0, 0, 0, objDest, objSrc);
+	mvx = velocitySrc->GetVelocity().x * velocitySrc->GetSpeed();
+	mvy = velocitySrc->GetVelocity().y * velocitySrc->GetSpeed();
+
+	float dtSeconds = dt / 1000.0f;
+	float mdx = mvx * dtSeconds;
+	float mdy = mvy * dtSeconds;
 
 	float svx = 0, svy = 0;
 	auto velocityDest = objDest->GetComponent<VelocityComponent>();
-	if (!velocityDest) return new CCollisionEvent(0, 0, 0, 0, 0, objDest, objSrc);
-	float sdx = svx * dt;
-	float sdy = svy * dt;
+	if (velocityDest) {
+		svx = velocityDest->GetVelocity().x * velocityDest->GetSpeed();
+		svy = velocityDest->GetVelocity().y * velocityDest->GetSpeed();
+	}
+	float sdx = svx * dtSeconds;
+	float sdy = svy * dtSeconds;
 
 	//
 	// NOTE: new m speed = original m speed - collide object speed
 	// 
+
 	float dx = mdx - sdx;
 	float dy = mdy - sdy;
+
+	if (dx == 0 && dy == 0)
+		return new CCollisionEvent(-1.0f, 0, 0, 0, 0, objDest, objSrc);
 
 	auto srcCollider = objSrc->GetComponent<ColliderComponent>();
 	auto destCollider = objDest->GetComponent<ColliderComponent>();
 
-	if (srcCollider && destCollider) {
-		srcCollider->GetBoundingBox(ml, mt, mr, mb);
-		destCollider->GetBoundingBox(sl, st, sr, sb);
-	}
+	if (!srcCollider || !destCollider)
+		return new CCollisionEvent(-1.0f, 0, 0, 0, 0, objDest, objSrc);
+
+	srcCollider->GetBoundingBox(ml, mt, mr, mb);
+	destCollider->GetBoundingBox(sl, st, sr, sb);
 
 	SweptAABB(
 		ml, mt, mr, mb,
@@ -165,7 +177,9 @@ LPCOLLISIONEVENT CCollision::SweptAABB(LPGAMEOBJECT objSrc, DWORD dt, LPGAMEOBJE
 		sl, st, sr, sb,
 		t, nx, ny
 	);
-
+	if (t >= 0.0f && t <= 1.0f) {
+		DebugOut(L"Collision detected! t=%.4f, nx=%.1f, ny=%.1f\n", t, nx, ny);
+	}
 	CCollisionEvent* e = new CCollisionEvent(t, nx, ny, dx, dy, objDest, objSrc);
 	return e;
 }
@@ -247,45 +261,50 @@ void CCollision::Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* co
 	coEvents.clear();
 
 	auto srcCollider = objSrc->GetComponent<ColliderComponent>();
+	auto srcTransform = objSrc->GetComponent<TransformComponent>();
+	auto srcVelocity = objSrc->GetComponent<VelocityComponent>();
+	auto scriptComp = objSrc->GetComponent<ScriptComponent>();
+
+	if (!srcTransform || !srcVelocity) return;
+
+	float x = srcTransform->GetPositionX();
+	float y = srcTransform->GetPositionY();
+
+	float vx = srcVelocity->GetVelocity().x;
+	float vy = srcVelocity->GetVelocity().y;
+	float speed = srcVelocity->GetSpeed();
+	float dtSeconds = dt / 1000.0f;
+	float dx = vx * speed * dtSeconds;
+	float dy = vy * speed * dtSeconds;
+
+	float initialX = x;
+	float initialY = y;
+
 	if (srcCollider && srcCollider->IsCollidable())
 	{
 		Scan(objSrc, dt, coObjects, coEvents);
 	}
 
-	auto scriptComp = objSrc->GetComponent<ScriptComponent>();
 	// No collision detected
 	if (coEvents.size() == 0)
 	{
+
 		if (scriptComp) {
 			scriptComp->OnNoCollision(dt);
 		}
+		// By default, velocity will handle the movement
+		return;
 	}
 	else
 	{
 		Filter(objSrc, coEvents, colX, colY);
 
-		float x, y, vx, vy, dx, dy;
-
-		auto transform = objSrc->GetComponent<TransformComponent>();
-		if (!transform) return;
-
-		x = transform->GetPositionX();
-		y = transform->GetPositionY();
-		
-		auto velocity = objSrc->GetComponent<VelocityComponent>();
-		if (!velocity) return;
-		vx = velocity->GetVelocity().x;
-		vy = velocity->GetVelocity().y;
-
-		dx = vx * dt;
-		dy = vy * dt;
 
 		if (colX != NULL && colY != NULL) 
 		{
 			if (colY->t < colX->t)	// was collision on Y first ?
 			{
-				y += colY->t * dy + colY->ny * BLOCK_PUSH_FACTOR;
-				transform->SetPosition(x, y);
+				y = initialY + colY->t * dy + colY->ny * BLOCK_PUSH_FACTOR;
 
 				if (scriptComp) {
 					scriptComp->OnCollisionWith(colY);
@@ -309,22 +328,23 @@ void CCollision::Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* co
 
 				if (colX_other != NULL)
 				{
-					x += colX_other->t * dx +colX_other->nx * BLOCK_PUSH_FACTOR;
+					x = initialX + colX_other->t * dx + colX_other->nx * BLOCK_PUSH_FACTOR;
 					if (scriptComp) {
 						scriptComp->OnCollisionWith(colX_other);
 					}
 				}
 				else
 				{
-					x += dx;
+					x = initialX + dx;
 				}
 			}
 			else // collision on X first
 			{
-				x += colX->t * dx + colX->nx * BLOCK_PUSH_FACTOR;
-				transform->SetPosition(x, y);
+				x = initialX + colX->t * dx + colX->nx * BLOCK_PUSH_FACTOR;
 
-				scriptComp->OnCollisionWith(colX);
+				if (scriptComp) {
+					scriptComp->OnCollisionWith(colX);
+				}
 
 				//
 				// see if after correction on X, is there still a collision on Y ? 
@@ -344,36 +364,45 @@ void CCollision::Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* co
 
 				if (colY_other != NULL)
 				{
-					y += colY_other->t * dy + colY_other->ny * BLOCK_PUSH_FACTOR;
-					scriptComp->OnCollisionWith(colY_other);
+					y = initialY + colY_other->t * dy + colY_other->ny * BLOCK_PUSH_FACTOR;
+
+					if (scriptComp) {
+						scriptComp->OnCollisionWith(colY_other);
+					}
 				}
 				else
 				{
-					y += dy;
+					y = initialY + dy;
 				}
 			}
 		}
 		else
 		if (colX != NULL)
 		{
-			x += colX->t * dx + colX->nx * BLOCK_PUSH_FACTOR;
-			y += dy;
-			scriptComp->OnCollisionWith(colX);
+			x = initialX + colX->t * dx + colX->nx * BLOCK_PUSH_FACTOR;
+			y = initialY + dy;
+
+			if (scriptComp) {
+				scriptComp->OnCollisionWith(colX);
+			}
 		}
 		else 
 			if (colY != NULL)
 			{
-				x += dx;
-				y += colY->t * dy + colY->ny * BLOCK_PUSH_FACTOR;
-				scriptComp->OnCollisionWith(colY);
+				x = initialX + dx;
+				y = initialY + colY->t * dy + colY->ny * BLOCK_PUSH_FACTOR;
+
+				if (scriptComp) {
+					scriptComp->OnCollisionWith(colY);
+				};
 			}
 			else // both colX & colY are NULL 
 			{
-				x += dx;
-				y += dy;
+				x = initialX + dx;
+				y = initialY + dy;
 			}
 
-			transform->SetPosition(x, y);
+			srcVelocity->MoveToPosition(x, y);
 	}
 
 	//

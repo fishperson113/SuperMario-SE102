@@ -13,3 +13,12 @@ void VelocityComponent::Update(float dt)
 	}
 
 }
+
+void VelocityComponent::MoveToPosition(float x, float y)
+{
+	auto transform = parentObject->GetComponent<TransformComponent>();
+	if (transform)
+	{
+		transform->SetPosition(x, y);
+	}
+}

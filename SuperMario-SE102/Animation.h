@@ -28,7 +28,7 @@ class CAnimation
 
 
 public:
-    CAnimation(int defaultTime) {
+    CAnimation(int defaultTime=100) {
         this->defaultTime = defaultTime;
         lastFrameTime = -1;
         currentFrame = -1;

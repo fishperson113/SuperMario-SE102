@@ -2,13 +2,13 @@
 
 #include "Game.h"
 #include "debug.h"
-//#include "Utils.h"
+#include "Utils.h"
 
 #include "Texture.h"
 #include "Animations.h"
-//#include "PlayScene.h"
+#include "PlayScene.h"
 
-CGame * CGame::__instance = NULL;
+CGame* CGame::__instance = NULL;
 
 /*
 	Initialize DirectX, create a Direct3D device for rendering within the window, initial Sprite library for
@@ -98,7 +98,7 @@ void CGame::Init(HWND hWnd, HINSTANCE hInstance)
 	//
 	//
 
-	D3D10_SAMPLER_DESC desc; 
+	D3D10_SAMPLER_DESC desc;
 	desc.Filter = D3D10_FILTER_MIN_MAG_POINT_MIP_LINEAR;
 	desc.AddressU = D3D10_TEXTURE_ADDRESS_CLAMP;
 	desc.AddressV = D3D10_TEXTURE_ADDRESS_CLAMP;
@@ -189,8 +189,8 @@ void CGame::Draw(float x, float y, LPTEXTURE tex, RECT* rect, float alpha, int s
 		sprite.TexSize.x = 1.0f;
 		sprite.TexSize.y = 1.0f;
 
-		if (spriteWidth==0) spriteWidth = tex->getWidth();
-		if (spriteHeight==0) spriteHeight = tex->getHeight();
+		if (spriteWidth == 0) spriteWidth = tex->getWidth();
+		if (spriteHeight == 0) spriteHeight = tex->getHeight();
 	}
 	else
 	{
@@ -249,7 +249,7 @@ LPTEXTURE CGame::LoadTexture(LPCWSTR texturePath)
 		return NULL;
 	}
 
-	D3DX10_IMAGE_LOAD_INFO info; 
+	D3DX10_IMAGE_LOAD_INFO info;
 	ZeroMemory(&info, sizeof(D3DX10_IMAGE_LOAD_INFO));
 	info.Width = imageInfo.Width;
 	info.Height = imageInfo.Height;
@@ -440,25 +440,25 @@ void CGame::ProcessKeyboard()
 
 void CGame::_ParseSection_SETTINGS(string line)
 {
-	/*vector<string> tokens = split(line);
+	vector<string> tokens = split(line);
 
 	if (tokens.size() < 2) return;
 	if (tokens[0] == "start")
 		next_scene = atoi(tokens[1].c_str());
 	else
-		DebugOut(L"[ERROR] Unknown game setting: %s\n", ToWSTR(tokens[0]).c_str());*/
+		DebugOut(L"[ERROR] Unknown game setting: %s\n", ToWSTR(tokens[0]).c_str());
 }
 
 void CGame::_ParseSection_SCENES(string line)
 {
-	//vector<string> tokens = split(line);
+	vector<string> tokens = split(line);
 
-	//if (tokens.size() < 2) return;
-	//int id = atoi(tokens[0].c_str());
-	//LPCWSTR path = ToLPCWSTR(tokens[1]);   // file: ASCII format (single-byte char) => Wide Char
+	if (tokens.size() < 2) return;
+	int id = atoi(tokens[0].c_str());
+	LPCWSTR path = ToLPCWSTR(tokens[1]);   // file: ASCII format (single-byte char) => Wide Char
 
-	//LPSCENE scene = new CPlayScene(id, path);
-	//scenes[id] = scene;
+	LPSCENE scene = new CPlayScene(id, path);
+	scenes[id] = scene;
 }
 
 /*
@@ -466,51 +466,51 @@ void CGame::_ParseSection_SCENES(string line)
 */
 void CGame::Load(LPCWSTR gameFile)
 {
-	//DebugOut(L"[INFO] Start loading game file : %s\n", gameFile);
+	DebugOut(L"[INFO] Start loading game file : %s\n", gameFile);
 
-	//ifstream f;
-	//f.open(gameFile);
-	//char str[MAX_GAME_LINE];
+	ifstream f;
+	f.open(gameFile);
+	char str[MAX_GAME_LINE];
 
-	//// current resource section flag
-	//int section = GAME_FILE_SECTION_UNKNOWN;
+	// current resource section flag
+	int section = GAME_FILE_SECTION_UNKNOWN;
 
-	//while (f.getline(str, MAX_GAME_LINE))
-	//{
-	//	string line(str);
+	while (f.getline(str, MAX_GAME_LINE))
+	{
+		string line(str);
 
-	//	if (line[0] == '#') continue;	// skip comment lines	
+		if (line[0] == '#') continue;	// skip comment lines	
 
-	//	if (line == "[SETTINGS]") { section = GAME_FILE_SECTION_SETTINGS; continue; }
-	//	if (line == "[TEXTURES]") { section = GAME_FILE_SECTION_TEXTURES; continue; }
-	//	if (line == "[SCENES]") { section = GAME_FILE_SECTION_SCENES; continue; }
-	//	if (line[0] == '[') 
-	//	{ 
-	//		section = GAME_FILE_SECTION_UNKNOWN; 
-	//		DebugOut(L"[ERROR] Unknown section: %s\n", ToLPCWSTR(line));
-	//		continue; 
-	//	}
+		if (line == "[SETTINGS]") { section = GAME_FILE_SECTION_SETTINGS; continue; }
+		if (line == "[TEXTURES]") { section = GAME_FILE_SECTION_TEXTURES; continue; }
+		if (line == "[SCENES]") { section = GAME_FILE_SECTION_SCENES; continue; }
+		if (line[0] == '[')
+		{
+			section = GAME_FILE_SECTION_UNKNOWN;
+			DebugOut(L"[ERROR] Unknown section: %s\n", ToLPCWSTR(line));
+			continue;
+		}
 
-	//	//
-	//	// data section
-	//	//
-	//	switch (section)
-	//	{
-	//	case GAME_FILE_SECTION_SETTINGS: _ParseSection_SETTINGS(line); break;
-	//	case GAME_FILE_SECTION_SCENES: _ParseSection_SCENES(line); break;
-	//	case GAME_FILE_SECTION_TEXTURES: _ParseSection_TEXTURES(line); break;
-	//	}
-	//}
-	//f.close();
+		//
+		// data section
+		//
+		switch (section)
+		{
+		case GAME_FILE_SECTION_SETTINGS: _ParseSection_SETTINGS(line); break;
+		case GAME_FILE_SECTION_SCENES: _ParseSection_SCENES(line); break;
+		case GAME_FILE_SECTION_TEXTURES: _ParseSection_TEXTURES(line); break;
+		}
+	}
+	f.close();
 
-	//DebugOut(L"[INFO] Loading game file : %s has been loaded successfully\n", gameFile);
+	DebugOut(L"[INFO] Loading game file : %s has been loaded successfully\n", gameFile);
 
-	//SwitchScene();
+	SwitchScene();
 }
 
 void CGame::SwitchScene()
 {
-	/*if (next_scene < 0 || next_scene == current_scene) return; 
+	if (next_scene < 0 || next_scene == current_scene) return;
 
 	DebugOut(L"[INFO] Switching to scene %d\n", next_scene);
 
@@ -522,7 +522,7 @@ void CGame::SwitchScene()
 	current_scene = next_scene;
 	LPSCENE s = scenes[next_scene];
 	this->SetKeyHandler(s->GetKeyEventHandler());
-	s->Load();*/
+	s->Load();
 }
 
 void CGame::InitiateSwitchScene(int scene_id)
@@ -533,14 +533,14 @@ void CGame::InitiateSwitchScene(int scene_id)
 
 void CGame::_ParseSection_TEXTURES(string line)
 {
-	/*vector<string> tokens = split(line);
+	vector<string> tokens = split(line);
 
 	if (tokens.size() < 2) return;
 
 	int texID = atoi(tokens[0].c_str());
 	wstring path = ToWSTR(tokens[1]);
 
-	CTextures::GetInstance()->Add(texID, path.c_str());*/
+	CTextures::GetInstance()->Add(texID, path.c_str());
 }
 
 

@@ -67,6 +67,7 @@ private:
 //Monobehaviour
 class ScriptComponent : public Component
 {
+	//ObjectManager coObjectManager;
 public:
     virtual void Update(float dt) = 0;
     virtual void Awake()=0;

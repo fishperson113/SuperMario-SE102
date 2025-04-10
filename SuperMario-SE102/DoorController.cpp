@@ -2,31 +2,7 @@
 
 void DoorController::Update(float dt)
 {
-    switch (state) {
-    case DoorState::Closed:
-        if (IsMarioInRange()) {
-            SetState(DoorState::Opening);
-        }
-        break;
 
-    case DoorState::Opening:
-        if (animComponent->GetCurrentAnimation()->IsFinished()) {
-            SetState(DoorState::Open);
-        }
-        break;
-
-    case DoorState::Open:
-        if (!IsMarioInRange()) {
-            SetState(DoorState::Closing);
-        }
-        break;
-
-    case DoorState::Closing:
-        if (animComponent->GetCurrentAnimation()->IsFinished()) {
-            SetState(DoorState::Closed);
-        }
-        break;
-    }
 }
 
 void DoorController::Awake()
@@ -41,21 +17,6 @@ void DoorController::Start()
 {
 }
 
-bool DoorController::IsMarioInRange() const
-{
-	extern CGameObject* mario;
-    if (!mario || !parentObject || !mario->IsActive()) return false;
-
-    auto doorTransform = parentObject->GetComponent<TransformComponent>();
-    auto marioTransform = mario->GetComponent<TransformComponent>();
-    if (!doorTransform || !marioTransform) return false;
-
-    float dx = doorTransform->GetPositionX() - marioTransform->GetPositionX();
-    float dy = doorTransform->GetPositionY() - marioTransform->GetPositionY();
-
-    float distanceSquared = dx * dx + dy * dy;
-    return distanceSquared <= collisionRange * collisionRange;
-}
 
 void DoorController::SetState(DoorState newState)
 {

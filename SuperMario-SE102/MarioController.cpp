@@ -1,6 +1,5 @@
 #include "MarioController.h"
 #include"debug.h"
-extern vector<LPGAMEOBJECT>* coObjects;
 
 void MarioController::Update(float dt)
 {
@@ -48,14 +47,6 @@ void MarioController::Update(float dt)
 		animation->SetCurrentAnimation(ani);
 	}
 
-	if (collider && velocity && coObjects)
-	{
-		velocity->SetEnabled(false);
-	
-		CCollision::GetInstance()->Process(this->GetParentObject(), dt, coObjects);
-
-		velocity->SetEnabled(true);
-	}
 }
 
 void MarioController::Awake()

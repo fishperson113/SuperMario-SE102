@@ -16,7 +16,6 @@ public:
 	void Start() override;
 	void Render() override {};
 private:
-	bool IsMarioInRange() const;
 	void SetState(DoorState newState);
 private:
 	DoorState state;

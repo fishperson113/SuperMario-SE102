@@ -5,6 +5,7 @@
 
 CCoin::CCoin()
 {
+	this->active = true;
 	AddComponent<TransformComponent>();
 	AddComponent<AnimationComponent>();
 }

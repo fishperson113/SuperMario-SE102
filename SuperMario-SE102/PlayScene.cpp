@@ -172,6 +172,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 	// General object setup
 	if (obj == NULL) return;
+	
 	auto transform = obj->GetComponent<TransformComponent>();
 	transform->SetPosition(x, y);
 
@@ -264,10 +265,10 @@ void CPlayScene::Update(DWORD dt)
 	{
 		objects[i]->Update(dt);
 	}
+	
 
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return; 
-
 	// Update camera to follow mario
 	float cx, cy;
 	auto transform = player->GetComponent<TransformComponent>();

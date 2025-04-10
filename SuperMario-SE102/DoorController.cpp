@@ -1,4 +1,5 @@
 #include "DoorController.h"
+#include "Mario.h"
 
 void DoorController::Update(float dt)
 {
@@ -43,7 +44,8 @@ void DoorController::Start()
 
 bool DoorController::IsMarioInRange() const
 {
-	extern CGameObject* mario;
+	//extern CGameObject* mario;
+    extern CMario* mario;
     if (!mario || !parentObject || !mario->IsActive()) return false;
 
     auto doorTransform = parentObject->GetComponent<TransformComponent>();

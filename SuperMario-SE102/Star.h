@@ -9,11 +9,6 @@ class CStar : public CGameObject
 public:
 	CStar();
 	~CStar();
-
-	void Update(DWORD dt);
-	void Render();
-	void Start();
-	void Awake();
 private:
 };
 

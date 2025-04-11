@@ -3,6 +3,7 @@
 #include "Animation.h"
 #include "Animations.h"
 #include "AssetIDs.h"
+#include "TurtleController.h"
 
 #define TURTLE_WIDTH 10
 #define TURTLE_BBOX_WIDTH 10
@@ -16,9 +17,8 @@ public:
 
 	void Update(DWORD dt);
 	void Render();
-	void Start();
 	void Awake();
 private:
-	void Move();
+	TurtleController* turtleController;
 };
 

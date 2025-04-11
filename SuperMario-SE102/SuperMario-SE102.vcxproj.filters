@@ -185,7 +185,10 @@
     <ClInclude Include="Star.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ObjectManager.h">
+    <ClInclude Include="GoombaController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TurtleController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

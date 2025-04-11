@@ -1,7 +1,7 @@
 #pragma once
 
-#include "KeyEventHandler.h"
 #include "Scene.h"
+
 class CSampleKeyHandler: public CSceneKeyHandler
 {
 public:

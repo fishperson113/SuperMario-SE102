@@ -4,8 +4,6 @@
 #include <d3dx10.h>
 #include <vector>
 #include "Texture.h"
-#include "Animation.h"
-#include "Animations.h"
 class Component;
 
 class CGameObject

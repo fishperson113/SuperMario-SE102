@@ -2,9 +2,9 @@
 #include "Game.h"
 #include "debug.h"
 
-CSprites * CSprites::__instance = NULL;
+CSprites* CSprites::__instance = NULL;
 
-CSprites *CSprites::GetInstance()
+CSprites* CSprites::GetInstance()
 {
 	if (__instance == NULL) __instance = new CSprites();
 	return __instance;
@@ -21,6 +21,9 @@ LPSPRITE CSprites::Get(int id)
 	return sprites[id];
 }
 
+/*
+	Clear all loaded sprites
+*/
 void CSprites::Clear()
 {
 	for (auto x : sprites)

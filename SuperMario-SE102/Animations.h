@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Animation.h"
-#include "Sprite.h"
 
 class CAnimations
 {

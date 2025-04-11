@@ -3,7 +3,9 @@
 #include"GameObject.h"
 #include"Game.h"
 #include"Collision.h"
-#define ID_TEX_BBOX 100
+#include"Animation.h"
+#include"Animations.h"
+#include"AssetIDs.h"
 class VECTOR2
 {
 public:
@@ -132,6 +134,7 @@ public:
     void Update(float dt) override {};
     void Render() override;
 
+public:
     void SetBoundingBox(float left, float top, float width, float height);
     void GetBoundingBox(float& left, float& top, float& right, float& bottom) const;
 

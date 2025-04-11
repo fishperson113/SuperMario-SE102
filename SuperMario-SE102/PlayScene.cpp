@@ -15,7 +15,6 @@ using namespace std;
 CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 	CScene(id, filePath)
 {
-	player = NULL;
 	key_handler = new CSampleKeyHandler(this);
 }
 
@@ -104,19 +103,19 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	switch (object_type)
 	{
 	case OBJECT_TYPE_MARIO:
-		//if (player!=NULL) 
-		//{
-		//	DebugOut(L"[ERROR] MARIO object was created before!\n");
-		//	return;
-		//}
-		//obj = new CMario(x,y); 
-		//player = (CMario*)obj;  
+		if (objectManager->GetPlayer() !=NULL)
+		{
+			DebugOut(L"[ERROR] MARIO object was created before!\n");
+			return;
+		}
+		obj = new CMario(); 
+		objectManager->AddPlayer(obj);
 
-		//DebugOut(L"[INFO] Player object has been created!\n");
+		DebugOut(L"[INFO] Player object has been created!\n");
 		break;
-	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(); break;
+	case OBJECT_TYPE_GOOMBA: /*obj = new CGoomba();*/ break;
 	case OBJECT_TYPE_BRICK: obj = new CBrick(); break;
-	case OBJECT_TYPE_COIN: obj = new CCoin(); break;
+	case OBJECT_TYPE_COIN: /*obj = new CCoin();*/ break;
 	
 	case OBJECT_TYPE_PIPE:
 	{
@@ -177,7 +176,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	transform->SetPosition(x, y);
 
 
-	objects.push_back(obj);
+	objectManager->Add(obj);
 }
 
 void CPlayScene::LoadAssets(LPCWSTR assetFile)
@@ -255,30 +254,20 @@ void CPlayScene::Update(DWORD dt)
 	// We know that Mario is the first object in the list hence we won't add him into the colliable object list
 	// TO-DO: This is a "dirty" way, need a more organized way 
 
-	vector<LPGAMEOBJECT> coObjects;
-	for (size_t i = 1; i < objects.size(); i++)
-	{
-		coObjects.push_back(objects[i]);
-	}
-
-	for (size_t i = 0; i < objects.size(); i++)
-	{
-		objects[i]->Update(dt);
-	}
-	
+	objectManager->Update(dt);
 
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
-	if (player == NULL) return; 
+	if (objectManager->GetPlayer() == NULL) return;
 	// Update camera to follow mario
 	float cx, cy;
+	auto player = objectManager->GetPlayer();
 	auto transform = player->GetComponent<TransformComponent>();
-	cx=transform->GetPositionX();
+	cx = transform->GetPositionX();
 	cy = transform->GetPositionY();
 
 	CGame *game = CGame::GetInstance();
 	cx -= game->GetBackBufferWidth() / 2;
 	cy -= game->GetBackBufferHeight() / 2;
-
 	if (cx < 0) cx = 0;
 
 	CGame::GetInstance()->SetCamPos(cx, 0.0f /*cy*/);
@@ -288,8 +277,7 @@ void CPlayScene::Update(DWORD dt)
 
 void CPlayScene::Render()
 {
-	for (int i = 0; i < objects.size(); i++)
-		objects[i]->Render();
+	objectManager->Render();
 }
 
 /*
@@ -297,12 +285,7 @@ void CPlayScene::Render()
 */
 void CPlayScene::Clear()
 {
-	vector<LPGAMEOBJECT>::iterator it;
-	for (it = objects.begin(); it != objects.end(); it++)
-	{
-		delete (*it);
-	}
-	objects.clear();
+	objectManager->Clear();
 }
 
 /*
@@ -313,12 +296,7 @@ void CPlayScene::Clear()
 */
 void CPlayScene::Unload()
 {
-	for (int i = 0; i < objects.size(); i++)
-		delete objects[i];
-
-	objects.clear();
-	player = NULL;
-
+	objectManager->Clear();
 	DebugOut(L"[INFO] Scene %d unloaded! \n", id);
 }
 
@@ -326,20 +304,5 @@ bool CPlayScene::IsGameObjectDeleted(const LPGAMEOBJECT& o) { return o == NULL; 
 
 void CPlayScene::PurgeDeletedObjects()
 {
-	vector<LPGAMEOBJECT>::iterator it;
-	for (it = objects.begin(); it != objects.end(); it++)
-	{
-		LPGAMEOBJECT o = *it;
-		if (!o->IsActive())
-		{
-			delete o;
-			*it = NULL;
-		}
-	}
-
-	// NOTE: remove_if will swap all deleted items to the end of the vector
-	// then simply trim the vector, this is much more efficient than deleting individual items
-	objects.erase(
-		std::remove_if(objects.begin(), objects.end(), CPlayScene::IsGameObjectDeleted),
-		objects.end());
+	objectManager->PurgeDeletedObjects();
 }

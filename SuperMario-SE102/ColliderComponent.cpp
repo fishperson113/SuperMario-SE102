@@ -27,9 +27,10 @@ void ColliderComponent::Render()
     float cx, cy;
     CGame::GetInstance()->GetCamPos(cx, cy);
 
-    float width = r - l;
-    float height = b - t;
-    CGame::GetInstance()->Draw(l - cx, t - cy, bbox, 0, 0, (int)width, (int)height, 0.25f);
+    float x = transform->GetPositionX();
+	float y = transform->GetPositionY();
+
+    CGame::GetInstance()->Draw(x - cx, y - cy, bbox, &rect, 0.25);
 }
 
 void ColliderComponent::SetBoundingBox(float left, float top, float width, float height)

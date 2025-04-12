@@ -51,8 +51,8 @@ private:
 class VelocityComponent : public Component
 {
 public:
-    VelocityComponent() : velX(0), velY(0), speed(1.0f),
-        useGravity(false), gravityAccel(0.002f),
+    VelocityComponent() : velX(0), velY(0), speed(0.1f),
+        useGravity(true), gravityAccel(0.002f),
         maxFallingSpeed(0.5f), isOnGround(false) {
     }
     VelocityComponent(float vx, float vy, float spd) : velX(vx), velY(vy), speed(spd),
@@ -65,9 +65,9 @@ public:
     void SetSpeed(float spd) { speed = spd; }
     float GetSpeed() const { return speed; }
     void Update(float dt) override;
-    void UpdatePosition(float dt);
 	void Render() override {}
 
+    void UpdatePosition(float dt);
     void MoveToPosition(float x, float y);
 
     void EnableGravity(bool enable);
@@ -87,7 +87,6 @@ private:
 //Monobehaviour
 class ScriptComponent : public Component
 {
-	//ObjectManager coObjectManager;
 public:
     virtual void Update(float dt) = 0;
     virtual void Awake()=0;
@@ -96,13 +95,13 @@ public:
 
     // When no collision has been detected (triggered by CCollision::Process)
     virtual void OnNoCollision(DWORD dt) { 
-
+        auto velocity = parentObject->GetComponent<VelocityComponent>();
+		if (!velocity) return;
+        velocity->UpdatePosition(dt);
     };
 
     // When collision with an object has been detected (triggered by CCollision::Process)
-    virtual void OnCollisionWith(LPCOLLISIONEVENT e) { 
-
-    };
+    virtual void OnCollisionWith(LPCOLLISIONEVENT e);
 };
 
 class AnimationComponent : public Component

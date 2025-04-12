@@ -17,9 +17,8 @@ void VelocityComponent::UpdatePosition(float dt)
 	auto transform = parentObject->GetComponent<TransformComponent>();
 	if (transform)
 	{
-		float dtSeconds = dt / 1000.0f;
-		float newX = transform->GetPositionX() + velX * speed * dtSeconds;
-		float newY = transform->GetPositionY() + velY * speed * dtSeconds;
+		float newX = transform->GetPositionX() + velX * speed * dt;
+		float newY = transform->GetPositionY() + velY * speed * dt;
 		transform->SetPosition(newX, newY);
 	}
 

@@ -30,18 +30,13 @@ void CGameObject::Render()
 	auto transform = GetComponent<TransformComponent>();
 	if (transform == nullptr) return;
 
-	auto collider = GetComponent<ColliderComponent>();
-	if (collider) {
-		collider->Render();
-	}
 	auto animComponent = GetComponent<AnimationComponent>();
 	if (animComponent) {
 		animComponent->Render();
-		return;
 	}
-	auto spriteComponent = GetComponent<SpriteComponent>();
-	if (spriteComponent) {
-		spriteComponent->Render();
+	auto collider = GetComponent<ColliderComponent>();
+	if (collider) {
+		collider->Render();
 	}
 }
 

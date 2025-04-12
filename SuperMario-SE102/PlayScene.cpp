@@ -9,7 +9,7 @@
 #include "Coin.h"
 #include "SampleKeyEventHandler.h"
 #include"Component.h"
-
+#include"Koopas.h"
 using namespace std;
 
 CPlayScene::CPlayScene(int id, LPCWSTR filePath):
@@ -92,7 +92,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	vector<string> tokens = split(line);
 
 	// skip invalid lines - an object set must have at least id, x, y
-	if (tokens.size() < 2) return;
+	if (tokens.size() < 3) return;
 
 	int object_type = atoi(tokens[0].c_str());
 	float x = (float)atof(tokens[1].c_str());
@@ -114,9 +114,32 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		DebugOut(L"[INFO] Player object has been created!\n");
 		break;
 	case OBJECT_TYPE_GOOMBA: /*obj = new CGoomba();*/ break;
-	case OBJECT_TYPE_BRICK: obj = new CBrick(); break;
+	case OBJECT_TYPE_BRICK:
+		if (tokens.size() >= 6) {
+			int numBricks = atoi(tokens[3].c_str());
+			float offsetX = (float)atof(tokens[4].c_str());
+			float offsetY = (float)atof(tokens[5].c_str());
+
+			for (int i = 0; i < numBricks; i++) {
+				CGameObject* brick = new CBrick();
+				auto transform = brick->GetComponent<TransformComponent>();
+
+				float brickX = x + (i * offsetX);
+				float brickY = y + (i * offsetY);
+				transform->SetPosition(brickX, brickY);
+
+				objectManager->Add(brick);
+				DebugOut(L"[INFO] Created brick %d at position (%f, %f)\n", i, brickX, brickY);
+			}
+
+			return;
+		}
+		else {
+			obj = new CBrick();
+		}
+		break;
 	case OBJECT_TYPE_COIN: /*obj = new CCoin();*/ break;
-	
+	case OBJECT_TYPE_KOOPAS: obj = new Koopas(); break;
 	case OBJECT_TYPE_PIPE:
 	{
 

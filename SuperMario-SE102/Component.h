@@ -51,20 +51,38 @@ private:
 class VelocityComponent : public Component
 {
 public:
-    VelocityComponent() : velX(0), velY(0), speed(1.0f) {}
-    VelocityComponent(float vx, float vy, float spd) : velX(vx), velY(vy), speed(spd) {}
+    VelocityComponent() : velX(0), velY(0), speed(1.0f),
+        useGravity(false), gravityAccel(0.002f),
+        maxFallingSpeed(0.5f), isOnGround(false) {
+    }
+    VelocityComponent(float vx, float vy, float spd) : velX(vx), velY(vy), speed(spd),
+        useGravity(false), gravityAccel(0.002f),
+        maxFallingSpeed(0.5f), isOnGround(false) {
+    }
 
     void SetVelocity(float vx, float vy) { velX = vx; velY = vy; }
     VECTOR2 GetVelocity() const { return VECTOR2(velX, velY); }
     void SetSpeed(float spd) { speed = spd; }
     float GetSpeed() const { return speed; }
     void Update(float dt) override;
+    void UpdatePosition(float dt);
 	void Render() override {}
 
     void MoveToPosition(float x, float y);
+
+    void EnableGravity(bool enable);
+    void SetGravityAcceleration(float accel);
+    void SetMaxFallingSpeed(float maxSpeed);
+    void SetGrounded(bool grounded);
+    bool IsGrounded() const;
 private:
     float velX, velY;
     float speed;
+
+    bool useGravity;
+    float gravityAccel;
+    float maxFallingSpeed;
+    bool isOnGround;
 };
 //Monobehaviour
 class ScriptComponent : public Component
@@ -77,10 +95,14 @@ public:
 	virtual void Render() = 0;
 
     // When no collision has been detected (triggered by CCollision::Process)
-    virtual void OnNoCollision(DWORD dt) {};
+    virtual void OnNoCollision(DWORD dt) { 
+
+    };
 
     // When collision with an object has been detected (triggered by CCollision::Process)
-    virtual void OnCollisionWith(LPCOLLISIONEVENT e) {};
+    virtual void OnCollisionWith(LPCOLLISIONEVENT e) { 
+
+    };
 };
 
 class AnimationComponent : public Component

@@ -55,12 +55,12 @@ void ObjectManager::Clear()
 void ObjectManager::Update(DWORD dt)
 {
 
+    ProcessCollisions(dt);
     for (auto obj : objects)
     {
         obj->Update(dt);
     }
 
-    ProcessCollisions(dt);
 }
 
 void ObjectManager::Render()

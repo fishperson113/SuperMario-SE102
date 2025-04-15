@@ -1,5 +1,6 @@
 #include "MarioController.h"
 #include"debug.h"
+#include"KoopasController.h"
 
 void MarioController::Update(float dt)
 {
@@ -15,6 +16,7 @@ void MarioController::Update(float dt)
 	// Get current velocity values
 	VECTOR2 currentVelocity = velocity->GetVelocity();
 
+	velocity->SetGrounded(false);
 	// Reset horizontal velocity if no keys are pressed (simulate friction)
 	if (!isLeftPressed && !isRightPressed) {
 		currentVelocity.x = 0.0f;
@@ -27,7 +29,6 @@ void MarioController::Update(float dt)
 	}
 
 	velocity->SetVelocity(currentVelocity.x, currentVelocity.y);
-
 
 	LPANIMATION ani=nullptr;
 	auto animation = parentObject->GetComponent<AnimationComponent>();
@@ -52,16 +53,13 @@ void MarioController::Update(float dt)
 void MarioController::Awake()
 {
 	auto transform = parentObject->AddComponent<TransformComponent>();
-	transform->SetPosition(10.0f, 130.0f);
-
 	auto velocity=parentObject->AddComponent<VelocityComponent>();
 	parentObject->AddComponent<AnimationComponent>();
-	moveSpeed = 100.0f;
+	moveSpeed = 0.1f;
 	velocity->SetSpeed(moveSpeed);
-	velocity->SetVelocity(0.0f, 0.0f);
 
 	auto collider = parentObject->AddComponent<ColliderComponent>();
-	collider->SetBoundingBox(0, 0, 25, 25);
+	collider->SetBoundingBox(0, 0, 15, 22);
 }
 
 void MarioController::Start()
@@ -69,25 +67,39 @@ void MarioController::Start()
 }
 void MarioController::OnCollisionWith(LPCOLLISIONEVENT e)
 {
-	if (!e->obj->GetComponent<ColliderComponent>()->IsBlocking()) return;
+	ScriptComponent::OnCollisionWith(e);
 
 	auto velocity = parentObject->GetComponent<VelocityComponent>();
 	if (!velocity) return;
 
-	if (e->ny != 0) 
+	VECTOR2 currentVel = velocity->GetVelocity();
+	if (e->ny < 0)
 	{
-		VECTOR2 currentVel = velocity->GetVelocity();
 		velocity->SetVelocity(currentVel.x, 0.0f);
 
-		if (e->ny < 0) {
-			DebugOut(L"Mario is on ground\n");
-		}
+		velocity->SetGrounded(true);
 	}
-	else if (e->nx != 0) 
+	else if (e->ny > 0) {
+		velocity->SetVelocity(currentVel.x, 0.0f);
+	}
+	else if (e->nx != 0)
 	{
-		VECTOR2 currentVel = velocity->GetVelocity();
 		velocity->SetVelocity(0.0f, currentVel.y);
-
-		DebugOut(L"Horizontal collision detected: nx=%.1f\n", e->nx);
 	}
+
+	if (e->obj->GetComponent<KoopasController>())
+		OnCollisionWithKoopas(e);
+}
+
+void MarioController::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
+{
+	DebugOut(L"Collision with Koopas detected: nx=%.1f, ny=%.1f\n", e->nx, e->ny);
+}
+
+void MarioController::OnCollisionWithCoin(LPCOLLISIONEVENT e)
+{
+}
+
+void MarioController::OnCollisionWithPortal(LPCOLLISIONEVENT e)
+{
 }

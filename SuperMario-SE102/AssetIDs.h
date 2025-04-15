@@ -18,6 +18,7 @@
 #define OBJECT_TYPE_COIN 4
 #define OBJECT_TYPE_PLATFORM 5
 #define OBJECT_TYPE_PIPE 6
+#define OBJECT_TYPE_JUMPINGGOOMBA 7
 #define OBJECT_TYPE_PORTAL	50
 
 #define ID_SPRITE_MARIO 10000
@@ -148,3 +149,13 @@
 
 #define ID_SPRITE_TURTLE 130000
 #define ID_ANI_TURTLE 150000
+
+#define platformBeginAnimId 200000
+#define platformMiddleAnimId 200001
+#define platformEndAnimId 200002
+
+#define pipeBeginAnimId 200003
+#define pipeMiddleAnimId 200004
+#define pipeEndAnimId 200005
+
+#define ID_ANI_PORTAL 200006

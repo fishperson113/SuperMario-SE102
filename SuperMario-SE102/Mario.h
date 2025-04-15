@@ -10,11 +10,5 @@ class CMario : public CGameObject
 public:
     CMario();
     ~CMario();
-
-    void Awake();
-    void Update(DWORD dt);
-    void Render();
-private:
-    MarioController* marioController;
 };
 

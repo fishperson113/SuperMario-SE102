@@ -1,5 +1,11 @@
 #include "MarioController.h"
 #include"debug.h"
+#include "Coin.h"
+#include <typeinfo>
+#include "Goomba.h"
+#include "Koopas.h"
+#include "Coin.h"
+#include "Portal.h"
 
 void MarioController::Update(float dt)
 {
@@ -22,8 +28,8 @@ void MarioController::Update(float dt)
 	else {
 		// Apply movement based on input
 		currentVelocity.x = 0.0f;
-		if (isLeftPressed) currentVelocity.x -= 1.0f;
-		if (isRightPressed) currentVelocity.x += 1.0f;
+		if (isLeftPressed) currentVelocity.x -= 100.0f;
+		if (isRightPressed) currentVelocity.x += 100.0f;
 	}
 
 	velocity->SetVelocity(currentVelocity.x, currentVelocity.y);
@@ -60,8 +66,8 @@ void MarioController::Awake()
 	velocity->SetSpeed(moveSpeed);
 	velocity->SetVelocity(0.0f, 0.0f);
 
-	auto collider = parentObject->AddComponent<ColliderComponent>();
-	collider->SetBoundingBox(0, 0, 25, 25);
+	//auto collider = parentObject->AddComponent<ColliderComponent>();
+	//collider->SetBoundingBox(0, 0, 25, 25);
 }
 
 void MarioController::Start()
@@ -83,11 +89,58 @@ void MarioController::OnCollisionWith(LPCOLLISIONEVENT e)
 			DebugOut(L"Mario is on ground\n");
 		}
 	}
-	else if (e->nx != 0) 
+	else if (e->nx != 0)
 	{
 		VECTOR2 currentVel = velocity->GetVelocity();
 		velocity->SetVelocity(0.0f, currentVel.y);
 
 		DebugOut(L"Horizontal collision detected: nx=%.1f\n", e->nx);
 	}
+
+	if (typeid(*e->obj) == typeid(CCoin)) {
+		DebugOut(L"Collision with Coin detected\n");
+		OnCollisionWithCoin(e);
+	}
+	else if (typeid(*e->obj) == typeid(CGoomba)) {
+		DebugOut(L"Collision with Goomba detected\n");
+		OnCollisionWithGoomba(e);
+	}
+	else if (typeid(*e->obj) == typeid(Koopas)) {
+		DebugOut(L"Collision with Koopas detected\n");
+		OnCollisionWithKoopas(e);
+	}
+	else if (typeid(*e->obj) == typeid(CPortal))
+	{
+		DebugOut(L"Collision with Portal detected\n");
+		OnCollisionWithPortal(e);
+	}
+	else
+	{
+		DebugOut(L"Collision with unknown object detected\n");
+	}
+}
+
+void MarioController::OnCollisionWithCoin(LPCOLLISIONEVENT e)
+{
+	CCoin* coin = static_cast<CCoin*>(e->obj);
+	coin->Deactivate();
+	//coin++;
+}
+
+void MarioController::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
+{
+	CGoomba* goomba = static_cast<CGoomba*>(e->obj);
+	goomba->Deactivate();
+}
+
+void MarioController::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
+{
+	Koopas* koopas = static_cast<Koopas*>(e->obj);
+	koopas->Deactivate();
+}
+
+void MarioController::OnCollisionWithPortal(LPCOLLISIONEVENT e)
+{
+	CPortal* portal = static_cast<CPortal*>(e->obj);
+	CGame::GetInstance()->InitiateSwitchScene(portal->GetSceneId());
 }

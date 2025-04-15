@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+
 class KoopasController :public ScriptComponent
 {
 public:

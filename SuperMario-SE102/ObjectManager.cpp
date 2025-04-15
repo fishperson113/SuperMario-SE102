@@ -1,6 +1,10 @@
 #include "ObjectManager.h"
 #include "debug.h"
 #include <algorithm>
+#include <typeinfo>
+#include "Platform.h"
+#include "Goomba.h"
+#include "Koopas.h"
 
 ObjectManager::ObjectManager() : player(nullptr)
 {

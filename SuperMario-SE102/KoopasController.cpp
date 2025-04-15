@@ -1,4 +1,6 @@
 #include "KoopasController.h"
+#include <typeinfo>
+#include "Coin.h"
 
 void KoopasController::Update(float dt)
 {
@@ -25,6 +27,8 @@ void KoopasController::Start()
 
 void KoopasController::OnCollisionWith(LPCOLLISIONEVENT e)
 {
+	if (!e->obj->GetComponent<ColliderComponent>()->IsBlocking()) return;
+
 	ScriptComponent::OnCollisionWith(e);
     auto velocity = parentObject->GetComponent<VelocityComponent>();
     if (!velocity) return;

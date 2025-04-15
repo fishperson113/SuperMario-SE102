@@ -1,4 +1,5 @@
 #include "Animations.h"
+#include "debug.h"
 
 CAnimations* CAnimations::__instance = NULL;
 
@@ -11,6 +12,7 @@ CAnimations* CAnimations::GetInstance()
 void CAnimations::Add(int id, LPANIMATION ani)
 {
 	animations[id] = ani;
+	DebugOut(L"[DEBUG] Added animation with ID: %d\n", id);
 }
 
 LPANIMATION CAnimations::Get(int id)

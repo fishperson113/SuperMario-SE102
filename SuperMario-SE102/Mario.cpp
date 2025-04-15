@@ -9,4 +9,3 @@ CMario::CMario()
 CMario::~CMario()
 {
 }
-

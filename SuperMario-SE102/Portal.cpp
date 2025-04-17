@@ -14,6 +14,7 @@ CPortal::CPortal(float l, float t, float r, float b, int scene_id)
 
 	auto collider = AddComponent<ColliderComponent>();
 	collider->SetBoundingBox(0, 0, 25, 25);
+	collider->SetCollidable(false);
 
 	auto animation = AddComponent<AnimationComponent>();
 	LPANIMATION ani = CAnimations::GetInstance()->Get(ID_ANI_PORTAL);

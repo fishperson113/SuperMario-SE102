@@ -14,7 +14,7 @@ CPipe::CPipe(float x, float y, float cell_width, float cell_height, int length, 
 	this->spriteIdBegin = sprite_id_begin;
 	this->spriteIdMiddle = sprite_id_middle;
 	this->spriteIdEnd = sprite_id_end;
-	
+
 	auto animation = AddComponent<AnimationComponent>();
 
 	auto transform = AddComponent<TransformComponent>();
@@ -28,9 +28,9 @@ CPipe::CPipe(float x, float y, float cell_width, float cell_height, int length, 
 
 	LPANIMATION ani = new CAnimation(100);
 	ani->CreateFrame(500);
-	for (int i = - this->length / 2; i < this->length / 2; i++)
-		ani->AddSprite(51001, 0, - this->cellHeight * i);
-	ani->AddSprite(52001, 0, - this->cellHeight * (length / 2));
+	ani->AddSprite(52001, 0, 0);
+	for (int i = 1; i < this->length; i++)
+		ani->AddSprite(51001, 0, this->cellHeight * i);
 	animation->SetCurrentAnimation(ani);
 	ani->Render(transform->GetPositionX(), transform->GetPositionY());
 }

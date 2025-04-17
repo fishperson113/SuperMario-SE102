@@ -24,14 +24,12 @@ CPlatform::CPlatform(float x, float y, float cell_width, float cell_height, int 
 	auto animation = AddComponent<AnimationComponent>();
 	LPANIMATION ani = new CAnimation(100);
 	ani->CreateFrame(500);
-	ani->AddSprite(this->spriteIdMiddle, 0, 0);
-	for (int i = 1; i < length / 2; i++)
+	ani->AddSprite(this->spriteIdBegin, 0, 0);
+	for (int i = 1; i < length; i++)
 	{
 		ani->AddSprite(this->spriteIdMiddle, this->cellWidth * i, 0);
-		ani->AddSprite(this->spriteIdMiddle, - this->cellWidth * i, 0);
 	}
-	ani->AddSprite(this->spriteIdEnd, this->cellWidth * this->length / 2, 0);
-	ani->AddSprite(this->spriteIdBegin, - this->cellWidth * this->length / 2, 0);
+	ani->AddSprite(this->spriteIdEnd, this->cellWidth * this->length, 0);
 	animation->SetCurrentAnimation(ani);
 	ani->Render(transform->GetPositionX(), transform->GetPositionY());
 }

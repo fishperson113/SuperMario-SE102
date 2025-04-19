@@ -1,7 +1,7 @@
 #include "MarioController.h"
 #include"debug.h"
 #include"KoopasController.h"
-
+#include"Mario.h"
 void MarioController::Update(float dt)
 {
 	if (!parentObject->IsActive()) return;
@@ -89,6 +89,9 @@ void MarioController::OnCollisionWith(LPCOLLISIONEVENT e)
 
 	if (e->obj->GetComponent<KoopasController>())
 		OnCollisionWithKoopas(e);
+	if ((CMario*)e->obj) {
+
+	}
 }
 
 void MarioController::OnCollisionWithKoopas(LPCOLLISIONEVENT e)

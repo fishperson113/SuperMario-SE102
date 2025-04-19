@@ -8,8 +8,16 @@
 #include "Sprites.h"
 #include "Coin.h"
 #include "SampleKeyEventHandler.h"
-#include"Component.h"
-#include"Koopas.h"
+#include "Component.h"
+#include "Koopas.h"
+#include "Goomba.h"
+#include "Brick.h"
+#include "Mario.h"
+#include "Platform.h"
+#include "Pipe.h"
+#include "JumpingGoomba.h"
+#include "Portal.h"
+
 using namespace std;
 
 CPlayScene::CPlayScene(int id, LPCWSTR filePath):
@@ -113,7 +121,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 		DebugOut(L"[INFO] Player object has been created!\n");
 		break;
-	case OBJECT_TYPE_GOOMBA: /*obj = new CGoomba();*/ break;
+	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(); break;
 	case OBJECT_TYPE_BRICK:
 		if (tokens.size() >= 6) {
 			int numBricks = atoi(tokens[3].c_str());
@@ -138,30 +146,28 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			obj = new CBrick();
 		}
 		break;
-	case OBJECT_TYPE_COIN: /*obj = new CCoin();*/ break;
+	case OBJECT_TYPE_COIN: obj = new CCoin(); break;
 	case OBJECT_TYPE_KOOPAS: obj = new Koopas(); break;
 	case OBJECT_TYPE_PIPE:
 	{
-
-		/*float cell_width = (float)atof(tokens[3].c_str());
+		float cell_width = (float)atof(tokens[3].c_str());
 		float cell_height = (float)atof(tokens[4].c_str());
 		int length = atoi(tokens[5].c_str());
 		int sprite_begin = atoi(tokens[6].c_str());
 		int sprite_middle = atoi(tokens[7].c_str());
 		int sprite_end = atoi(tokens[8].c_str());
 
-		obj = new Pipe(
+		obj = new CPipe(
 			x, y,
 			cell_width, cell_height, length,
 			sprite_begin, sprite_middle, sprite_end
-		);*/
-
+		);
 		break;
 	}
 	case OBJECT_TYPE_PLATFORM:
 	{
 
-		/*float cell_width = (float)atof(tokens[3].c_str());
+		float cell_width = (float)atof(tokens[3].c_str());
 		float cell_height = (float)atof(tokens[4].c_str());
 		int length = atoi(tokens[5].c_str());
 		int sprite_begin = atoi(tokens[6].c_str());
@@ -173,26 +179,26 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			cell_width, cell_height, length,
 			sprite_begin, sprite_middle, sprite_end
 		);
-		*/
 		break;
 	}
-
+	case OBJECT_TYPE_JUMPINGGOOMBA:
+	{
+		obj = new CJumpingGoomba();
+		break;
+	}
 	case OBJECT_TYPE_PORTAL:
 	{
-		//float r = (float)atof(tokens[3].c_str());
-		//float b = (float)atof(tokens[4].c_str());
-		//int scene_id = atoi(tokens[5].c_str());
-		//obj = new CPortal(x, y, r, b, scene_id);
+		float r = (float)atof(tokens[3].c_str());
+		float b = (float)atof(tokens[4].c_str());
+		int scene_id = atoi(tokens[5].c_str());
+		obj = new CPortal(x, y, r, b, scene_id);
+		break;
 	}
-	break;
-
-
 	default:
 		DebugOut(L"[ERROR] Invalid object type: %d\n", object_type);
 		return;
 	}
 
-	// General object setup
 	if (obj == NULL) return;
 	
 	auto transform = obj->GetComponent<TransformComponent>();

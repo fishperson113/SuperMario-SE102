@@ -14,11 +14,5 @@ class CTurtle : public CGameObject
 public:
 	CTurtle();
 	~CTurtle();
-
-	void Update(DWORD dt);
-	void Render();
-	void Awake();
-private:
-	TurtleController* turtleController;
 };
 

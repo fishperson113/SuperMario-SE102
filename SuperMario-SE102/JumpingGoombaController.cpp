@@ -1,16 +1,17 @@
-#include "GoombaController.h"
-#include "debug.h"
+#include "JumpingGoombaController.h"
 
-void GoombaController::Update(float dt)
+void CJumpingGoombaController::Update(float dt)
 {
-	
+	auto velocity = parentObject->GetComponent<VelocityComponent>();
+	auto currentVelocity = velocity->GetVelocity();
+	if (currentVelocity.y == 0.0f)
+		currentVelocity.y = -2.0f;
+	else if (currentVelocity.y != 0.0f)
+		currentVelocity.y += 0.05f;
+	velocity->SetVelocity(currentVelocity.x, currentVelocity.y);
 }
 
-void GoombaController::Start()
-{
-}
-
-void GoombaController::Awake()
+void CJumpingGoombaController::Awake()
 {
 	parentObject->AddComponent<TransformComponent>();
 
@@ -21,11 +22,15 @@ void GoombaController::Awake()
 
 	auto collider = parentObject->AddComponent<ColliderComponent>();
 	collider->SetBoundingBox(0, 0, 19, 18);
-	LPANIMATION ani = CAnimations::GetInstance()->Get(5000);
+	LPANIMATION ani = CAnimations::GetInstance()->Get(5002);
 	animation->SetCurrentAnimation(ani);
 }
 
-void GoombaController::OnCollisionWith(LPCOLLISIONEVENT e)
+void CJumpingGoombaController::Start()
+{
+}
+
+void CJumpingGoombaController::OnCollisionWith(LPCOLLISIONEVENT e)
 {
 	if (!e->obj->GetComponent<ColliderComponent>()->IsBlocking()) return;
 

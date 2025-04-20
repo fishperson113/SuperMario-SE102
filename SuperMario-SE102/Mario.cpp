@@ -24,7 +24,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		untouchable = 0;
 	}
 
-	CCollision::GetInstance()->Process(this, dt, coObjects);
+	//CCollision::GetInstance()->Process(this, dt, coObjects);
 }
 
 void CMario::OnNoCollision(DWORD dt)

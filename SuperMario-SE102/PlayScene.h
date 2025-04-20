@@ -6,6 +6,7 @@
 #include "Brick.h"
 #include "Mario.h"
 #include "Goomba.h"
+#include "ObjectManager.h"
 //#include "Koopas.h"
 
 
@@ -15,7 +16,7 @@ protected:
 	// A play scene has to have player, right? 
 	LPGAMEOBJECT player;					
 
-	vector<LPGAMEOBJECT> objects;
+	ObjectManager objectManager;
 
 	void _ParseSection_SPRITES(string line);
 	void _ParseSection_ANIMATIONS(string line);

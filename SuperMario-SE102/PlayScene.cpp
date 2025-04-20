@@ -11,6 +11,7 @@
 #include "Platform.h"
 #include"Pipe.h"
 #include "SampleKeyEventHandler.h"
+#include"CBackgroundObject.h"
 
 using namespace std;
 
@@ -171,7 +172,12 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 		break;
 	}
-
+	case OBJECT_TYPE_BACKGROUND:
+	{
+		int spriteId = atoi(tokens[3].c_str());
+		obj = new CBackgroundObject(x, y, spriteId);
+		break;
+	}
 	case OBJECT_TYPE_PORTAL:
 	{
 		float r = (float)atof(tokens[3].c_str());

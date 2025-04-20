@@ -1,40 +1,58 @@
 #include "Pipe.h"
-#include "debug.h"
-#include "Component.h"
-#include "AssetIDs.h"
+#include "Sprite.h"
+#include "Sprites.h"
 
-CPipe::CPipe(float x, float y, float cell_width, float cell_height, int length, int sprite_id_begin, int sprite_id_middle, int sprite_id_end)
+#include "Textures.h"
+#include "Game.h"
+
+void Pipe::Render()
 {
-	DebugOut(L"[INFO] Pipe object has been created!\n");
-	this->active = true;
+	if (this->length <= 0) return;
+	float yy = x;
+	CSprites* s = CSprites::GetInstance();
 
-	this->length = length;
-	this->cellWidth = cell_width;
-	this->cellHeight = cell_height;
-	this->spriteIdBegin = sprite_id_begin;
-	this->spriteIdMiddle = sprite_id_middle;
-	this->spriteIdEnd = sprite_id_end;
+	s->Get(this->spriteIdBot)->Draw(x, yy);
+	yy += this->cellWidth;
+	for (int i = 1; i < this->length - 1; i++)
+	{
+		s->Get(this->spriteIdBody)->Draw(x, yy);
+		yy += this->cellWidth;
+	}
+	if (length > 1)
+		s->Get(this->spriteIdTop)->Draw(x, yy);
 
-	auto animation = AddComponent<AnimationComponent>();
-
-	auto transform = AddComponent<TransformComponent>();
-	transform->SetPosition(x, y);
-
-	AddComponent<AnimationComponent>();
-	auto collider = AddComponent<ColliderComponent>();
-	collider->SetCollidableDirections(true, false, false, false);
-
-	collider->SetBoundingBox(0, 0, this->cellWidth, this->cellHeight * this->length);
-
-	LPANIMATION ani = new CAnimation(100);
-	ani->CreateFrame(500);
-	ani->AddSprite(52001, 0, 0);
-	for (int i = 1; i < this->length; i++)
-		ani->AddSprite(51001, 0, this->cellHeight * i);
-	animation->SetCurrentAnimation(ani);
-	ani->Render(transform->GetPositionX(), transform->GetPositionY());
+	RenderBoundingBox();
 }
 
-void CPipe::Render()
+void Pipe::GetBoundingBox(float& l, float& t, float& r, float& b)
 {
+}
+
+void Pipe::RenderBoundingBox()
+{
+	D3DXVECTOR3 p(x, y, 0);
+	RECT rect;
+
+	LPTEXTURE bbox = CTextures::GetInstance()->Get(ID_TEX_BBOX);
+
+	float l, t, r, b;
+
+	GetBoundingBox(l, t, r, b);
+	rect.left = 0;
+	rect.top = 0;
+	rect.right = (int)r - (int)l;
+	rect.bottom = (int)b - (int)t;
+
+	float cx, cy;
+	CGame::GetInstance()->GetCamPos(cx, cy);
+
+	float xx = x - this->cellWidth / 2 + rect.right / 2;
+
+	CGame::GetInstance()->Draw(xx - cx, y - cy, bbox, nullptr, BBOX_ALPHA, rect.right - 1, rect.bottom - 1);
+
+}
+
+int Pipe::IsDirectionColliable(float nx, float ny)
+{
+	return 1;
 }

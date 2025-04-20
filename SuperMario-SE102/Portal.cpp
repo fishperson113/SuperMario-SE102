@@ -1,26 +1,46 @@
 #include "Portal.h"
+#include "Game.h"
+#include "Textures.h"
 
-CPortal::CPortal(float l, float t, float r, float b, int scene_id)
+CPortal::CPortal(float l, float t, float r, float b, int scene_id )
 {
-	DebugOut(L"[INFO] Portal object has been created!\n");
-	this->active = true;
-
 	this->scene_id = scene_id;
-	this->width = r - l;
-	this->height = b - t;
-
-	auto transform = AddComponent<TransformComponent>();
-	transform->SetPosition(l, t);
-
-	auto collider = AddComponent<ColliderComponent>();
-	collider->SetBoundingBox(0, 0, 25, 25);
-	collider->SetCollidable(false);
-
-	auto animation = AddComponent<AnimationComponent>();
-	LPANIMATION ani = CAnimations::GetInstance()->Get(ID_ANI_PORTAL);
-	animation->SetCurrentAnimation(ani);
+	x = l; 
+	y = t;
+	width = r - l;
+	height = b - t;
 }
 
-CPortal::~CPortal()
+void CPortal::RenderBoundingBox()
 {
+	D3DXVECTOR3 p(x, y, 0);
+	RECT rect;
+
+	LPTEXTURE bbox = CTextures::GetInstance()->Get(ID_TEX_BBOX);
+
+	float l, t, r, b;
+
+	GetBoundingBox(l, t, r, b);
+	rect.left = 0;
+	rect.top = 0;
+	rect.right = (int)r - (int)l;
+	rect.bottom = (int)b - (int)t;
+
+	float cx, cy;
+	CGame::GetInstance()->GetCamPos(cx, cy);
+
+	CGame::GetInstance()->Draw(x - cx, y - cy, bbox, nullptr, BBOX_ALPHA, rect.right - 1, rect.bottom - 1);
+}
+
+void CPortal::Render()
+{
+	RenderBoundingBox();
+}
+
+void CPortal::GetBoundingBox(float &l, float &t, float &r, float &b)
+{
+	l = x - width/2;
+	t = y - height/2;
+	r = x + width/2;
+	b = y + height/2;
 }

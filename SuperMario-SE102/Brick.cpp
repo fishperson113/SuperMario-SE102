@@ -1,20 +1,16 @@
 #include "Brick.h"
-#include "debug.h"
-#include "Game.h"
-#include "Component.h"
 
-CBrick::CBrick()
+void CBrick::Render()
 {
-	this->active = true;
-	AddComponent<TransformComponent>();
-	auto animation=AddComponent<AnimationComponent>();
-	auto collider = AddComponent<ColliderComponent>();
-	collider->SetBoundingBox(0, 0, 16, 16);
-	LPANIMATION ani = CAnimations::GetInstance()->Get(ID_ANI_BRICK);
-	animation->SetCurrentAnimation(ani);
+	CAnimations* animations = CAnimations::GetInstance();
+	animations->Get(ID_ANI_BRICK)->Render(x, y);
+	//RenderBoundingBox();
 }
 
-CBrick::~CBrick()
+void CBrick::GetBoundingBox(float &l, float &t, float &r, float &b)
 {
+	l = x - BRICK_BBOX_WIDTH/2;
+	t = y - BRICK_BBOX_HEIGHT/2;
+	r = l + BRICK_BBOX_WIDTH;
+	b = t + BRICK_BBOX_HEIGHT;
 }
-

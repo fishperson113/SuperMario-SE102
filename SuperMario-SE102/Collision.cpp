@@ -1,19 +1,16 @@
 #include "Collision.h"
 #include "GameObject.h"
-#include "Component.h"
+
 #include "debug.h"
-#include "GameObject.h"
-
-int CCollisionEvent::WasCollided() {
-	auto collider = obj->GetComponent<ColliderComponent>();
-	if (!collider) return 0;
-
-	return t >= 0.0f && t <= 1.0f && collider->IsDirectionColliable(nx, ny) == 1;
-}
 
 #define BLOCK_PUSH_FACTOR 0.01f
 
 CCollision* CCollision::__instance = NULL;
+
+int CCollisionEvent::WasCollided() {
+	return
+		t >= 0.0f && t <= 1.0f && obj->IsDirectionColliable(nx, ny) == 1;
+}
 
 CCollision* CCollision::GetInstance()
 {
@@ -127,48 +124,28 @@ void CCollision::SweptAABB(
 */
 LPCOLLISIONEVENT CCollision::SweptAABB(LPGAMEOBJECT objSrc, DWORD dt, LPGAMEOBJECT objDest)
 {
-	if (objSrc == objDest) return new CCollisionEvent(-1.0f, 0, 0, 0, 0, objDest, objSrc);
+	float sl, st, sr, sb;		// static object bbox
+	float ml, mt, mr, mb;		// moving object bbox
+	float t, nx, ny;
 
-	float sl=0, st=0, sr=0, sb=0;		// static object bbox
-	float ml=0, mt=0, mr=0, mb=0;		// moving object bbox
-	float t = 1.0f, nx = 0, ny = 0;
-
-	float mvx=0, mvy=0;
-	auto velocitySrc = objSrc->GetComponent<VelocityComponent>();
-	if (!velocitySrc) return new CCollisionEvent(-1.0f, 0, 0, 0, 0, objDest, objSrc);
-	mvx = velocitySrc->GetVelocity().x * velocitySrc->GetSpeed();
-	mvy = velocitySrc->GetVelocity().y * velocitySrc->GetSpeed();
-
+	float mvx, mvy;
+	objSrc->GetSpeed(mvx, mvy);
 	float mdx = mvx * dt;
 	float mdy = mvy * dt;
 
-	float svx = 0, svy = 0;
-	auto velocityDest = objDest->GetComponent<VelocityComponent>();
-	if (velocityDest) {
-		svx = velocityDest->GetVelocity().x * velocityDest->GetSpeed();
-		svy = velocityDest->GetVelocity().y * velocityDest->GetSpeed();
-	}
+	float svx, svy;
+	objDest->GetSpeed(svx, svy);
 	float sdx = svx * dt;
 	float sdy = svy * dt;
 
 	//
 	// NOTE: new m speed = original m speed - collide object speed
 	// 
-
 	float dx = mdx - sdx;
 	float dy = mdy - sdy;
 
-	if (dx == 0 && dy == 0)
-		return new CCollisionEvent(-1.0f, 0, 0, 0, 0, objDest, objSrc);
-
-	auto srcCollider = objSrc->GetComponent<ColliderComponent>();
-	auto destCollider = objDest->GetComponent<ColliderComponent>();
-
-	if (!srcCollider || !destCollider)
-		return new CCollisionEvent(-1.0f, 0, 0, 0, 0, objDest, objSrc);
-
-	srcCollider->GetBoundingBox(ml, mt, mr, mb);
-	destCollider->GetBoundingBox(sl, st, sr, sb);
+	objSrc->GetBoundingBox(ml, mt, mr, mb);
+	objDest->GetBoundingBox(sl, st, sr, sb);
 
 	SweptAABB(
 		ml, mt, mr, mb,
@@ -176,6 +153,7 @@ LPCOLLISIONEVENT CCollision::SweptAABB(LPGAMEOBJECT objSrc, DWORD dt, LPGAMEOBJE
 		sl, st, sr, sb,
 		t, nx, ny
 	);
+
 	CCollisionEvent* e = new CCollisionEvent(t, nx, ny, dx, dy, objDest, objSrc);
 	return e;
 }
@@ -220,11 +198,10 @@ void CCollision::Filter( LPGAMEOBJECT objSrc,
 	{
 		LPCOLLISIONEVENT c = coEvents[i];
 		if (c->isDeleted) continue;
-		if (!c->obj->IsActive()) continue;
+		if (c->obj->IsDeleted()) continue; 
 
-		auto collider = c->obj->GetComponent<ColliderComponent>();
 		// ignore collision event with object having IsBlocking = 0 (like coin, mushroom, etc)
-		if (filterBlock == 1 && !collider->IsBlocking())
+		if (filterBlock == 1 && !c->obj->IsBlocking()) 
 		{
 			continue;
 		}
@@ -246,34 +223,15 @@ void CCollision::Filter( LPGAMEOBJECT objSrc,
 *  Simple/Sample collision framework 
 *  NOTE: Student might need to improve this based on game logic 
 */
-
-//TODO: Object collision doesnt follow the correct logic of velocity speed
 void CCollision::Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	vector<LPCOLLISIONEVENT> coEvents;
-	LPCOLLISIONEVENT colX = NULL;
+	LPCOLLISIONEVENT colX = NULL; 
 	LPCOLLISIONEVENT colY = NULL;
 
 	coEvents.clear();
 
-	auto srcCollider = objSrc->GetComponent<ColliderComponent>();
-	auto srcTransform = objSrc->GetComponent<TransformComponent>();
-	auto srcVelocity = objSrc->GetComponent<VelocityComponent>();
-	auto scriptComp = objSrc->GetComponent<ScriptComponent>();
-
-	if (!srcTransform || !srcVelocity) return;
-
-	float x = srcTransform->GetPositionX();
-	float y = srcTransform->GetPositionY();
-
-	float vx = srcVelocity->GetVelocity().x;
-	float vy = srcVelocity->GetVelocity().y;
-	float speed = srcVelocity->GetSpeed();
-	float dtSeconds = dt / 1000.0f;
-	float dx = vx * speed * dtSeconds;
-	float dy = vy * speed * dtSeconds;
-
-	if (srcCollider && srcCollider->IsCollidable())
+	if (objSrc->IsCollidable())
 	{
 		Scan(objSrc, dt, coObjects, coEvents);
 	}
@@ -281,44 +239,47 @@ void CCollision::Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* co
 	// No collision detected
 	if (coEvents.size() == 0)
 	{
-		if (scriptComp) {
-			scriptComp->OnNoCollision(dt);
-		}
-		// By default, velocity will handle the movement
-		return;
+		objSrc->OnNoCollision(dt);
 	}
 	else
 	{
 		Filter(objSrc, coEvents, colX, colY);
 
-		if (colX != NULL && colY != NULL)
+		float x, y, vx, vy, dx, dy;
+		objSrc->GetPosition(x, y);
+		objSrc->GetSpeed(vx, vy);
+		dx = vx * dt;
+		dy = vy * dt;
+
+		if (colX != NULL && colY != NULL) 
 		{
-			if (colY->t < colX->t)  // was collision on Y first?
+			if (colY->t < colX->t)	// was collision on Y first ?
 			{
 				y += colY->t * dy + colY->ny * BLOCK_PUSH_FACTOR;
-				srcVelocity->MoveToPosition(x, y);  // Update position after Y collision
+				objSrc->SetPosition(x, y);
 
-				if (scriptComp) {
-					scriptComp->OnCollisionWith(colY);
-				}
+				objSrc->OnCollisionWith(colY);
 
-				// See if after correction on Y, is there still a collision on X?
+				//
+				// see if after correction on Y, is there still a collision on X ? 
+				//
 				LPCOLLISIONEVENT colX_other = NULL;
-				colX->isDeleted = true;  // Remove current collision event on X
 
-				// Replace with a new collision event using corrected location 
+				//
+				// check again if there is true collision on X 
+				//
+				colX->isDeleted = true;		// remove current collision event on X
+
+				// replace with a new collision event using corrected location 
 				coEvents.push_back(SweptAABB(objSrc, dt, colX->obj));
 
-				// Re-filter on X only
+				// re-filter on X only
 				Filter(objSrc, coEvents, colX_other, colY, /*filterBlock = */ 1, 1, /*filterY=*/0);
 
 				if (colX_other != NULL)
 				{
-					x += colX_other->t * dx + colX_other->nx * BLOCK_PUSH_FACTOR;
-
-					if (scriptComp) {
-						scriptComp->OnCollisionWith(colX_other);
-					}
+					x += colX_other->t * dx +colX_other->nx * BLOCK_PUSH_FACTOR;
+					objSrc->OnCollisionWith(colX_other);
 				}
 				else
 				{
@@ -328,27 +289,30 @@ void CCollision::Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* co
 			else // collision on X first
 			{
 				x += colX->t * dx + colX->nx * BLOCK_PUSH_FACTOR;
-				srcVelocity->MoveToPosition(x, y);  // Update position after X collision
+				objSrc->SetPosition(x, y);
 
-				if (scriptComp) {
-					scriptComp->OnCollisionWith(colX);
-				}
+				objSrc->OnCollisionWith(colX);
 
-				// See if after correction on X, is there still a collision on Y?
+				//
+				// see if after correction on X, is there still a collision on Y ? 
+				//
 				LPCOLLISIONEVENT colY_other = NULL;
-				colY->isDeleted = true;  // Remove current collision event on Y
 
+				//
+				// check again if there is true collision on Y
+				//
+				colY->isDeleted = true;		// remove current collision event on Y
+
+				// replace with a new collision event using corrected location 
 				coEvents.push_back(SweptAABB(objSrc, dt, colY->obj));
 
+				// re-filter on Y only
 				Filter(objSrc, coEvents, colX, colY_other, /*filterBlock = */ 1, /*filterX=*/0, /*filterY=*/1);
 
 				if (colY_other != NULL)
 				{
 					y += colY_other->t * dy + colY_other->ny * BLOCK_PUSH_FACTOR;
-
-					if (scriptComp) {
-						scriptComp->OnCollisionWith(colY_other);
-					}
+					objSrc->OnCollisionWith(colY_other);
 				}
 				else
 				{
@@ -356,43 +320,41 @@ void CCollision::Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* co
 				}
 			}
 		}
-		else if (colX != NULL)
+		else
+		if (colX != NULL)
 		{
 			x += colX->t * dx + colX->nx * BLOCK_PUSH_FACTOR;
 			y += dy;
-
-			if (scriptComp) {
-				scriptComp->OnCollisionWith(colX);
+			objSrc->OnCollisionWith(colX);
+		}
+		else 
+			if (colY != NULL)
+			{
+				x += dx;
+				y += colY->t * dy + colY->ny * BLOCK_PUSH_FACTOR;
+				objSrc->OnCollisionWith(colY);
 			}
-		}
-		else if (colY != NULL)
-		{
-			x += dx;
-			y += colY->t * dy + colY->ny * BLOCK_PUSH_FACTOR;
-
-			if (scriptComp) {
-				scriptComp->OnCollisionWith(colY);
+			else // both colX & colY are NULL 
+			{
+				x += dx;
+				y += dy;
 			}
-		}
-		else // both colX & colY are NULL 
-		{
-			x += dx;
-			y += dy;
-		}
 
-		srcVelocity->MoveToPosition(x, y);
+		objSrc->SetPosition(x, y);
 	}
 
+	//
 	// Scan all non-blocking collisions for further collision logic
+	//
 	for (UINT i = 0; i < coEvents.size(); i++)
 	{
 		LPCOLLISIONEVENT e = coEvents[i];
 		if (e->isDeleted) continue;
-		auto collider = e->obj->GetComponent<ColliderComponent>();
-		if (collider && collider->IsBlocking()) continue;  // blocking collisions were handled already, skip them
+		if (e->obj->IsBlocking()) continue;  // blocking collisions were handled already, skip them
 
-		scriptComp->OnCollisionWith(e);
+		objSrc->OnCollisionWith(e);			
 	}
+
 
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 }

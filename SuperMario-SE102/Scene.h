@@ -1,7 +1,7 @@
 #pragma once
 
 #include "KeyEventHandler.h"
-#include "ObjectManager.h"
+
 /*
 *  Abstract class for a game scene
 */
@@ -11,7 +11,6 @@ protected:
 	LPKEYEVENTHANDLER key_handler;
 	int id;
 	LPCWSTR sceneFilePath;
-	ObjectManager* objectManager;
 
 public: 
 	CScene(int id, LPCWSTR filePath)
@@ -19,12 +18,8 @@ public:
 		this->id = id;
 		this->sceneFilePath = filePath;
 		this->key_handler = NULL;
-		this->objectManager = new ObjectManager();
 	}
-	virtual ~CScene()
-	{
-		delete objectManager;  
-	}
+
 	LPKEYEVENTHANDLER GetKeyEventHandler() { return key_handler; }
 	virtual void Load() = 0;
 	virtual void Unload() = 0;

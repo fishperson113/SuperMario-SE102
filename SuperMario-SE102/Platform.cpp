@@ -1,41 +1,64 @@
 #include "Platform.h"
-#include "Component.h"
-#include "AssetIDs.h"
 
-CPlatform::CPlatform(float x, float y, float cell_width, float cell_height, int length, int sprite_id_begin, int sprite_id_middle, int sprite_id_end)
+#include "Sprite.h"
+#include "Sprites.h"
+
+#include "Textures.h"
+#include "Game.h"
+
+void CPlatform::RenderBoundingBox()
 {
-	DebugOut(L"[INFO] Platform object has been created!\n");
-	this->active = true;
+	D3DXVECTOR3 p(x, y, 0);
+	RECT rect;
 
-	this->length = length;
-	this->cellWidth = cell_width;
-	this->cellHeight = cell_height;
-	this->spriteIdBegin = sprite_id_begin;
-	this->spriteIdMiddle = sprite_id_middle;
-	this->spriteIdEnd = sprite_id_end;
+	LPTEXTURE bbox = CTextures::GetInstance()->Get(ID_TEX_BBOX);
 
-	auto transform = AddComponent<TransformComponent>();
-	transform->SetPosition(x, y);
+	float l, t, r, b;
 
-	auto collider = AddComponent<ColliderComponent>();
-	collider->SetBoundingBox(0, 0, this->cellWidth * (this->length + 1), this->cellHeight);
-	collider->SetAsPlatform();
+	GetBoundingBox(l, t, r, b);
+	rect.left = 0;
+	rect.top = 0;
+	rect.right = (int)r - (int)l;
+	rect.bottom = (int)b - (int)t;
 
-	auto animation = AddComponent<AnimationComponent>();
-	LPANIMATION ani = new CAnimation(100);
-	ani->CreateFrame(500);
-	ani->AddSprite(this->spriteIdBegin, 0, 0);
-	for (int i = 1; i < length; i++)
-	{
-		ani->AddSprite(this->spriteIdMiddle, this->cellWidth * i, 0);
-	}
-	ani->AddSprite(this->spriteIdEnd, this->cellWidth * this->length, 0);
-	animation->SetCurrentAnimation(ani);
-	ani->Render(transform->GetPositionX(), transform->GetPositionY());
+	float cx, cy;
+	CGame::GetInstance()->GetCamPos(cx, cy);
+
+	float xx = x - this->cellWidth / 2 + rect.right / 2;
+
+	CGame::GetInstance()->Draw(xx - cx, y - cy, bbox, nullptr, BBOX_ALPHA, rect.right - 1, rect.bottom - 1);
 }
 
 void CPlatform::Render()
 {
+	if (this->length <= 0) return; 
+	float xx = x; 
+	CSprites * s = CSprites::GetInstance();
 
+	s->Get(this->spriteIdBegin)->Draw(xx, y);
+	xx += this->cellWidth;
+	for (int i = 1; i < this->length - 1; i++)
+	{
+		s->Get(this->spriteIdMiddle)->Draw(xx, y);
+		xx += this->cellWidth;
+	}
+	if (length>1)
+		s->Get(this->spriteIdEnd)->Draw(xx, y);
+
+	RenderBoundingBox();
 }
 
+void CPlatform::GetBoundingBox(float& l, float& t, float& r, float& b)
+{
+	float cellWidth_div_2 = this->cellWidth / 2;
+	l = x - cellWidth_div_2;
+	t = y - this->cellHeight / 2;
+	r = l + this->cellWidth * this->length;
+	b = t + this->cellHeight;
+}
+
+int CPlatform::IsDirectionColliable(float nx, float ny)
+{
+	if (nx == 0 && ny == -1) return 1;
+	else return 0;
+}

@@ -35,7 +35,7 @@ struct CCollisionEvent
 		this->isDeleted = false;
 	}
 
-	int WasCollided(); 
+	int WasCollided();
 
 	static bool compare(const LPCOLLISIONEVENT& a, LPCOLLISIONEVENT& b)
 	{

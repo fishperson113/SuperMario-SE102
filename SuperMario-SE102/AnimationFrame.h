@@ -2,39 +2,19 @@
 
 #include "Sprite.h"
 
-struct SpriteInfo {
-    LPSPRITE sprite;
-    float offsetX;
-    float offsetY;
-
-    SpriteInfo(LPSPRITE s, float ox, float oy) :
-        sprite(s), offsetX(ox), offsetY(oy) {
-    }
-};
-
+/*
+	Sprite animation
+*/
 class CAnimationFrame
 {
-    std::vector<SpriteInfo> sprites;
-    DWORD time;
+	LPSPRITE sprite;
+	DWORD time;
 
 public:
-    CAnimationFrame(int time) {
-        this->time = time;
-    }
-
-    void AddSprite(LPSPRITE sprite, float offsetX = 0, float offsetY = 0) {
-        sprites.push_back(SpriteInfo(sprite, offsetX, offsetY));
-    }
-
-    DWORD GetTime() { return time; }
-
-    void Draw(float x, float y) {
-        for (const SpriteInfo& info : sprites) {
-            if (info.sprite) {
-                info.sprite->Draw(x + info.offsetX, y + info.offsetY);
-            }
-        }
-    }
+	CAnimationFrame(LPSPRITE sprite, int time) { this->sprite = sprite; this->time = time; }
+	DWORD GetTime() { return time; }
+	LPSPRITE GetSprite() { return sprite; }
 };
 
 typedef CAnimationFrame* LPANIMATION_FRAME;
+

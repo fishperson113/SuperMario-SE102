@@ -6,23 +6,18 @@
 #include "Utils.h"
 #include "Textures.h"
 #include "Sprites.h"
-#include "Coin.h"
-#include "SampleKeyEventHandler.h"
-#include "Component.h"
-#include "Koopas.h"
-#include "Goomba.h"
-#include "Brick.h"
-#include "Mario.h"
-#include "Platform.h"
-#include "Pipe.h"
-#include "JumpingGoomba.h"
 #include "Portal.h"
+#include "Coin.h"
+#include "Platform.h"
+#include"Pipe.h"
+#include "SampleKeyEventHandler.h"
 
 using namespace std;
 
 CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 	CScene(id, filePath)
 {
+	player = NULL;
 	key_handler = new CSampleKeyHandler(this);
 }
 
@@ -100,7 +95,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	vector<string> tokens = split(line);
 
 	// skip invalid lines - an object set must have at least id, x, y
-	if (tokens.size() < 3) return;
+	if (tokens.size() < 2) return;
 
 	int object_type = atoi(tokens[0].c_str());
 	float x = (float)atof(tokens[1].c_str());
@@ -111,45 +106,23 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	switch (object_type)
 	{
 	case OBJECT_TYPE_MARIO:
-		if (objectManager->GetPlayer() !=NULL)
+		if (player!=NULL) 
 		{
 			DebugOut(L"[ERROR] MARIO object was created before!\n");
 			return;
 		}
-		obj = new CMario(); 
-		objectManager->AddPlayer(obj);
+		obj = new CMario(x,y); 
+		player = (CMario*)obj;  
 
 		DebugOut(L"[INFO] Player object has been created!\n");
 		break;
-	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(); break;
-	case OBJECT_TYPE_BRICK:
-		if (tokens.size() >= 6) {
-			int numBricks = atoi(tokens[3].c_str());
-			float offsetX = (float)atof(tokens[4].c_str());
-			float offsetY = (float)atof(tokens[5].c_str());
+	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(x,y); break;
+	case OBJECT_TYPE_BRICK: obj = new CBrick(x,y); break;
+	case OBJECT_TYPE_COIN: obj = new CCoin(x, y); break;
 
-			for (int i = 0; i < numBricks; i++) {
-				CGameObject* brick = new CBrick();
-				auto transform = brick->GetComponent<TransformComponent>();
-
-				float brickX = x + (i * offsetX);
-				float brickY = y + (i * offsetY);
-				transform->SetPosition(brickX, brickY);
-
-				objectManager->Add(brick);
-				DebugOut(L"[INFO] Created brick %d at position (%f, %f)\n", i, brickX, brickY);
-			}
-
-			return;
-		}
-		else {
-			obj = new CBrick();
-		}
-		break;
-	case OBJECT_TYPE_COIN: obj = new CCoin(); break;
-	case OBJECT_TYPE_KOOPAS: obj = new Koopas(); break;
 	case OBJECT_TYPE_PIPE:
 	{
+
 		float cell_width = (float)atof(tokens[3].c_str());
 		float cell_height = (float)atof(tokens[4].c_str());
 		int length = atoi(tokens[5].c_str());
@@ -157,11 +130,12 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		int sprite_middle = atoi(tokens[7].c_str());
 		int sprite_end = atoi(tokens[8].c_str());
 
-		obj = new CPipe(
+		obj = new Pipe(
 			x, y,
 			cell_width, cell_height, length,
 			sprite_begin, sprite_middle, sprite_end
 		);
+
 		break;
 	}
 	case OBJECT_TYPE_PLATFORM:
@@ -179,33 +153,30 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 			cell_width, cell_height, length,
 			sprite_begin, sprite_middle, sprite_end
 		);
+
 		break;
 	}
-	case OBJECT_TYPE_JUMPINGGOOMBA:
-	{
-		obj = new CJumpingGoomba();
-		break;
-	}
+
 	case OBJECT_TYPE_PORTAL:
 	{
 		float r = (float)atof(tokens[3].c_str());
 		float b = (float)atof(tokens[4].c_str());
 		int scene_id = atoi(tokens[5].c_str());
 		obj = new CPortal(x, y, r, b, scene_id);
-		break;
 	}
+	break;
+
+
 	default:
 		DebugOut(L"[ERROR] Invalid object type: %d\n", object_type);
 		return;
 	}
 
-	if (obj == NULL) return;
-	
-	auto transform = obj->GetComponent<TransformComponent>();
-	transform->SetPosition(x, y);
+	// General object setup
+	obj->SetPosition(x, y);
 
 
-	objectManager->Add(obj);
+	objects.push_back(obj);
 }
 
 void CPlayScene::LoadAssets(LPCWSTR assetFile)
@@ -283,20 +254,28 @@ void CPlayScene::Update(DWORD dt)
 	// We know that Mario is the first object in the list hence we won't add him into the colliable object list
 	// TO-DO: This is a "dirty" way, need a more organized way 
 
-	objectManager->Update(dt);
+	vector<LPGAMEOBJECT> coObjects;
+	for (size_t i = 1; i < objects.size(); i++)
+	{
+		coObjects.push_back(objects[i]);
+	}
+
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		objects[i]->Update(dt, &coObjects);
+	}
 
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
-	if (objectManager->GetPlayer() == NULL) return;
+	if (player == NULL) return; 
+
 	// Update camera to follow mario
 	float cx, cy;
-	auto player = objectManager->GetPlayer();
-	auto transform = player->GetComponent<TransformComponent>();
-	cx = transform->GetPositionX();
-	cy = transform->GetPositionY();
+	player->GetPosition(cx, cy);
 
 	CGame *game = CGame::GetInstance();
 	cx -= game->GetBackBufferWidth() / 2;
 	cy -= game->GetBackBufferHeight() / 2;
+
 	if (cx < 0) cx = 0;
 
 	CGame::GetInstance()->SetCamPos(cx, 0.0f /*cy*/);
@@ -306,7 +285,8 @@ void CPlayScene::Update(DWORD dt)
 
 void CPlayScene::Render()
 {
-	objectManager->Render();
+	for (int i = 0; i < objects.size(); i++)
+		objects[i]->Render();
 }
 
 /*
@@ -314,7 +294,12 @@ void CPlayScene::Render()
 */
 void CPlayScene::Clear()
 {
-	objectManager->Clear();
+	vector<LPGAMEOBJECT>::iterator it;
+	for (it = objects.begin(); it != objects.end(); it++)
+	{
+		delete (*it);
+	}
+	objects.clear();
 }
 
 /*
@@ -325,7 +310,12 @@ void CPlayScene::Clear()
 */
 void CPlayScene::Unload()
 {
-	objectManager->Clear();
+	for (int i = 0; i < objects.size(); i++)
+		delete objects[i];
+
+	objects.clear();
+	player = NULL;
+
 	DebugOut(L"[INFO] Scene %d unloaded! \n", id);
 }
 
@@ -333,5 +323,20 @@ bool CPlayScene::IsGameObjectDeleted(const LPGAMEOBJECT& o) { return o == NULL; 
 
 void CPlayScene::PurgeDeletedObjects()
 {
-	objectManager->PurgeDeletedObjects();
+	vector<LPGAMEOBJECT>::iterator it;
+	for (it = objects.begin(); it != objects.end(); it++)
+	{
+		LPGAMEOBJECT o = *it;
+		if (o->IsDeleted())
+		{
+			delete o;
+			*it = NULL;
+		}
+	}
+
+	// NOTE: remove_if will swap all deleted items to the end of the vector
+	// then simply trim the vector, this is much more efficient than deleting individual items
+	objects.erase(
+		std::remove_if(objects.begin(), objects.end(), CPlayScene::IsGameObjectDeleted),
+		objects.end());
 }

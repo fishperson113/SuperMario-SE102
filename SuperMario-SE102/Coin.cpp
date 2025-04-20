@@ -1,25 +1,17 @@
 #include "Coin.h"
-#include "debug.h"
-#include "Game.h"
-#include "Component.h"
 
-CCoin::CCoin()
+void CCoin::Render()
 {
-	this->active = true;
-	AddComponent<TransformComponent>();
+	CAnimations* animations = CAnimations::GetInstance();
+	animations->Get(ID_ANI_COIN)->Render(x, y);
 
-	auto collider = AddComponent<ColliderComponent>();
-	collider->SetBoundingBox(0, 0, 10, 15);
-	collider->SetBlocking(false);
-	collider->SetCollidableDirections(false, false, false, false);
-	collider->SetBlocking(false);
-
-	auto animation = AddComponent<AnimationComponent>();
-	LPANIMATION ani = CAnimations::GetInstance()->Get(ID_ANI_COIN);
-	animation->SetCurrentAnimation(ani);
-	
+	//RenderBoundingBox();
 }
 
-CCoin::~CCoin()
+void CCoin::GetBoundingBox(float& l, float& t, float& r, float& b)
 {
+	l = x - COIN_BBOX_WIDTH / 2;
+	t = y - COIN_BBOX_HEIGHT / 2;
+	r = l + COIN_BBOX_WIDTH;
+	b = t + COIN_BBOX_HEIGHT;
 }

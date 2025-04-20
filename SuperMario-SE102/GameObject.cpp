@@ -1,46 +1,44 @@
 #include <d3dx9.h>
+#include <algorithm>
+
 
 #include "debug.h"
+#include "Textures.h"
 #include "Game.h"
 #include "GameObject.h"
-#include"Component.h"
+#include "Sprites.h"
 
-/*
-	Initialize game object 
-*/
 CGameObject::CGameObject()
 {
-	active = true;
+	x = y = 0;
+	vx = vy = 0;
+	nx = 1;	
+	state = -1;
+	isDeleted = false;
 }
 
-void CGameObject::Update(DWORD dt)
+void CGameObject::RenderBoundingBox()
 {
-	if (!active) return;
+	D3DXVECTOR3 p(x, y, 0);
+	RECT rect;
 
-	for (auto component : components)
-	{
-		if (component->IsEnabled())
-			component->Update(dt);
-	}
-}
+	LPTEXTURE bbox = CTextures::GetInstance()->Get(ID_TEX_BBOX);
 
-void CGameObject::Render()
-{
-	if (!active) return;
-	auto transform = GetComponent<TransformComponent>();
-	if (transform == nullptr) return;
+	float l,t,r,b; 
 
-	auto animComponent = GetComponent<AnimationComponent>();
-	if (animComponent) {
-		animComponent->Render();
-	}
-	auto collider = GetComponent<ColliderComponent>();
-	if (collider) {
-		collider->Render();
-	}
+	GetBoundingBox(l, t, r, b);
+	rect.left = 0;
+	rect.top = 0;
+	rect.right = (int)r - (int)l;
+	rect.bottom = (int)b - (int)t;
+
+	float cx, cy; 
+	CGame::GetInstance()->GetCamPos(cx, cy);
+
+	CGame::GetInstance()->Draw(x - cx, y - cy, bbox, &rect, BBOX_ALPHA);
 }
 
 CGameObject::~CGameObject()
 {
-}
 
+}

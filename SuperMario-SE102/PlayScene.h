@@ -38,7 +38,7 @@ public:
 
 	void Clear();
 	void PurgeDeletedObjects();
-
+	ObjectManager* GetObjectManager() { return &objectManager; }
 	static bool IsGameObjectDeleted(const LPGAMEOBJECT& o);
 };
 

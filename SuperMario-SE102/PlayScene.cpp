@@ -9,9 +9,13 @@
 #include "Portal.h"
 #include "Coin.h"
 #include "Platform.h"
-#include"Pipe.h"
+#include "Pipe.h"
 #include "SampleKeyEventHandler.h"
-#include"CBackgroundObject.h"
+#include "CBackgroundObject.h"
+#include "CoinBrick.h"
+#include "Mushroom.h"
+#include "MushroomBrick.h"
+#include "PiranhaPlant.h"
 
 using namespace std;
 
@@ -146,7 +150,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		int sprite_middle = atoi(tokens[7].c_str());
 		int sprite_end = atoi(tokens[8].c_str());
 
-		obj = new Pipe(
+		obj = new CPipe(
 			x, y,
 			cell_width, cell_height, length,
 			sprite_begin, sprite_middle, sprite_end
@@ -184,10 +188,35 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		float b = (float)atof(tokens[4].c_str());
 		int scene_id = atoi(tokens[5].c_str());
 		obj = new CPortal(x, y, r, b, scene_id);
+		break;
 	}
-	break;
+	case OBJECT_TYPE_COINBRICK:
+	{
+		obj = new CCoinBrick(x, y);
 
+		DebugOut(L"[INFO] CoinBrick object has been created!\n");
+		break;
+	}
+	case OBJECT_TYPE_MUSHROOM:
+	{
+		obj = new CMushroom(x, y);
 
+		DebugOut(L"[INFO] Mushroom object has been created!\n");
+		break;
+	}
+	case OBJECT_TYPE_MUSHROOMBRICK:
+	{
+		obj = new CMushroomBrick(x, y);
+
+		DebugOut(L"[INFO] MushroomBrick object has been created!\n");
+		break;
+	}
+	/*case OBJECT_TYPE_PIRANHAPLANT:
+	{
+		obj = new CPiranhaPlant(x, y);
+		DebugOut(L"[INFO] PiranhaPlant object has been created!\n");
+		break;
+	}*/
 	default:
 		DebugOut(L"[ERROR] Invalid object type: %d\n", object_type);
 		return;

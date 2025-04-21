@@ -57,9 +57,6 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		isDeleted = true;
 		return;
 	}
-
-	CGameObject::Update(dt, coObjects);
-	/*CCollision::GetInstance()->Process(this, dt, coObjects);*/
 }
 
 

@@ -12,6 +12,7 @@
 #include"Pipe.h"
 #include "SampleKeyEventHandler.h"
 #include"CBackgroundObject.h"
+#include"Koopas.h"
 
 using namespace std;
 
@@ -184,8 +185,13 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		float b = (float)atof(tokens[4].c_str());
 		int scene_id = atoi(tokens[5].c_str());
 		obj = new CPortal(x, y, r, b, scene_id);
+		break;
 	}
-	break;
+	case OBJECT_TYPE_KOOPAS:
+	{
+		obj = new Koopas(x, y);
+		break;
+	}
 
 
 	default:

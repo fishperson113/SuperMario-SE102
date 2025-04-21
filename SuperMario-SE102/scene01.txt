@@ -8,6 +8,7 @@ cloud.txt
 pipe.txt
 jumpinggoomba.txt
 portal.txt
+koopas.txt
 #
 [OBJECTS]
 # type	x	y	extra_settings per object type
@@ -17,7 +18,6 @@ portal.txt
 # MARIO
 0	20	10
 
-3	200	10
 # BRICKS
 1	0	148
 1	0	164
@@ -56,8 +56,9 @@ portal.txt
 4	160	120
 4	180	120
 
-#Goomba
-2	300	10
+#Enemies
+3	300	10
+3	200	10
 
 #Platform
 5	150	136	16	15	16	51000	52000	53000

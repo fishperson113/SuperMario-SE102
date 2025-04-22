@@ -153,8 +153,36 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 			vy = -MARIO_JUMP_DEFLECT_SPEED;
 		}
 	}
-}
+	else if (e->nx != 0) // Mario kicks the shell
+	{
+		if (koopas->GetState() == KOOPAS_STATE_SHELL)
+		{
+			int shellDirection = (e->nx > 0) ? -1 : 1; // Determine direction based on collision
+			koopas->SetState(KOOPAS_STATE_SHELL_MOVING);
+			koopas->SetSpeed(shellDirection * KOOPAS_SHELL_SPEED, 0); // Set shell speed
+		}
+		else // hit by Koopas
+		{
+			if (untouchable == 0)
+			{
+				if (koopas->GetState() != KOOPAS_STATE_SHELL)
+				{
+					if (level > MARIO_LEVEL_SMALL)
+					{
+						level = MARIO_LEVEL_SMALL;
+						StartUntouchable();
+					}
+					else
+					{
+						DebugOut(L">>> Mario DIE >>> \n");
+						SetState(MARIO_STATE_DIE);
+					}
+				}
+			}
+		}
+	}
 
+}
 //
 // Get animation ID for small Mario
 //

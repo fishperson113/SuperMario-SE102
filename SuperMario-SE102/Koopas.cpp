@@ -22,8 +22,29 @@ void Koopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	vy += ay * dt;
 	vx += ax * dt;
-
-	if (state == KOOPAS_STATE_SHELL && GetTickCount64() - shell_start > KOOPAS_SHELL_TIMEOUT)
+	if (state == KOOPAS_STATE_SHELL_MOVING)
+	{
+		// Apply deceleration to the shell on left or right movement
+		if (vx > 0)
+		{
+			vx -= KOOPAS_SHELL_DECELERATION * dt;
+			if (vx < KOOPAS_MIN_SPEED)
+			{
+				vx = 0;
+				SetState(KOOPAS_STATE_SHELL); 
+			}
+		}
+		else if (vx < 0)
+		{
+			vx += KOOPAS_SHELL_DECELERATION * dt;
+			if (vx > -KOOPAS_MIN_SPEED)
+			{
+				vx = 0;
+				SetState(KOOPAS_STATE_SHELL); 
+			}
+		}
+	}
+	else if (state == KOOPAS_STATE_SHELL && GetTickCount64() - shell_start > KOOPAS_SHELL_TIMEOUT)
 	{
 		SetState(KOOPAS_STATE_WALKING);
 	}
@@ -47,7 +68,7 @@ void Koopas::Render()
 			aniId = ID_ANI_KOOPAS_WALKING_LEFT;
 		}
 	}
-	else if (state == KOOPAS_STATE_SHELL)
+	else if (state == KOOPAS_STATE_SHELL || state == KOOPAS_STATE_SHELL_MOVING)
 	{
 		aniId = ID_ANI_KOOPAS_SHELL;
 	}
@@ -87,7 +108,7 @@ Koopas::Koopas(float x, float y)
 	frontSensor = new FallSensor(x, y, this, true);
 	backSensor = new FallSensor(x, y, this, false);
 
-	SetState(KOOPAS_STATE_WALKING);
+	SetState(KOOPAS_STATE_SHELL);
 	ResetSensors();
 }
 
@@ -106,6 +127,10 @@ void Koopas::SetState(int state)
 		}
 		break;
 
+	case KOOPAS_STATE_SHELL_MOVING:
+		ay = KOOPAS_GRAVITY; 
+		shell_start = 0;
+		break;
 	case KOOPAS_STATE_SHELL:
 		vx = 0;
 		ay = KOOPAS_GRAVITY;

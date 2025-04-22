@@ -27,6 +27,10 @@ void Koopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		SetState(KOOPAS_STATE_WALKING);
 	}
+
+	// Add this line to continuously update sensor positions
+	ResetSensors();
+
 }
 
 void Koopas::Render()
@@ -70,6 +74,7 @@ void Koopas::OnCollisionWith(LPCOLLISIONEVENT e)
 	else if (e->nx != 0)
 	{
 		vx = -vx;
+		ResetSensors();
 	}
 }
 
@@ -79,8 +84,11 @@ Koopas::Koopas(float x, float y)
 	this->ay = KOOPAS_GRAVITY;
 	die_start = -1;
 	shell_start = 0;
+	frontSensor = new FallSensor(x, y, this, true);
+	backSensor = new FallSensor(x, y, this, false);
 
 	SetState(KOOPAS_STATE_WALKING);
+	ResetSensors();
 }
 
 void Koopas::SetState(int state)
@@ -109,5 +117,28 @@ void Koopas::SetState(int state)
 
 		shell_start = GetTickCount64();
 		break;
+	}
+}
+
+void Koopas::ResetSensors()
+{
+	if (!frontSensor || !backSensor) return;
+
+	float koopas_left, koopas_top, koopas_right, koopas_bottom;
+	GetBoundingBox(koopas_left, koopas_top, koopas_right, koopas_bottom);
+
+	float sensorY = y;
+
+	if (vx > 0) 
+	{
+		frontSensor->SetPosition(koopas_right + 4, sensorY);
+
+		backSensor->SetPosition(koopas_left - 4, sensorY);
+	}
+	else 
+	{
+		frontSensor->SetPosition(koopas_left - 4, sensorY);
+
+		backSensor->SetPosition(koopas_right + 4, sensorY);
 	}
 }

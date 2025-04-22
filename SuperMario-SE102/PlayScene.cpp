@@ -189,7 +189,10 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	}
 	case OBJECT_TYPE_KOOPAS:
 	{
-		obj = new Koopas(x, y);
+		Koopas* koopas = new Koopas(x, y);
+		obj = koopas;
+		objectManager.Add(koopas->GetFrontSensor());
+		objectManager.Add(koopas->GetBackSensor());
 		break;
 	}
 

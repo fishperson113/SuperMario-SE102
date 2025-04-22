@@ -3,7 +3,7 @@
 #include "Animation.h"
 #include "Animations.h"
 #include "GameObject.h"
-
+#include "FallSensor.h"
 #define KOOPAS_GRAVITY 0.002f
 #define KOOPAS_WALKING_SPEED 0.05f
 
@@ -20,8 +20,12 @@
 #define ID_ANI_KOOPAS_SHELL 6004
 
 #define KOOPAS_SHELL_TIMEOUT 5000
+
 class Koopas :public CGameObject
 {
+private:
+	FallSensor* frontSensor;
+	FallSensor* backSensor;
 protected:
 	float ax;
 	float ay;
@@ -42,5 +46,10 @@ protected:
 public:
 	Koopas(float x, float y);
 	virtual void SetState(int state);
+	void ChangeDirection() { vx = -vx; }
+	void ResetSensors();
+
+	FallSensor* GetFrontSensor() { return frontSensor; }
+	FallSensor* GetBackSensor() { return backSensor; }
 };
 

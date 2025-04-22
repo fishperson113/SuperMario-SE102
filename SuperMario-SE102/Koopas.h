@@ -27,8 +27,7 @@
 class Koopas :public CGameObject
 {
 private:
-	FallSensor* frontSensor;
-	FallSensor* backSensor;
+	FallSensor* fallSensor;
 	bool isBeingHeld;
 protected:
 	float ax;
@@ -50,14 +49,13 @@ protected:
 public:
 	Koopas(float x, float y);
 	virtual void SetState(int state);
-	void ChangeDirection() { vx = -vx; }
+	void ChangeDirection();
 	void ResetSensors();
 
 	void SetBeingHeld(bool held) { isBeingHeld = held; }
 	bool IsBeingHeld() { return isBeingHeld; }
 	bool IsAboutToWakeUp() { return state == KOOPAS_STATE_SHELL && GetTickCount64() - shell_start > KOOPAS_SHELL_TIMEOUT - 500; }
 
-	FallSensor* GetFrontSensor() { return frontSensor; }
-	FallSensor* GetBackSensor() { return backSensor; }
+	FallSensor* GetFallSensor() { return fallSensor; }
 };
 

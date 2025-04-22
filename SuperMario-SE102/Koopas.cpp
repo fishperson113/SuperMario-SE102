@@ -58,9 +58,9 @@ void Koopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		}
 	}
 
-	if (!isBeingHeld)
+	if (!isBeingHeld && state == KOOPAS_STATE_WALKING)
 	{
-		ResetSensors();
+		if (fallSensor) fallSensor->Update(dt, coObjects);
 	}
 
 }
@@ -85,7 +85,6 @@ void Koopas::Render()
 	}
 
 	CAnimations::GetInstance()->Get(aniId)->Render(x, y);
-	//RenderBoundingBox();
 }
 
 void Koopas::OnNoCollision(DWORD dt)
@@ -163,10 +162,8 @@ Koopas::Koopas(float x, float y)
 	die_start = -1;
 	shell_start = 0;
 	isBeingHeld = false;
-	frontSensor = new FallSensor(x, y, this, true);
-	backSensor = new FallSensor(x, y, this, false);
-
-	SetState(KOOPAS_STATE_SHELL);
+	fallSensor = new FallSensor(x, y, this);
+	SetState(KOOPAS_STATE_WALKING);
 	ResetSensors();
 }
 
@@ -205,25 +202,31 @@ void Koopas::SetState(int state)
 	}
 }
 
+void Koopas::ChangeDirection()
+{
+	if (state == KOOPAS_STATE_WALKING)
+	{
+		vx = -vx; 
+		DebugOut(L">>> Koopas is now moving in the opposite direction: %f >>> \n", vx);
+		ResetSensors();
+	}
+}
+
 void Koopas::ResetSensors()
 {
-	if (!frontSensor || !backSensor) return;
+	if (!fallSensor) return;
 
 	float koopas_left, koopas_top, koopas_right, koopas_bottom;
 	GetBoundingBox(koopas_left, koopas_top, koopas_right, koopas_bottom);
 
-	float sensorY = y;
+	float sensorY = koopas_bottom -5;
 
 	if (vx > 0) 
 	{
-		frontSensor->SetPosition(koopas_right + 4, sensorY);
-
-		backSensor->SetPosition(koopas_left - 4, sensorY);
+		fallSensor->SetPosition(koopas_right + 4, sensorY);
 	}
 	else 
 	{
-		frontSensor->SetPosition(koopas_left - 4, sensorY);
-
-		backSensor->SetPosition(koopas_right + 4, sensorY);
+		fallSensor->SetPosition(koopas_left - 4, sensorY);
 	}
 }

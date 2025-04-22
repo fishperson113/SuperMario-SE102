@@ -5,11 +5,10 @@ class FallSensor : public CGameObject
 {
 private:
     Koopas* owner;
-    bool isFront;
     float ax;
     float ay;
 public:
-    FallSensor(float x, float y, Koopas* owner, bool isFront);
+    FallSensor(float x, float y, Koopas* owner);
 
     virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 

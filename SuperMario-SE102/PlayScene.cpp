@@ -215,8 +215,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	{
 		Koopas* koopas = new Koopas(x, y);
 		obj = koopas;
-		objectManager.Add(koopas->GetFrontSensor());
-		objectManager.Add(koopas->GetBackSensor());
+		objectManager.Add(koopas->GetFallSensor());
 		break;
 	}
 	/*case OBJECT_TYPE_PIRANHAPLANT:

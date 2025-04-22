@@ -8,6 +8,7 @@ cloud.txt
 pipe.txt
 jumpinggoomba.txt
 portal.txt
+mushroom.txt
 koopas.txt
 #
 [OBJECTS]
@@ -65,10 +66,19 @@ koopas.txt
 5	120	90	16	16	8	20001	20001	20001
 
 #Pipe
-6	150	164	31	15	5	51001	51001	52001
+6	150	164	31	15	5	52001	51001	51001
+
+#Coin Brick
+7	80	120
+
+#Mushroom
+9	20	10
 
 #Jumping Goomba
-7	320	180
+10	320	180
+
+#Mushroom Brick
+11	100	120
 
 #Portal 
 50	250	110	316	140	2

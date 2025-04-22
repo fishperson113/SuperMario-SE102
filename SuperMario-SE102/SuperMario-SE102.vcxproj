@@ -140,6 +140,7 @@
     <ClCompile Include="Brick.cpp" />
     <ClCompile Include="CBackgroundObject.cpp" />
     <ClCompile Include="Coin.cpp" />
+    <ClCompile Include="CoinBrick.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="debug.cpp" />
     <ClCompile Include="FallSensor.cpp" />
@@ -149,6 +150,8 @@
     <ClCompile Include="Koopas.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mario.cpp" />
+    <ClCompile Include="Mushroom.cpp" />
+    <ClCompile Include="MushroomBrick.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="Pipe.cpp" />
     <ClCompile Include="Platform.cpp" />
@@ -169,6 +172,7 @@
     <ClInclude Include="Brick.h" />
     <ClInclude Include="CBackgroundObject.h" />
     <ClInclude Include="Coin.h" />
+    <ClInclude Include="CoinBrick.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="debug.h" />
     <ClInclude Include="FallSensor.h" />
@@ -178,6 +182,8 @@
     <ClInclude Include="KeyEventHandler.h" />
     <ClInclude Include="Koopas.h" />
     <ClInclude Include="Mario.h" />
+    <ClInclude Include="Mushroom.h" />
+    <ClInclude Include="MushroomBrick.h" />
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="Pipe.h" />
     <ClInclude Include="Platform.h" />

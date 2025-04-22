@@ -7,7 +7,10 @@
 #include "Goomba.h"
 #include "Coin.h"
 #include "Portal.h"
-#include"Koopas.h"
+#include "CoinBrick.h"
+#include "Mushroom.h"
+#include "MushroomBrick.h"
+#include "Koopas.h"
 #include "Collision.h"
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
@@ -53,6 +56,12 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithCoin(e);
 	else if (dynamic_cast<CPortal*>(e->obj))
 		OnCollisionWithPortal(e);
+	else if (dynamic_cast<CCoinBrick*>(e->obj))
+		OnCollisionWithCoinBrick(e);
+	else if (dynamic_cast<CMushroom*>(e->obj))
+		OnCollisionWithMushroom(e);
+	else if (dynamic_cast<CMushroomBrick*>(e->obj))
+		OnCollisionWithMushroomBrick(e);
 	else if (dynamic_cast<Koopas*>(e->obj))
 		OnCollisionWithKoopas(e);
 }
@@ -101,6 +110,36 @@ void CMario::OnCollisionWithPortal(LPCOLLISIONEVENT e)
 {
 	CPortal* p = (CPortal*)e->obj;
 	CGame::GetInstance()->InitiateSwitchScene(p->GetSceneId());
+}
+
+void CMario::OnCollisionWithCoinBrick(LPCOLLISIONEVENT e)
+{
+	CCoinBrick* coinBrick = dynamic_cast<CCoinBrick*>(e->obj);
+
+	if (e->ny > 0)	//collision from below
+	{
+		if (coinBrick->GetState() == BRICK_STATE_HIT) return; // already hit
+		coinBrick->SpawnCoin();
+		coinBrick->SetState(BRICK_STATE_HIT);
+	}
+}
+
+void CMario::OnCollisionWithMushroom(LPCOLLISIONEVENT e)
+{
+	e->obj->Delete();
+	this->SetLevel(MARIO_LEVEL_BIG);
+}
+
+void CMario::OnCollisionWithMushroomBrick(LPCOLLISIONEVENT e)
+{
+	CMushroomBrick* mushroomBrick = dynamic_cast<CMushroomBrick*>(e->obj);
+
+	if (e->ny > 0)	//collision from below
+	{
+		if (mushroomBrick->GetState() == BRICK_STATE_HIT) return; // already hit
+		mushroomBrick->SpawnMushroom();
+		mushroomBrick->SetState(BRICK_STATE_HIT);
+	}
 }
 
 void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)

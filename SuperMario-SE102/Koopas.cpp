@@ -22,37 +22,46 @@ void Koopas::GetBoundingBox(float& left, float& top, float& right, float& bottom
 
 void Koopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	vy += ay * dt;
-	vx += ax * dt;
-	if (state == KOOPAS_STATE_SHELL_MOVING)
+	if (!isBeingHeld)  
 	{
-		// Apply deceleration to the shell on left or right movement
-		if (vx > 0)
+		vy += ay * dt;
+		vx += ax * dt;
+
+		if (state == KOOPAS_STATE_SHELL_MOVING)
 		{
-			vx -= KOOPAS_SHELL_DECELERATION * dt;
-			if (vx < KOOPAS_MIN_SPEED)
+			// Apply deceleration to the shell on left or right movement
+			if (vx > 0)
 			{
-				vx = 0;
-				SetState(KOOPAS_STATE_SHELL); 
+				vx -= KOOPAS_SHELL_DECELERATION * dt;
+				if (vx < KOOPAS_MIN_SPEED)
+				{
+					vx = 0;
+					SetState(KOOPAS_STATE_SHELL);
+				}
 			}
-		}
-		else if (vx < 0)
-		{
-			vx += KOOPAS_SHELL_DECELERATION * dt;
-			if (vx > -KOOPAS_MIN_SPEED)
+			else if (vx < 0)
 			{
-				vx = 0;
-				SetState(KOOPAS_STATE_SHELL); 
+				vx += KOOPAS_SHELL_DECELERATION * dt;
+				if (vx > -KOOPAS_MIN_SPEED)
+				{
+					vx = 0;
+					SetState(KOOPAS_STATE_SHELL);
+				}
 			}
 		}
 	}
-	else if (state == KOOPAS_STATE_SHELL && GetTickCount64() - shell_start > KOOPAS_SHELL_TIMEOUT)
+	if (state == KOOPAS_STATE_SHELL && GetTickCount64() - shell_start > KOOPAS_SHELL_TIMEOUT)
 	{
-		SetState(KOOPAS_STATE_WALKING);
+		if (!isBeingHeld) 
+		{
+			SetState(KOOPAS_STATE_WALKING);
+		}
 	}
 
-	// Add this line to continuously update sensor positions
-	ResetSensors();
+	if (!isBeingHeld)
+	{
+		ResetSensors();
+	}
 
 }
 
@@ -81,8 +90,11 @@ void Koopas::Render()
 
 void Koopas::OnNoCollision(DWORD dt)
 {
-	x += vx * dt;
-	y += vy * dt;
+	if (!isBeingHeld)  
+	{
+		x += vx * dt;
+		y += vy * dt;
+	}
 }
 
 void Koopas::OnCollisionWith(LPCOLLISIONEVENT e)
@@ -150,6 +162,7 @@ Koopas::Koopas(float x, float y)
 	this->ay = KOOPAS_GRAVITY;
 	die_start = -1;
 	shell_start = 0;
+	isBeingHeld = false;
 	frontSensor = new FallSensor(x, y, this, true);
 	backSensor = new FallSensor(x, y, this, false);
 
@@ -166,6 +179,7 @@ void Koopas::SetState(int state)
 	case KOOPAS_STATE_WALKING:
 		vx = -KOOPAS_WALKING_SPEED;
 		ay = KOOPAS_GRAVITY;
+		isBeingHeld = false;
 		if (previousState == KOOPAS_STATE_SHELL)
 		{
 			y -= (KOOPAS_BBOX_HEIGHT - KOOPAS_BBOX_HEIGHT_SHELL) / 2;
@@ -175,6 +189,7 @@ void Koopas::SetState(int state)
 	case KOOPAS_STATE_SHELL_MOVING:
 		ay = KOOPAS_GRAVITY; 
 		shell_start = 0;
+		isBeingHeld = false;
 		break;
 	case KOOPAS_STATE_SHELL:
 		vx = 0;

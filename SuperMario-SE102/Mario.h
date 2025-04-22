@@ -100,9 +100,12 @@
 
 
 #define MARIO_UNTOUCHABLE_TIME 2500
-
+class Koopas;
 class CMario : public CGameObject
 {
+	Koopas* heldKoopas;  
+	BOOLEAN isHolding;
+
 	BOOLEAN isSitting;
 	float maxVx;
 	float ax;				// acceleration on x 
@@ -114,6 +117,7 @@ class CMario : public CGameObject
 	BOOLEAN isOnPlatform;
 	int coin; 
 
+	void UpdateHeldKoopasPosition();
 	void OnCollisionWithGoomba(LPCOLLISIONEVENT e);
 	void OnCollisionWithCoin(LPCOLLISIONEVENT e);
 	void OnCollisionWithPortal(LPCOLLISIONEVENT e);
@@ -137,7 +141,13 @@ public:
 		untouchable_start = -1;
 		isOnPlatform = false;
 		coin = 0;
+		heldKoopas = NULL;
 	}
+
+	void HoldKoopas(Koopas* koopas);
+	void ReleaseKoopas();
+	bool IsHolding() { return isHolding; }
+
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();
 	void SetState(int state);

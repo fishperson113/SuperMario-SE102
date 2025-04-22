@@ -58,7 +58,7 @@ koopas.txt
 4	180	120
 
 #Enemies
-3	300	10
+#3	300	10
 3	200	10
 
 #Platform
@@ -69,7 +69,7 @@ koopas.txt
 6	150	164	31	15	5	52001	51001	51001
 
 #Coin Brick
-7	80	120
+7	80	160
 
 #Mushroom
 9	20	10

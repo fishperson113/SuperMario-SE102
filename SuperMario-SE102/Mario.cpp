@@ -159,7 +159,7 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 		{
 			int shellDirection = (e->nx > 0) ? -1 : 1; // Determine direction based on collision
 			koopas->SetState(KOOPAS_STATE_SHELL_MOVING);
-			koopas->SetSpeed(shellDirection * KOOPAS_SHELL_SPEED, 0); // Set shell speed
+			koopas->SetSpeed(shellDirection * KOOPAS_SHELL_SPEED, 0); 
 		}
 		else // hit by Koopas
 		{

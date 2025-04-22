@@ -1,8 +1,10 @@
 #include "Koopas.h"
-
+#include "Goomba.h"
+#include "CoinBrick.h"
+#include "MushroomBrick.h"
 void Koopas::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
-	if (state == KOOPAS_STATE_SHELL)
+	if (state == KOOPAS_STATE_SHELL || state == KOOPAS_STATE_SHELL_MOVING)
 	{
 		left = x - KOOPAS_BBOX_WIDTH / 2;
 		top = y - KOOPAS_BBOX_HEIGHT_SHELL / 2;
@@ -85,17 +87,60 @@ void Koopas::OnNoCollision(DWORD dt)
 
 void Koopas::OnCollisionWith(LPCOLLISIONEVENT e)
 {
-	if (!e->obj->IsBlocking()) return;
-	if (dynamic_cast<Koopas*>(e->obj)) return;
-
-	if (e->ny != 0)
+	if (state == KOOPAS_STATE_SHELL_MOVING)
 	{
-		vy = 0;
+		if (dynamic_cast<CGoomba*>(e->obj))
+		{
+			CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
+			if (goomba->GetState() != GOOMBA_STATE_DIE)
+			{
+				goomba->SetState(GOOMBA_STATE_DIE);
+				DebugOut(L">>> Koopa shell killed Goomba! >>> \n");
+			}
+		}
+		else if (dynamic_cast<Koopas*>(e->obj))
+		{
+			Koopas* otherKoopas = dynamic_cast<Koopas*>(e->obj);
+			if (otherKoopas->GetState() != KOOPAS_STATE_SHELL &&
+				otherKoopas->GetState() != KOOPAS_STATE_SHELL_MOVING)
+			{
+				otherKoopas->SetState(KOOPAS_STATE_SHELL);
+				DebugOut(L">>> Koopa shell hit another Koopa! >>> \n");
+			}
+		}
+		else if (dynamic_cast<CCoinBrick*>(e->obj))
+		{
+			CCoinBrick* coinBrick = dynamic_cast<CCoinBrick*>(e->obj);
+			if (coinBrick->GetState() != BRICK_STATE_HIT)
+			{
+				coinBrick->SpawnCoin();
+				coinBrick->SetState(BRICK_STATE_HIT);
+				DebugOut(L">>> Koopa shell hit Coin Brick! >>> \n");
+			}
+		}
+		else if (dynamic_cast<CMushroomBrick*>(e->obj))
+		{
+			CMushroomBrick* mushroomBrick = dynamic_cast<CMushroomBrick*>(e->obj);
+			if (mushroomBrick->GetState() != BRICK_STATE_HIT)
+			{
+				mushroomBrick->SpawnMushroom();
+				mushroomBrick->SetState(BRICK_STATE_HIT);
+				DebugOut(L">>> Koopa shell hit Mushroom Brick! >>> \n");
+			}
+		}
 	}
-	else if (e->nx != 0)
+
+	if (e->obj->IsBlocking())
 	{
-		vx = -vx;
-		ResetSensors();
+		if (e->ny != 0)
+		{
+			vy = 0;
+		}
+		else if (e->nx != 0)
+		{
+			vx = -vx;
+			ResetSensors();
+		}
 	}
 }
 

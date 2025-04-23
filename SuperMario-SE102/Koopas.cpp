@@ -50,14 +50,11 @@ void Koopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 		}
 	}
-	if (state == KOOPAS_STATE_SHELL && GetTickCount64() - shell_start > KOOPAS_SHELL_TIMEOUT)
+	if (IsAboutToWakeUp())
 	{
-		if (!isBeingHeld) 
-		{
-			SetState(KOOPAS_STATE_WALKING);
-		}
+		SetState(KOOPAS_STATE_WALKING);
 	}
-
+	
 	if (!isBeingHeld && state == KOOPAS_STATE_WALKING)
 	{
 		if (fallSensor) fallSensor->Update(dt, coObjects);
@@ -163,7 +160,7 @@ Koopas::Koopas(float x, float y)
 	shell_start = 0;
 	isBeingHeld = false;
 	fallSensor = new FallSensor(x, y, this);
-	SetState(KOOPAS_STATE_WALKING);
+	SetState(KOOPAS_STATE_SHELL);
 	ResetSensors();
 }
 

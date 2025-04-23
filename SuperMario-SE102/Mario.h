@@ -33,9 +33,10 @@
 #define MARIO_STATE_SIT				600
 #define MARIO_STATE_SIT_RELEASE		601
 
+#define MARIO_KICK_TIMEOUT 150
 
 #pragma region ANIMATION_ID
-
+//BIG MARIO
 #define ID_ANI_MARIO_IDLE_RIGHT 400
 #define ID_ANI_MARIO_IDLE_LEFT 401
 
@@ -59,6 +60,14 @@
 
 #define ID_ANI_MARIO_DIE 999
 
+// BIG MARIO HOLDING SHELL
+#define ID_ANI_MARIO_HOLD_IDLE_RIGHT 2001
+#define ID_ANI_MARIO_HOLD_IDLE_LEFT 2002
+#define ID_ANI_MARIO_HOLD_RUNNING_RIGHT 2003
+#define ID_ANI_MARIO_HOLD_RUNNING_LEFT 2004
+#define ID_ANI_MARIO_KICK_RIGHT 2005
+#define ID_ANI_MARIO_KICK_LEFT 2006
+
 // SMALL MARIO
 #define ID_ANI_MARIO_SMALL_IDLE_RIGHT 1100
 #define ID_ANI_MARIO_SMALL_IDLE_LEFT 1102
@@ -78,12 +87,16 @@
 #define ID_ANI_MARIO_SMALL_JUMP_RUN_RIGHT 1600
 #define ID_ANI_MARIO_SMALL_JUMP_RUN_LEFT 1601
 
+// SMALL MARIO HOLDING SHELL 
+#define ID_ANI_MARIO_SMALL_HOLD_IDLE_RIGHT 2100
+#define ID_ANI_MARIO_SMALL_HOLD_IDLE_LEFT 2101
+#define ID_ANI_MARIO_SMALL_HOLD_RUNNING_RIGHT 2102
+#define ID_ANI_MARIO_SMALL_HOLD_RUNNING_LEFT 2103
+#define ID_ANI_MARIO_SMALL_KICK_RIGHT 2104
+#define ID_ANI_MARIO_SMALL_KICK_LEFT 2105
 #pragma endregion
 
 #define GROUND_Y 160.0f
-
-
-
 
 #define	MARIO_LEVEL_SMALL	1
 #define	MARIO_LEVEL_BIG		2
@@ -116,6 +129,8 @@ class CMario : public CGameObject
 	ULONGLONG untouchable_start;
 	BOOLEAN isOnPlatform;
 	int coin; 
+	BOOLEAN isKicking;
+	ULONGLONG kick_start;
 
 	void UpdateHeldKoopasPosition();
 	void OnCollisionWithGoomba(LPCOLLISIONEVENT e);
@@ -142,6 +157,9 @@ public:
 		isOnPlatform = false;
 		coin = 0;
 		heldKoopas = NULL;
+		isHolding = false;
+		isKicking = false;
+		kick_start = 0;
 	}
 
 	void HoldKoopas(Koopas* koopas);

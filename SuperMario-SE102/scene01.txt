@@ -58,7 +58,7 @@ koopas.txt
 4	180	120
 
 #Enemies
-#3	300	10
+2	300	10
 3	200	10
 
 #Platform

@@ -54,7 +54,7 @@ public:
 
 	void SetBeingHeld(bool held) { isBeingHeld = held; }
 	bool IsBeingHeld() { return isBeingHeld; }
-	bool IsAboutToWakeUp() { return state == KOOPAS_STATE_SHELL && GetTickCount64() - shell_start > KOOPAS_SHELL_TIMEOUT - 500; }
+	bool IsAboutToWakeUp() { return state == KOOPAS_STATE_SHELL && GetTickCount64() - shell_start > KOOPAS_SHELL_TIMEOUT; }
 
 	FallSensor* GetFallSensor() { return fallSensor; }
 };

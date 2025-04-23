@@ -111,6 +111,28 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		vx = 0;
 	}
 
+	if (IsGodMode())
+	{
+		if (dynamic_cast<CGoomba*>(e->obj))
+		{
+			CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
+			if (goomba->GetState() != GOOMBA_STATE_DIE)
+			{
+				goomba->SetState(GOOMBA_STATE_DIE);
+				return; 
+			}
+		}
+		else if (dynamic_cast<Koopas*>(e->obj))
+		{
+			Koopas* koopas = dynamic_cast<Koopas*>(e->obj);
+			if (koopas->GetState() != KOOPAS_STATE_SHELL)
+			{
+				koopas->SetState(KOOPAS_STATE_SHELL);
+				return; 
+			}
+		}
+	}
+
 	if (dynamic_cast<CGoomba*>(e->obj))
 		OnCollisionWithGoomba(e);
 	else if (dynamic_cast<CCoin*>(e->obj))
@@ -620,6 +642,11 @@ void CMario::SetState(int state)
 	}
 
 	CGameObject::SetState(state);
+}
+
+bool CMario::IsGodMode()
+{
+	return isHolding && heldKoopas && !heldKoopas->IsAboutToWakeUp();
 }
 
 void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom)

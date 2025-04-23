@@ -169,7 +169,7 @@ public:
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();
 	void SetState(int state);
-
+	bool IsGodMode();
 	int IsCollidable()
 	{ 
 		return (state != MARIO_STATE_DIE); 

@@ -96,7 +96,19 @@
     <ClCompile Include="MushroomBrick.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FallSensor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Koopas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FallPitch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="PiranhaPlant.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParaGoomba.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -188,7 +200,19 @@
     <ClInclude Include="MushroomBrick.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FallSensor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Koopas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FallPitch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="PiranhaPlant.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParaGoomba.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

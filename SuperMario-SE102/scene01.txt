@@ -10,6 +10,8 @@ jumpinggoomba.txt
 portal.txt
 mushroom.txt
 koopas.txt
+piranhaplant.txt
+paragoomba.txt
 #
 [OBJECTS]
 # type	x	y	extra_settings per object type
@@ -74,11 +76,17 @@ koopas.txt
 #Mushroom
 9	20	10
 
-#Jumping Goomba
-10	320	180
+#Para Goomba
+10	280	10
 
 #Mushroom Brick
 11	100	120
+
+#Piranha Plant
+12	70	120
+
+#Fall Pitch
+13	0	200	2000	10
 
 #Portal 
 50	250	110	316	140	2

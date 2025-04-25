@@ -12,6 +12,8 @@
 #include "MushroomBrick.h"
 #include "Koopas.h"
 #include "Collision.h"
+#include "FallPitch.h"
+#include "ParaGoomba.h"
 
 void CMario::HoldKoopas(Koopas* koopas)
 {
@@ -147,6 +149,10 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithMushroomBrick(e);
 	else if (dynamic_cast<Koopas*>(e->obj))
 		OnCollisionWithKoopas(e);
+	else if (dynamic_cast<CFallPitch*>(e->obj))
+		OnCollisionWithFallPitch(e);
+	else if (dynamic_cast<CParaGoomba*>(e->obj))
+		OnCollisionWithParaGoomba(e);
 }
 
 void CMario::UpdateHeldKoopasPosition()
@@ -232,6 +238,43 @@ void CMario::OnCollisionWithMushroomBrick(LPCOLLISIONEVENT e)
 		if (mushroomBrick->GetState() == BRICK_STATE_HIT) return; // already hit
 		mushroomBrick->SpawnMushroom();
 		mushroomBrick->SetState(BRICK_STATE_HIT);
+	}
+}
+
+void CMario::OnCollisionWithFallPitch(LPCOLLISIONEVENT e)
+{
+	this->SetState(MARIO_STATE_DIE);
+	DebugOut(L">>> Mario DIE >>> \n");
+}
+
+void CMario::OnCollisionWithParaGoomba(LPCOLLISIONEVENT e)
+{
+	CParaGoomba* paraGoomba = dynamic_cast<CParaGoomba*>(e->obj);
+	if (e->ny < 0)
+	{
+		if (paraGoomba->GetState() == PARAGOOMBA_STATE_WALKING || paraGoomba->GetState() == PARAGOOMBA_STATE_JUMPING)
+			paraGoomba->SetState(PARAGOOMBA_STATE_WALKING2);
+		else if (paraGoomba->GetState() == PARAGOOMBA_STATE_WALKING2)
+			paraGoomba->SetState(PARAGOOMBA_STATE_DIE);
+	}
+	else // hit by Goomba
+	{
+		if (untouchable == 0)
+		{
+			if (paraGoomba->GetState() != GOOMBA_STATE_DIE)
+			{
+				if (level > MARIO_LEVEL_SMALL)
+				{
+					level = MARIO_LEVEL_SMALL;
+					StartUntouchable();
+				}
+				else
+				{
+					DebugOut(L">>> Mario DIE >>> \n");
+					SetState(MARIO_STATE_DIE);
+				}
+			}
+		}
 	}
 }
 

@@ -16,6 +16,9 @@
 #include "Mushroom.h"
 #include "MushroomBrick.h"
 #include "Koopas.h"
+#include "FallPitch.h"
+#include "PiranhaPlant.h"
+#include "ParaGoomba.h"
 
 using namespace std;
 
@@ -218,12 +221,26 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		objectManager.Add(koopas->GetFallSensor());
 		break;
 	}
-	/*case OBJECT_TYPE_PIRANHAPLANT:
+	case OBJECT_TYPE_PARAGOOMBA:
+	{
+		obj = new CParaGoomba(x, y);
+		DebugOut(L"[INFO] ParaGoomba object has been created!\n");
+		break;
+	}
+	case OBJECT_TYPE_PIRANHAPLANT:
 	{
 		obj = new CPiranhaPlant(x, y);
 		DebugOut(L"[INFO] PiranhaPlant object has been created!\n");
 		break;
-	}*/
+	}
+	case OBJECT_FALL_PITCH:
+	{
+		float w = (float)atof(tokens[3].c_str());
+		float h = (float)atof(tokens[4].c_str());
+		obj = new CFallPitch(x, y, w, h);
+		DebugOut(L"[INFO] FallPitch object has been created!\n");
+		break;
+	}
 	default:
 		DebugOut(L"[ERROR] Invalid object type: %d\n", object_type);
 		return;

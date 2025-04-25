@@ -3,4 +3,8 @@
 41000	74	0	123	25	30	#cloud double
 41001	128	0	164	25	30	#cloud single
 41002	55	0	73	25	30	#small bush
-41003
+41003	57	34	125	84	30	#big bush
+41004	3	146	57	195	30	#big transparent bush
+41005	1	207	88	310	30	#mega big transparent bush
+41006	281	367	414	438	30	#big long bush
+41007	558	16	657	151	30	#mega big bush

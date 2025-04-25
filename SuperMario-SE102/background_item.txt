@@ -1,0 +1,6 @@
+# id	left	top	right	bottom	texture_id
+[SPRITES]
+41000	74	0	123	25	30	#cloud double
+41001	128	0	164	25	30	#cloud single
+41002	55	0	73	25	30	#small bush
+41003

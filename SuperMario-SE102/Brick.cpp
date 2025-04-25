@@ -3,7 +3,12 @@
 void CBrick::Render()
 {
 	CAnimations* animations = CAnimations::GetInstance();
-	animations->Get(ID_ANI_BRICK)->Render(x + offsetX, y + offsetY);
+	for (int i = 0; i < brickNumber; i++)
+	{
+		float posX = x + i * offsetX;
+		float posY = y + i * offsetY;
+		animations->Get(ID_ANI_BRICK)->Render(posX,posY);
+	}
 	//RenderBoundingBox();
 }
 

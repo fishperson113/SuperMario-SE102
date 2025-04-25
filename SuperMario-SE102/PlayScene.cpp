@@ -181,8 +181,20 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	}
 	case OBJECT_TYPE_BACKGROUND:
 	{
+		int objectCount = 1;
+		float offsetX = 0.0f;
+		float offsetY = 0.0f;
 		int spriteId = atoi(tokens[3].c_str());
-		obj = new CBackgroundObject(x, y, spriteId);
+
+		if (tokens.size() >= 7)
+		{
+			objectCount = atoi(tokens[4].c_str());
+			offsetX = (float)atof(tokens[5].c_str());
+			offsetY = (float)atof(tokens[6].c_str());
+		}
+
+		obj = new CBackgroundObject(x, y, spriteId, objectCount, offsetX, offsetY);
+		DebugOut(L"[INFO] Background object has been created!\n");
 		break;
 	}
 	case OBJECT_TYPE_PORTAL:

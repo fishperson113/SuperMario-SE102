@@ -19,3 +19,4 @@ height	240
 10	textures\enemies-Photoroom.png
 20	textures\misc.png
 30	textures\background.png
+40	textures\background_item.png

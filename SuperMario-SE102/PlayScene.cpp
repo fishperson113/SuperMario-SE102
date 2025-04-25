@@ -124,7 +124,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		objectManager.AddPlayer(player);
 		DebugOut(L"[INFO] Player object has been created!\n");
 		break;
-	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(x,y); break;
+	//case OBJECT_TYPE_GOOMBA: obj = new CGoomba(x,y); break;
 	case OBJECT_TYPE_BRICK:
 	{
 		int brickNumber = 1; 
@@ -197,14 +197,14 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		DebugOut(L"[INFO] Background object has been created!\n");
 		break;
 	}
-	case OBJECT_TYPE_PORTAL:
+	/*case OBJECT_TYPE_PORTAL:
 	{
 		float r = (float)atof(tokens[3].c_str());
 		float b = (float)atof(tokens[4].c_str());
 		int scene_id = atoi(tokens[5].c_str());
 		obj = new CPortal(x, y, r, b, scene_id);
 		break;
-	}
+	}*/
 	case OBJECT_TYPE_COINBRICK:
 	{
 		obj = new CCoinBrick(x, y);
@@ -212,13 +212,13 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		DebugOut(L"[INFO] CoinBrick object has been created!\n");
 		break;
 	}
-	case OBJECT_TYPE_MUSHROOM:
+	/*case OBJECT_TYPE_MUSHROOM:
 	{
 		obj = new CMushroom(x, y);
 
 		DebugOut(L"[INFO] Mushroom object has been created!\n");
 		break;
-	}
+	}*/
 	case OBJECT_TYPE_MUSHROOMBRICK:
 	{
 		obj = new CMushroomBrick(x, y);
@@ -226,25 +226,25 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		DebugOut(L"[INFO] MushroomBrick object has been created!\n");
 		break;
 	}
-	case OBJECT_TYPE_KOOPAS:
+	/*case OBJECT_TYPE_KOOPAS:
 	{
 		Koopas* koopas = new Koopas(x, y);
 		obj = koopas;
 		objectManager.Add(koopas->GetFallSensor());
 		break;
-	}
-	case OBJECT_TYPE_PARAGOOMBA:
+	}*/
+	/*case OBJECT_TYPE_PARAGOOMBA:
 	{
 		obj = new CParaGoomba(x, y);
 		DebugOut(L"[INFO] ParaGoomba object has been created!\n");
 		break;
-	}
-	case OBJECT_TYPE_PIRANHAPLANT:
+	}*/
+	/*case OBJECT_TYPE_PIRANHAPLANT:
 	{
 		obj = new CPiranhaPlant(x, y);
 		DebugOut(L"[INFO] PiranhaPlant object has been created!\n");
 		break;
-	}
+	}*/
 	case OBJECT_FALL_PITCH:
 	{
 		float w = (float)atof(tokens[3].c_str());

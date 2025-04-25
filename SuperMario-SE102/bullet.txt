@@ -1,0 +1,9 @@
+# id	left	top	right	bottom	texture_id
+[SPRITES]
+#Walking Wings
+40011	356	141	365	149	10
+40012	370	140	378	149	10
+
+# ani_id	sprite1_id	time1	sprite2_id	time2	...
+[ANIMATIONS]
+4995	40011	200	40012	200

@@ -83,7 +83,7 @@ paragoomba.txt
 11	100	120
 
 #Piranha Plant
-12	70	120
+12	70	160
 
 #Fall Pitch
 13	0	200	2000	10

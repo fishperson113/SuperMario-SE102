@@ -14,6 +14,7 @@
 #include "Collision.h"
 #include "FallPitch.h"
 #include "ParaGoomba.h"
+#include "PiranhaPlant.h"
 
 void CMario::HoldKoopas(Koopas* koopas)
 {
@@ -153,6 +154,8 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithFallPitch(e);
 	else if (dynamic_cast<CParaGoomba*>(e->obj))
 		OnCollisionWithParaGoomba(e);
+	else if (dynamic_cast<CPiranhaPlant*>(e->obj))
+		OnCollisionWithPiranhaPlant(e);
 }
 
 void CMario::UpdateHeldKoopasPosition()
@@ -256,6 +259,7 @@ void CMario::OnCollisionWithParaGoomba(LPCOLLISIONEVENT e)
 			paraGoomba->SetState(PARAGOOMBA_STATE_WALKING2);
 		else if (paraGoomba->GetState() == PARAGOOMBA_STATE_WALKING2)
 			paraGoomba->SetState(PARAGOOMBA_STATE_DIE);
+		vy = -MARIO_JUMP_DEFLECT_SPEED;
 	}
 	else // hit by Goomba
 	{
@@ -274,6 +278,23 @@ void CMario::OnCollisionWithParaGoomba(LPCOLLISIONEVENT e)
 					SetState(MARIO_STATE_DIE);
 				}
 			}
+		}
+	}
+}
+
+void CMario::OnCollisionWithPiranhaPlant(LPCOLLISIONEVENT e)
+{
+	if (this->untouchable == 0)
+	{
+		if (level > MARIO_LEVEL_SMALL)
+		{
+			level = MARIO_LEVEL_SMALL;
+			StartUntouchable();
+		}
+		else
+		{
+			DebugOut(L">>> Mario DIE >>> \n");
+			SetState(MARIO_STATE_DIE);
 		}
 	}
 }

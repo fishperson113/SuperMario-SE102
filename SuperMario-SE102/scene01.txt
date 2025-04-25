@@ -20,17 +20,19 @@ platform.txt
 # type: 0 = Mario , 1 = Brick, 2 = Goomba, 3 = Koopas, 8 = BackgroundObjects
 # See OBJECT_TYPE constants in AssetIDs.h
 
-# Background Clouds
-8	50	50	41007	# Cloud Double at (50, 50)
-8	150	80	41005	# Cloud Single at (150, 80)
-8	20	160	41002	3	15	0
+# Background
+8	60	140	41006	
+8	120	50	41000	
+8	150	160	41002	3	15	0
+8	400	10	41001
+
 # MARIO
 0	20	10
 # BRICKS
 
 
 #COIN
-4	1104	100
+4	1104	120
 
 #Enemies
 2	300	10

@@ -353,6 +353,8 @@ void CPlayScene::Update(DWORD dt)
 		// Center the camera on the player
 		cx -= game->GetBackBufferWidth() / 2;
 		cy -= game->GetBackBufferHeight() / 2;
+
+		game->SetCamPos(cx, 20);
 	}
 	// If no player exists, allow manual camera control
 	else {
@@ -368,13 +370,15 @@ void CPlayScene::Update(DWORD dt)
 			cy += 0.5f * dt;
 		if (game->IsKeyDown(DIK_UP))
 			cy -= 0.5f * dt;
+
+		game->SetCamPos(cx, cy);
 	}
 
 	// Constrain camera to not go below 0
 	if (cx < 0) cx = 0;
 
+	if (cy < 0) cy = 0;
 	// Update camera position
-	game->SetCamPos(cx, cy);
 
 	// Clean up deleted objects
 	PurgeDeletedObjects();

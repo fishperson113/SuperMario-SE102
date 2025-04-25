@@ -339,28 +339,47 @@ void CPlayScene::Load()
 
 void CPlayScene::Update(DWORD dt)
 {
-	// We know that Mario is the first object in the list hence we won't add him into the colliable object list
-	// TO-DO: This is a "dirty" way, need a more organized way 
-
+	// Update all game objects first
 	objectManager.Update(dt);
 
-	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
-	if (player == NULL) return; 
+	// Control camera position
+	float cx = 0, cy = 0;
+	CGame* game = CGame::GetInstance();
 
-	// Update camera to follow mario
-	float cx, cy;
-	player->GetPosition(cx, cy);
+	// If player exists, follow player
+	if (player != NULL) {
+		player->GetPosition(cx, cy);
 
-	CGame *game = CGame::GetInstance();
-	cx -= game->GetBackBufferWidth() / 2;
-	cy -= game->GetBackBufferHeight() / 2;
+		// Center the camera on the player
+		cx -= game->GetBackBufferWidth() / 2;
+		cy -= game->GetBackBufferHeight() / 2;
+	}
+	// If no player exists, allow manual camera control
+	else {
+		// Get current camera position
+		game->GetCamPos(cx, cy);
 
+		// Move camera based on keyboard input
+		if (game->IsKeyDown(DIK_RIGHT))
+			cx += 0.5f * dt;
+		if (game->IsKeyDown(DIK_LEFT))
+			cx -= 0.5f * dt;
+		if (game->IsKeyDown(DIK_DOWN))
+			cy += 0.5f * dt;
+		if (game->IsKeyDown(DIK_UP))
+			cy -= 0.5f * dt;
+	}
+
+	// Constrain camera to not go below 0
 	if (cx < 0) cx = 0;
 
-	CGame::GetInstance()->SetCamPos(cx, 0.0f /*cy*/);
+	// Update camera position
+	game->SetCamPos(cx, cy);
 
+	// Clean up deleted objects
 	PurgeDeletedObjects();
 }
+
 
 void CPlayScene::Render()
 {

@@ -130,15 +130,24 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		int brickNumber = 1; 
 		float offsetX = 0.0f;
 		float offsetY = 0.0f;
-
+		int aniId = ID_ANI_BRICK;
+		int bboxWidth = BRICK_BBOX_WIDTH;
+		int bboxHeight = BRICK_BBOX_HEIGHT;
 		if (tokens.size() >= 6)
 		{
-			brickNumber = atoi(tokens[3].c_str());
-			offsetX = (float)atof(tokens[4].c_str());
-			offsetY = (float)atof(tokens[5].c_str());
+			aniId = atoi(tokens[3].c_str());
+			bboxWidth = atoi(tokens[4].c_str());
+			bboxHeight = atoi(tokens[5].c_str());
+		}
+		if (tokens.size() >= 8)
+		{
+			brickNumber = atoi(tokens[6].c_str());
+			offsetX = (float)atof(tokens[7].c_str());
+			offsetY = (float)atof(tokens[8].c_str());
 		}
 
-		obj = new CBrick(x, y, brickNumber, offsetX, offsetY);
+		obj = new CBrick(x, y, brickNumber, offsetX, offsetY, aniId, bboxWidth, bboxHeight);
+
 		break;
 	}
 	case OBJECT_TYPE_COIN: obj = new CCoin(x, y); break;

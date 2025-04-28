@@ -175,6 +175,8 @@ class CMario : public CGameObject
 	void OnCollisionWithFallPitch(LPCOLLISIONEVENT e);
 	void OnCollisionWithParaGoomba(LPCOLLISIONEVENT e);
 	void OnCollisionWithPiranhaPlant(LPCOLLISIONEVENT e);
+	void OnCollisionWithSuperLeaf(LPCOLLISIONEVENT e);
+	void OnCollisionWithSuperLeafBrick(LPCOLLISIONEVENT e);
 
 	int GetAniIdBig();
 	int GetAniIdSmall();
@@ -188,7 +190,7 @@ public:
 		ax = 0.0f;
 		ay = MARIO_GRAVITY; 
 
-		level = MARIO_LEVEL_TAIL;
+		level = MARIO_LEVEL_SMALL;
 		untouchable = 0;
 		untouchable_start = -1;
 		isOnPlatform = false;

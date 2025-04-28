@@ -15,6 +15,8 @@
 #include "FallPitch.h"
 #include "ParaGoomba.h"
 #include "PiranhaPlant.h"
+#include "SuperLeaf.h"
+#include "SuperLeafBrick.h"
 
 void CMario::HoldKoopas(Koopas* koopas)
 {
@@ -156,6 +158,10 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithParaGoomba(e);
 	else if (dynamic_cast<CPiranhaPlant*>(e->obj))
 		OnCollisionWithPiranhaPlant(e);
+	else if (dynamic_cast<CSuperLeaf*>(e->obj))
+		OnCollisionWithSuperLeaf(e);
+	else if (dynamic_cast<CSuperLeafBrick*>(e->obj))
+		OnCollisionWithSuperLeafBrick(e);
 }
 
 void CMario::UpdateHeldKoopasPosition()
@@ -296,6 +302,24 @@ void CMario::OnCollisionWithPiranhaPlant(LPCOLLISIONEVENT e)
 			DebugOut(L">>> Mario DIE >>> \n");
 			SetState(MARIO_STATE_DIE);
 		}
+	}
+}
+
+void CMario::OnCollisionWithSuperLeaf(LPCOLLISIONEVENT e)
+{
+	e->obj->Delete();
+	this->SetLevel(MARIO_LEVEL_TAIL);
+}
+
+void CMario::OnCollisionWithSuperLeafBrick(LPCOLLISIONEVENT e)
+{
+	CSuperLeafBrick* superLeafBrick = dynamic_cast<CSuperLeafBrick*>(e->obj);
+
+	if (e->ny > 0)	//collision from below
+	{
+		if (superLeafBrick->GetState() == BRICK_STATE_HIT) return; // already hit
+		superLeafBrick->SpawnSuperLeaf ();
+		superLeafBrick->SetState(BRICK_STATE_HIT);
 	}
 }
 

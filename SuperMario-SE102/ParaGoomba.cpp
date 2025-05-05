@@ -10,6 +10,13 @@ void CParaGoomba::GetBoundingBox(float& left, float& top, float& right, float& b
 		right = left + PARAGOOMBA_BBOX_WIDTH;
 		bottom = top + PARAGOOMBA_BBOX_HEIGHT_DIE;
 	}
+	else if (state == PARAGOOMBA_STATE_JUMPING || state == PARAGOOMBA_STATE_WALKING)
+	{
+		left = x - PARAGOOMBAWINGS_BBOX_WIDTH / 2;
+		top = y - PARAGOOMBAWINGS_BBOX_HEIGHT / 2;
+		right = left + PARAGOOMBAWINGS_BBOX_WIDTH;
+		bottom = top + PARAGOOMBAWINGS_BBOX_HEIGHT;
+	}
 	else
 	{
 		left = x - PARAGOOMBA_BBOX_WIDTH / 2;

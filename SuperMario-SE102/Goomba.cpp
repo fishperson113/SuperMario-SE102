@@ -1,4 +1,5 @@
 #include "Goomba.h"
+#include "FallPitch.h"
 
 CGoomba::CGoomba(float x, float y):CGameObject(x, y)
 {
@@ -30,7 +31,12 @@ void CGoomba::OnNoCollision(DWORD dt)
 {
 	x += vx * dt;
 	y += vy * dt;
-};
+}
+void CGoomba::OnCollisionWithFallPitch(LPCOLLISIONEVENT e)
+{
+	this->SetState(GOOMBA_STATE_DIE);
+}
+;
 
 void CGoomba::OnCollisionWith(LPCOLLISIONEVENT e)
 {
@@ -45,6 +51,9 @@ void CGoomba::OnCollisionWith(LPCOLLISIONEVENT e)
 	{
 		vx = -vx;
 	}
+	
+	if (dynamic_cast<CFallPitch*>(e->obj))
+		OnCollisionWithFallPitch(e);
 }
 
 void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)

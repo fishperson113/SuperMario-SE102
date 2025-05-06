@@ -140,6 +140,7 @@
     <ClCompile Include="Brick.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="CBackgroundObject.cpp" />
+    <ClCompile Include="Checkpoint.cpp" />
     <ClCompile Include="Coin.cpp" />
     <ClCompile Include="CoinBrick.cpp" />
     <ClCompile Include="Collision.cpp" />
@@ -179,6 +180,7 @@
     <ClInclude Include="Brick.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="CBackgroundObject.h" />
+    <ClInclude Include="Checkpoint.h" />
     <ClInclude Include="Coin.h" />
     <ClInclude Include="CoinBrick.h" />
     <ClInclude Include="Collision.h" />

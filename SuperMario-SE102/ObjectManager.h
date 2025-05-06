@@ -4,13 +4,12 @@
 #include <algorithm>
 #include "GameObject.h"
 #include "Collision.h"
-
+#include"Checkpoint.h"
 class ObjectManager
 {
 private:
     std::vector<LPGAMEOBJECT> objects;
     LPGAMEOBJECT player;
-
 public:
     ObjectManager();
     ~ObjectManager();

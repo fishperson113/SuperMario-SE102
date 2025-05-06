@@ -12,6 +12,7 @@
 
 class CPlayScene: public CScene
 {
+	CGameObject* CreateEnemy(int enemyType, float x, float y);
 protected: 
 	// A play scene has to have player, right? 
 	LPGAMEOBJECT player;					
@@ -22,7 +23,7 @@ protected:
 	void _ParseSection_ANIMATIONS(string line);
 
 	void _ParseSection_ASSETS(string line);
-	void _ParseSection_OBJECTS(string line);
+	void _ParseSection_OBJECTS(string line, ifstream& f);
 
 	void LoadAssets(LPCWSTR assetFile);
 	

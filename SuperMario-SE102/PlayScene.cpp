@@ -43,6 +43,41 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 
 #define MAX_SCENE_LINE 1024
 
+CGameObject* CPlayScene::CreateEnemy(int enemyType, float x, float y)
+{
+	CGameObject* obj = nullptr;
+
+	switch (enemyType)
+	{
+	case OBJECT_TYPE_GOOMBA:
+		obj = new CGoomba(x, y);
+		break;
+
+	case OBJECT_TYPE_KOOPAS:
+	{
+		Koopas* koopas = new Koopas(x, y);
+		objectManager.Add(koopas->GetFallSensor());
+		obj = koopas;
+		break;
+	}
+
+	case OBJECT_TYPE_PARAGOOMBA:
+		obj = new CParaGoomba(x, y);
+		break;
+
+	case OBJECT_TYPE_PIRANHAPLANT:
+		obj = new CPiranhaPlant(x, y);
+		break;
+
+		// Add other enemy types as needed
+	default:
+		DebugOut(L"[WARNING] Unknown enemy type: %d\n", enemyType);
+		break;
+	}
+
+	return obj;
+}
+
 void CPlayScene::_ParseSection_SPRITES(string line)
 {
 	vector<string> tokens = split(line);
@@ -101,7 +136,7 @@ void CPlayScene::_ParseSection_ANIMATIONS(string line)
 /*
 	Parse a line in section [OBJECTS] 
 */
-void CPlayScene::_ParseSection_OBJECTS(string line)
+void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 {
 	vector<string> tokens = split(line);
 
@@ -127,7 +162,15 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		objectManager.AddPlayer(player);
 		DebugOut(L"[INFO] Player object has been created!\n");
 		break;
-	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(x,y); break;
+
+	//Enemy Spawn Section
+
+	case OBJECT_TYPE_GOOMBA:
+	case OBJECT_TYPE_KOOPAS:
+	case OBJECT_TYPE_PARAGOOMBA:
+	case OBJECT_TYPE_PIRANHAPLANT:
+		obj = CreateEnemy(object_type, x, y);
+		break;
 	case OBJECT_TYPE_BRICK:
 	{
 		int brickNumber = 1; 
@@ -256,27 +299,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		DebugOut(L"[INFO] MushroomBrick object has been created!\n");
 		break;
 	}
-	case OBJECT_TYPE_KOOPAS:
-	{
-		Koopas* koopas = new Koopas(x, y);
-		obj = koopas;
-		objectManager.Add(koopas->GetFallSensor());
-		DebugOut(L"[INFO] Koopas object has been created!\n");
-
-		break;
-	}
-	case OBJECT_TYPE_PARAGOOMBA:
-	{
-		obj = new CParaGoomba(x, y);
-		DebugOut(L"[INFO] ParaGoomba object has been created!\n");
-		break;
-	}
-	case OBJECT_TYPE_PIRANHAPLANT:
-	{
-		obj = new CPiranhaPlant(x, y);
-		DebugOut(L"[INFO] PiranhaPlant object has been created!\n");
-		break;
-	}
 	case OBJECT_TYPE_FALL_PITCH:
 	{
 		float w = (float)atof(tokens[3].c_str());
@@ -289,6 +311,56 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	{
 		obj = new CSuperLeafBrick(x, y);
 		DebugOut(L"[INFO] SuperLeafBrick object has been created!\n");
+		break;
+	}
+	case OBJECT_TYPE_CHECKPOINT:
+	{
+		float width = CHECKPOINT_BBOX_WIDTH;
+		float height = CHECKPOINT_BBOX_HEIGHT;
+
+		if (tokens.size() >= 5) {
+			width = (float)atof(tokens[3].c_str());
+			height = (float)atof(tokens[4].c_str());
+		}
+
+		Checkpoint* checkpoint = new Checkpoint(x, y, width, height, &objectManager);
+		obj = checkpoint;
+		int enemyCount = 0;
+		if (tokens.size() >= 6) {
+			enemyCount = atoi(tokens[5].c_str());
+		}
+
+		// Load enemy definitions
+		for (int i = 0; i < enemyCount; i++) {
+			char enemyStr[MAX_SCENE_LINE];
+			if (!f.getline(enemyStr, MAX_SCENE_LINE))
+				break;
+
+			string enemyLine(enemyStr);
+
+			// Skip comments
+			if (enemyLine.empty() || enemyLine[0] == '#') {
+				i--; // Don't count this as an enemy
+				continue;
+			}
+
+			vector<string> enemyTokens = split(enemyLine);
+			if (enemyTokens.size() < 3)
+				continue;
+
+			int enemyType = atoi(enemyTokens[0].c_str());
+			float enemyX = (float)atof(enemyTokens[1].c_str());
+			float enemyY = (float)atof(enemyTokens[2].c_str());
+
+			CGameObject* enemyObj = CreateEnemy(enemyType, enemyX, enemyY);
+
+			if (enemyObj) {
+				checkpoint->AddObjectToSpawn(enemyObj);
+				DebugOut(L"[INFO] Added enemy type %d to checkpoint\n", enemyType);
+			}
+		}
+
+		DebugOut(L"[INFO] Checkpoint object has been created with %d enemies!\n", enemyCount);
 		break;
 	}
 	default:
@@ -366,7 +438,7 @@ void CPlayScene::Load()
 		switch (section)
 		{ 
 			case SCENE_SECTION_ASSETS: _ParseSection_ASSETS(line); break;
-			case SCENE_SECTION_OBJECTS: _ParseSection_OBJECTS(line); break;
+			case SCENE_SECTION_OBJECTS: _ParseSection_OBJECTS(line,f); break;
 		}
 	}
 

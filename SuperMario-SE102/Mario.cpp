@@ -142,6 +142,8 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithSuperLeaf(e);
 	else if (dynamic_cast<CSuperLeafBrick*>(e->obj))
 		OnCollisionWithSuperLeafBrick(e);
+	else if (dynamic_cast<Checkpoint*>(e->obj))
+		OnCollisionWithCheckpoint(e);
 }
 
 void CMario::UpdateHeldKoopasPosition()
@@ -302,6 +304,18 @@ void CMario::OnCollisionWithSuperLeafBrick(LPCOLLISIONEVENT e)
 		superLeafBrick->SetState(BRICK_STATE_HIT);
 	}
 }
+
+void CMario::OnCollisionWithCheckpoint(LPCOLLISIONEVENT e)
+{
+	Checkpoint* checkpoint = dynamic_cast<Checkpoint*>(e->obj);
+
+	if (checkpoint && !checkpoint->IsActivated())
+	{
+		checkpoint->SetState(CHECKPOINT_STATE_ACTIVE);
+		DebugOut(L">>> Mario triggered a checkpoint! >>> \n");
+	}
+}
+
 
 void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 {

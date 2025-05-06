@@ -53,47 +53,27 @@ void CMario::ReleaseKoopas()
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
 	vy += ay * dt;
-	vx += ax * dt;
 
+	// Update velocity based on acceleration
+	UpdateVelocity(dt);
+
+	// Apply velocity limits
 	if (abs(vx) > abs(maxVx)) vx = maxVx;
 
-	if ( GetTickCount64() - untouchable_start > MARIO_UNTOUCHABLE_TIME) 
-	{
-		untouchable_start = 0;
-		untouchable = 0;
-	}
+	// Handle untouchable state
+	UpdateUntouchableState();
 
-	if (isKicking && GetTickCount64() - kick_start > MARIO_KICK_TIMEOUT)
-	{
-		isKicking = false;
-	}
+	// Handle kicking timeout
+	UpdateKickingState();
 
-	if (isHolding && heldKoopas)
-	{
-		if (heldKoopas->IsAboutToWakeUp())
-		{
-			isHolding = false;
-			heldKoopas = NULL;
-			if (level > MARIO_LEVEL_SMALL)
-			{
-				level = MARIO_LEVEL_SMALL;
-				StartUntouchable();
-			}
-			else
-			{
-				SetState(MARIO_STATE_DIE);
-			}
-		}
-		else
-		{
-			UpdateHeldKoopasPosition();
-		}
-	}
+	// Update power meter
+	UpdatePowerMeter(dt);
 
-	if (isHolding && !CGame::GetInstance()->IsKeyDown(DIK_A))
-	{
-		ReleaseKoopas();
-	}
+	// Handle shell holding
+	UpdateHeldKoopas();
+
+	// Debug output
+	DebugOut(L"Coins: %d | P-Meter: %.2f/%.0f", coin, powerMeter, MARIO_PMETER_MAX);
 }
 
 void CMario::OnNoCollision(DWORD dt)
@@ -195,7 +175,7 @@ void CMario::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
 			{
 				if (level > MARIO_LEVEL_SMALL)
 				{
-					level = MARIO_LEVEL_SMALL;
+					LevelDown();
 					StartUntouchable();
 				}
 				else
@@ -275,7 +255,7 @@ void CMario::OnCollisionWithParaGoomba(LPCOLLISIONEVENT e)
 			{
 				if (level > MARIO_LEVEL_SMALL)
 				{
-					level = MARIO_LEVEL_SMALL;
+					LevelDown();
 					StartUntouchable();
 				}
 				else
@@ -294,7 +274,7 @@ void CMario::OnCollisionWithPiranhaPlant(LPCOLLISIONEVENT e)
 	{
 		if (level > MARIO_LEVEL_SMALL)
 		{
-			level = MARIO_LEVEL_SMALL;
+			LevelDown();
 			StartUntouchable();
 		}
 		else
@@ -356,6 +336,7 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 		{
 			// If shell is already moving, stop it
 			koopas->SetState(KOOPAS_STATE_SHELL);
+			koopas->SetSpeed(0, 0);
 			vy = -MARIO_JUMP_DEFLECT_SPEED;
 			DebugOut(L">>> Mario stopped moving Koopa shell! >>> \n");
 		}
@@ -389,7 +370,7 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 				{
 					if (level > MARIO_LEVEL_SMALL)
 					{
-						level = MARIO_LEVEL_SMALL;
+						LevelDown();
 						StartUntouchable();
 					}
 					else
@@ -408,221 +389,405 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 //
 int CMario::GetAniIdSmall()
 {
-	int aniId = -1;
-
-	// Check if Mario is kicking first
 	if (isKicking)
-	{
-		if (nx >= 0)
-			return ID_ANI_MARIO_SMALL_KICK_RIGHT;
-		else
-			return ID_ANI_MARIO_SMALL_KICK_LEFT;
-	}
+	return (nx >= 0) ? ID_ANI_MARIO_SMALL_KICK_RIGHT : ID_ANI_MARIO_SMALL_KICK_LEFT;
 
+	// Handle holding animations
 	if (isHolding)
 	{
-		if (!isOnPlatform)
-		{
-			// Jumping while holding
-			if (abs(ax) == MARIO_ACCEL_RUN_X)
-			{
-				if (nx >= 0)
-					aniId = ID_ANI_MARIO_SMALL_JUMP_RUN_RIGHT;
-				else
-					aniId = ID_ANI_MARIO_SMALL_JUMP_RUN_LEFT;
-			}
-			else
-			{
-				if (nx >= 0)
-					aniId = ID_ANI_MARIO_SMALL_JUMP_WALK_RIGHT;
-				else
-					aniId = ID_ANI_MARIO_SMALL_JUMP_WALK_LEFT;
-			}
-		}
-		else if (vx == 0)
-		{
-			// Idle while holding
-			if (nx >= 0)
-				aniId = ID_ANI_MARIO_SMALL_HOLD_IDLE_RIGHT;
-			else
-				aniId = ID_ANI_MARIO_SMALL_HOLD_IDLE_LEFT;
-		}
-		else if (vx > 0)
-		{
-			// Running while holding, facing right
-			aniId = ID_ANI_MARIO_SMALL_HOLD_RUNNING_RIGHT;
-		}
-		else // vx < 0
-		{
-			// Running while holding, facing left
-			aniId = ID_ANI_MARIO_SMALL_HOLD_RUNNING_LEFT;
-		}
-
+		int aniId = GetSmallHoldingAniId();
 		if (aniId != -1) return aniId;
 	}
 
-
+	// Handle jumping animations
 	if (!isOnPlatform)
-	{
-		if (abs(ax) == MARIO_ACCEL_RUN_X)
-		{
-			if (nx >= 0)
-				aniId = ID_ANI_MARIO_SMALL_JUMP_RUN_RIGHT;
-			else
-				aniId = ID_ANI_MARIO_SMALL_JUMP_RUN_LEFT;
-		}
-		else
-		{
-			if (nx >= 0)
-				aniId = ID_ANI_MARIO_SMALL_JUMP_WALK_RIGHT;
-			else
-				aniId = ID_ANI_MARIO_SMALL_JUMP_WALK_LEFT;
-		}
-	}
-	else if (isSitting)
-	{
-		if (nx > 0)
-			aniId = ID_ANI_MARIO_SIT_RIGHT;
-		else
-			aniId = ID_ANI_MARIO_SIT_LEFT;
-	}
-	else if (vx == 0)
-	{
-		if (nx > 0)
-			aniId = ID_ANI_MARIO_SMALL_IDLE_RIGHT;
-		else
-			aniId = ID_ANI_MARIO_SMALL_IDLE_LEFT;
-	}
-	else if (vx > 0)
-	{
-		if (ax < 0)
-			aniId = ID_ANI_MARIO_SMALL_BRACE_RIGHT;
-		else if (ax == MARIO_ACCEL_RUN_X)
-			aniId = ID_ANI_MARIO_SMALL_RUNNING_RIGHT;
-		else if (ax == MARIO_ACCEL_WALK_X)
-			aniId = ID_ANI_MARIO_SMALL_WALKING_RIGHT;
-	}
-	else // vx < 0
-	{
-		if (ax > 0)
-			aniId = ID_ANI_MARIO_SMALL_BRACE_LEFT;
-		else if (ax == -MARIO_ACCEL_RUN_X)
-			aniId = ID_ANI_MARIO_SMALL_RUNNING_LEFT;
-		else if (ax == -MARIO_ACCEL_WALK_X)
-			aniId = ID_ANI_MARIO_SMALL_WALKING_LEFT;
-	}
+	return GetSmallJumpingAniId();
 
-	if (aniId == -1) aniId = ID_ANI_MARIO_SMALL_IDLE_RIGHT;
+	// Handle sitting
+	if (isSitting)
+	return (nx > 0) ? ID_ANI_MARIO_SIT_RIGHT : ID_ANI_MARIO_SIT_LEFT;
 
-	return aniId;
+	// Handle idle
+	if (vx == 0)
+	return (nx > 0) ? ID_ANI_MARIO_SMALL_IDLE_RIGHT : ID_ANI_MARIO_SMALL_IDLE_LEFT;
+
+	// Handle moving right
+	if (vx > 0)
+	return GetSmallRightMovingAniId();
+
+	// Handle moving left
+	return GetSmallLeftMovingAniId();
+
 }
 
 int CMario::GetAniIdTail()
 {
-	int aniId = -1;
-
 	if (isKicking)
-	{
-		if (nx >= 0)
-			return ID_ANI_MARIO_TAIL_KICK_RIGHT;
-		else
-			return ID_ANI_MARIO_TAIL_KICK_LEFT;
-	}
+		return (nx >= 0) ? ID_ANI_MARIO_TAIL_KICK_RIGHT : ID_ANI_MARIO_TAIL_KICK_LEFT;
 
+	// Handle holding animations
 	if (isHolding)
 	{
-		// Handle holding animations for raccoon Mario
-		if (!isOnPlatform)
-		{
-			if (abs(ax) == MARIO_ACCEL_RUN_X)
-			{
-				if (nx >= 0)
-					aniId = ID_ANI_MARIO_TAIL_JUMP_RUN_RIGHT;
-				else
-					aniId = ID_ANI_MARIO_TAIL_JUMP_RUN_LEFT;
-			}
-			else
-			{
-				if (nx >= 0)
-					aniId = ID_ANI_MARIO_TAIL_JUMP_WALK_RIGHT;
-				else
-					aniId = ID_ANI_MARIO_TAIL_JUMP_WALK_LEFT;
-			}
-		}
-		else if (vx == 0)
-		{
-			// Idle while holding
-			if (nx >= 0)
-				aniId = ID_ANI_MARIO_TAIL_HOLD_IDLE_RIGHT;
-			else
-				aniId = ID_ANI_MARIO_TAIL_HOLD_IDLE_LEFT;
-		}
-		else if (vx > 0)
-		{
-			aniId = ID_ANI_MARIO_TAIL_HOLD_RUNNING_RIGHT;
-		}
-		else // vx < 0
-		{
-			aniId = ID_ANI_MARIO_TAIL_HOLD_RUNNING_LEFT;
-		}
-
+		int aniId = GetTailHoldingAniId();
 		if (aniId != -1) return aniId;
 	}
 
-	// Rest of the method remains unchanged
+	// Handle jumping animations
+	if (!isOnPlatform)
+		return GetTailJumpingAniId();
+
+	// Handle sitting
+	if (isSitting)
+		return (nx > 0) ? ID_ANI_MARIO_TAIL_SIT_RIGHT : ID_ANI_MARIO_TAIL_SIT_LEFT;
+
+	// Handle idle
+	if (vx == 0)
+		return (nx > 0) ? ID_ANI_MARIO_TAIL_IDLE_RIGHT : ID_ANI_MARIO_TAIL_IDLE_LEFT;
+
+	// Handle moving right
+	if (vx > 0)
+		return GetTailRightMovingAniId();
+
+	// Handle moving left
+	return GetTailLeftMovingAniId();
+}
+
+int CMario::GetSmallHoldingAniId()
+{
 	if (!isOnPlatform)
 	{
 		if (abs(ax) == MARIO_ACCEL_RUN_X)
-		{
-			if (nx >= 0)
-				aniId = ID_ANI_MARIO_TAIL_JUMP_RUN_RIGHT;
-			else
-				aniId = ID_ANI_MARIO_TAIL_JUMP_RUN_LEFT;
-		}
+			return (nx >= 0) ? ID_ANI_MARIO_SMALL_JUMP_RUN_RIGHT : ID_ANI_MARIO_SMALL_JUMP_RUN_LEFT;
 		else
-		{
-			if (nx >= 0)
-				aniId = ID_ANI_MARIO_TAIL_JUMP_WALK_RIGHT;
-			else
-				aniId = ID_ANI_MARIO_TAIL_JUMP_WALK_LEFT;
-		}
+			return (nx >= 0) ? ID_ANI_MARIO_SMALL_JUMP_WALK_RIGHT : ID_ANI_MARIO_SMALL_JUMP_WALK_LEFT;
 	}
-	else if (isSitting)
-	{
-		if (nx > 0)
-			aniId = ID_ANI_MARIO_TAIL_SIT_RIGHT;
-		else
-			aniId = ID_ANI_MARIO_TAIL_SIT_LEFT;
-	}
-	else if (vx == 0)
-	{
-		if (nx > 0)
-			aniId = ID_ANI_MARIO_TAIL_IDLE_RIGHT;
-		else
-			aniId = ID_ANI_MARIO_TAIL_IDLE_LEFT;
-	}
-	else if (vx > 0)
-	{
-		if (ax < 0)
-			aniId = ID_ANI_MARIO_TAIL_BRACE_RIGHT;
-		else if (ax == MARIO_ACCEL_RUN_X)
-			aniId = ID_ANI_MARIO_TAIL_RUNNING_RIGHT;
-		else if (ax == MARIO_ACCEL_WALK_X)
-			aniId = ID_ANI_MARIO_TAIL_WALKING_RIGHT;
-	}
+
+	if (vx == 0)
+		return (nx >= 0) ? ID_ANI_MARIO_SMALL_HOLD_IDLE_RIGHT : ID_ANI_MARIO_SMALL_HOLD_IDLE_LEFT;
+
+	if (vx > 0)
+		return ID_ANI_MARIO_SMALL_HOLD_RUNNING_RIGHT;
 	else // vx < 0
+		return ID_ANI_MARIO_SMALL_HOLD_RUNNING_LEFT;
+
+	return -1; 
+}
+
+int CMario::GetSmallJumpingAniId()
+{
+	if (abs(ax) == MARIO_ACCEL_RUN_X)
+		return (nx >= 0) ? ID_ANI_MARIO_SMALL_JUMP_RUN_RIGHT : ID_ANI_MARIO_SMALL_JUMP_RUN_LEFT;
+	else
+		return (nx >= 0) ? ID_ANI_MARIO_SMALL_JUMP_WALK_RIGHT : ID_ANI_MARIO_SMALL_JUMP_WALK_LEFT;
+}
+
+int CMario::GetSmallRightMovingAniId()
+{
+	if (ax < 0)
+		return ID_ANI_MARIO_SMALL_BRACE_RIGHT;
+	else if (ax == MARIO_ACCEL_RUN_X)
+		return ID_ANI_MARIO_SMALL_RUNNING_RIGHT;
+	else if (ax == MARIO_ACCEL_WALK_X)
+		return ID_ANI_MARIO_SMALL_WALKING_RIGHT;
+
+	return ID_ANI_MARIO_SMALL_IDLE_RIGHT; // Default
+}
+
+int CMario::GetSmallLeftMovingAniId()
+{
+	if (ax > 0)
+		return ID_ANI_MARIO_SMALL_BRACE_LEFT;
+	else if (ax == -MARIO_ACCEL_RUN_X)
+		return ID_ANI_MARIO_SMALL_RUNNING_LEFT;
+	else if (ax == -MARIO_ACCEL_WALK_X)
+		return ID_ANI_MARIO_SMALL_WALKING_LEFT;
+
+	return ID_ANI_MARIO_SMALL_IDLE_LEFT; // Default
+}
+
+int CMario::GetBigHoldingAniId()
+{
+	// Not on platform, jumping while holding
+	if (!isOnPlatform)
 	{
-		if (ax > 0)
-			aniId = ID_ANI_MARIO_TAIL_BRACE_LEFT;
-		else if (ax == -MARIO_ACCEL_RUN_X)
-			aniId = ID_ANI_MARIO_TAIL_RUNNING_LEFT;
-		else if (ax == -MARIO_ACCEL_WALK_X)
-			aniId = ID_ANI_MARIO_TAIL_WALKING_LEFT;
+		if (abs(ax) == MARIO_ACCEL_RUN_X)
+			return (nx >= 0) ? ID_ANI_MARIO_JUMP_RUN_RIGHT : ID_ANI_MARIO_JUMP_RUN_LEFT;
+		else
+			return (nx >= 0) ? ID_ANI_MARIO_JUMP_WALK_RIGHT : ID_ANI_MARIO_JUMP_WALK_LEFT;
 	}
 
-	if (aniId == -1) aniId = ID_ANI_MARIO_TAIL_IDLE_RIGHT;
+	// Idle while holding
+	if (vx == 0)
+		return (nx >= 0) ? ID_ANI_MARIO_HOLD_IDLE_RIGHT : ID_ANI_MARIO_HOLD_IDLE_LEFT;
 
-	return aniId;
+	// Running while holding
+	if (vx > 0)
+		return ID_ANI_MARIO_HOLD_RUNNING_RIGHT;
+	else // vx < 0
+		return ID_ANI_MARIO_HOLD_RUNNING_LEFT;
+
+	return -1; // No applicable animation found
+}
+
+int CMario::GetBigJumpingAniId()
+{
+	if (abs(ax) == MARIO_ACCEL_RUN_X)
+		return (nx >= 0) ? ID_ANI_MARIO_JUMP_RUN_RIGHT : ID_ANI_MARIO_JUMP_RUN_LEFT;
+	else
+		return (nx >= 0) ? ID_ANI_MARIO_JUMP_WALK_RIGHT : ID_ANI_MARIO_JUMP_WALK_LEFT;
+}
+
+int CMario::GetBigRightMovingAniId()
+{
+	if (ax < 0)
+		return ID_ANI_MARIO_BRACE_RIGHT;
+	else if (ax == MARIO_ACCEL_RUN_X)
+		return ID_ANI_MARIO_RUNNING_RIGHT;
+	else if (ax == MARIO_ACCEL_WALK_X)
+		return ID_ANI_MARIO_WALKING_RIGHT;
+
+	return ID_ANI_MARIO_IDLE_RIGHT; // Default
+}
+
+int CMario::GetBigLeftMovingAniId()
+{
+	if (ax > 0)
+		return ID_ANI_MARIO_BRACE_LEFT;
+	else if (ax == -MARIO_ACCEL_RUN_X)
+		return ID_ANI_MARIO_RUNNING_LEFT;
+	else if (ax == -MARIO_ACCEL_WALK_X)
+		return ID_ANI_MARIO_WALKING_LEFT;
+
+	return ID_ANI_MARIO_IDLE_LEFT; // Default
+}
+
+int CMario::GetTailHoldingAniId()
+{
+	// Not on platform, jumping while holding
+	if (!isOnPlatform)
+	{
+		if (abs(ax) == MARIO_ACCEL_RUN_X)
+			return (nx >= 0) ? ID_ANI_MARIO_TAIL_JUMP_RUN_RIGHT : ID_ANI_MARIO_TAIL_JUMP_RUN_LEFT;
+		else
+			return (nx >= 0) ? ID_ANI_MARIO_TAIL_JUMP_WALK_RIGHT : ID_ANI_MARIO_TAIL_JUMP_WALK_LEFT;
+	}
+
+	// Idle while holding
+	if (vx == 0)
+		return (nx >= 0) ? ID_ANI_MARIO_TAIL_HOLD_IDLE_RIGHT : ID_ANI_MARIO_TAIL_HOLD_IDLE_LEFT;
+
+	// Running while holding
+	if (vx > 0)
+		return ID_ANI_MARIO_TAIL_HOLD_RUNNING_RIGHT;
+	else // vx < 0
+		return ID_ANI_MARIO_TAIL_HOLD_RUNNING_LEFT;
+
+	return -1; // No applicable animation found
+}
+
+int CMario::GetTailJumpingAniId()
+{
+	if (abs(ax) == MARIO_ACCEL_RUN_X)
+		return (nx >= 0) ? ID_ANI_MARIO_TAIL_JUMP_RUN_RIGHT : ID_ANI_MARIO_TAIL_JUMP_RUN_LEFT;
+	else
+		return (nx >= 0) ? ID_ANI_MARIO_TAIL_JUMP_WALK_RIGHT : ID_ANI_MARIO_TAIL_JUMP_WALK_LEFT;
+}
+
+int CMario::GetTailRightMovingAniId()
+{
+	if (ax < 0)
+		return ID_ANI_MARIO_TAIL_BRACE_RIGHT;
+	else if (ax == MARIO_ACCEL_RUN_X)
+		return ID_ANI_MARIO_TAIL_RUNNING_RIGHT;
+	else if (ax == MARIO_ACCEL_WALK_X)
+		return ID_ANI_MARIO_TAIL_WALKING_RIGHT;
+
+	return ID_ANI_MARIO_TAIL_IDLE_RIGHT; // Default
+}
+
+int CMario::GetTailLeftMovingAniId()
+{
+	if (ax > 0)
+		return ID_ANI_MARIO_TAIL_BRACE_LEFT;
+	else if (ax == -MARIO_ACCEL_RUN_X)
+		return ID_ANI_MARIO_TAIL_RUNNING_LEFT;
+	else if (ax == -MARIO_ACCEL_WALK_X)
+		return ID_ANI_MARIO_TAIL_WALKING_LEFT;
+
+	return ID_ANI_MARIO_TAIL_IDLE_LEFT; // Default
+}
+
+void CMario::HandleKoopasJumpedOn(Koopas* koopas)
+{
+   vy = -MARIO_JUMP_DEFLECT_SPEED;
+
+   switch (koopas->GetState())
+   {
+   case KOOPAS_STATE_WALKING:
+       // Turn normal Koopas into shell
+       koopas->SetState(KOOPAS_STATE_SHELL);
+       break;
+
+   case KOOPAS_STATE_SHELL:
+   {
+       // If Koopas is already in shell state, kick it
+       float shellDirection = (nx > 0) ? 1.0f : -1.0f;
+       koopas->SetState(KOOPAS_STATE_SHELL_MOVING);
+       koopas->SetSpeed(shellDirection * KOOPAS_SHELL_SPEED, 0);
+       DebugOut(L">>> Mario kicked Koopa shell by jumping on it! >>> \n");
+       break;
+   }
+
+   case KOOPAS_STATE_SHELL_MOVING:
+       // If shell is already moving, stop it
+       koopas->SetState(KOOPAS_STATE_SHELL);
+       koopas->SetSpeed(0, 0);
+       DebugOut(L">>> Mario stopped moving Koopa shell! >>> \n");
+       break;
+   }
+}
+
+void CMario::HandleKoopasSideCollision(Koopas* koopas, LPCOLLISIONEVENT e)
+{
+	// Can we hold the shell?
+	if (koopas->GetState() == KOOPAS_STATE_SHELL && abs(vx) >= MARIO_WALKING_SPEED &&CGame::GetInstance()->IsKeyDown(DIK_A) &&
+		!isHolding)
+	{
+		HoldKoopas(koopas);
+		DebugOut(L">>> Mario picked up Koopa shell! >>> \n");
+		return;
+	}
+
+	// Can we kick the shell?
+	if (koopas->GetState() == KOOPAS_STATE_SHELL)
+	{
+		KickKoopasShell(koopas, e);
+		return;
+	}
+
+	// Handle damage when hit by Koopas
+	if (untouchable == 0 && koopas->GetState() != KOOPAS_STATE_SHELL)
+		TakeDamage();
+}
+
+void CMario::KickKoopasShell(Koopas* koopas, LPCOLLISIONEVENT e)
+{
+	isKicking = true;
+	kick_start = GetTickCount64();
+
+	int shellDirection = (e->nx > 0) ? -1 : 1;
+	koopas->SetState(KOOPAS_STATE_SHELL_MOVING);
+	koopas->SetSpeed(shellDirection * KOOPAS_SHELL_SPEED, 0);
+	DebugOut(L">>> Mario kicked Koopa shell from the side! >>> \n");
+}
+
+void CMario::TakeDamage()
+{
+	if (level > MARIO_LEVEL_SMALL)
+	{
+		LevelDown();
+		StartUntouchable();
+	}
+	else
+	{
+		DebugOut(L">>> Mario DIE >>> \n");
+		SetState(MARIO_STATE_DIE);
+	}
+}
+
+void CMario::LevelDown()
+{
+	// If already at the lowest level, do nothing
+	if (level <= MARIO_LEVEL_SMALL)
+		return;
+
+	StartUntouchable();
+
+	if (level == MARIO_LEVEL_TAIL)
+	{
+		level = MARIO_LEVEL_BIG;
+		DebugOut(L">>> Mario lost tail: reverted to Big Mario >>> \n");
+	}
+	else if (level == MARIO_LEVEL_BIG)
+	{
+		level = MARIO_LEVEL_SMALL;
+		y += (MARIO_BIG_BBOX_HEIGHT - MARIO_SMALL_BBOX_HEIGHT) / 2;
+		DebugOut(L">>> Mario lost power: reverted to Small Mario >>> \n");
+	}
+}
+
+void CMario::UpdateVelocity(DWORD dt)
+{
+	if (abs(ax) == MARIO_ACCEL_RUN_X) {
+		float accelMultiplier = 1.0f + (0.2f * powerMeter / MARIO_PMETER_MAX);
+		vx += ax * accelMultiplier * dt;
+	}
+	else {
+		vx += ax * dt;
+	}
+}
+
+void CMario::UpdateUntouchableState()
+{
+	if (GetTickCount64() - untouchable_start > MARIO_UNTOUCHABLE_TIME)
+	{
+		untouchable_start = 0;
+		untouchable = 0;
+	}
+}
+
+void CMario::UpdateKickingState()
+{
+	if (isKicking && GetTickCount64() - kick_start > MARIO_KICK_TIMEOUT)
+	{
+		isKicking = false;
+	}
+}
+
+void CMario::UpdatePowerMeter(DWORD dt)
+{
+	if (isOnPlatform && !isSitting && abs(vx) == MARIO_RUNNING_SPEED)
+	{
+		powerMeter += MARIO_PMETER_GAIN_RATE * dt;
+		if (powerMeter > MARIO_PMETER_MAX)
+			powerMeter = MARIO_PMETER_MAX;
+	}
+	else
+	{
+		powerMeter -= MARIO_PMETER_DECAY_RATE * dt;
+		if (powerMeter < 0)
+			powerMeter = 0;
+	}
+}
+
+void CMario::UpdateHeldKoopas()
+{
+	if (!isHolding || heldKoopas == NULL)
+		return;
+
+	if (heldKoopas->IsAboutToWakeUp())
+	{
+		isHolding = false;
+		heldKoopas = NULL;
+
+		if (level > MARIO_LEVEL_SMALL)
+		{
+			level = MARIO_LEVEL_SMALL;
+			StartUntouchable();
+		}
+		else
+		{
+			SetState(MARIO_STATE_DIE);
+		}
+		return;
+	}
+
+	UpdateHeldKoopasPosition();
+
+	if (!CGame::GetInstance()->IsKeyDown(DIK_A))
+	{
+		ReleaseKoopas();
+	}
 }
 
 
@@ -631,110 +796,34 @@ int CMario::GetAniIdTail()
 //
 int CMario::GetAniIdBig()
 {
-	int aniId = -1;
-
 	if (isKicking)
-	{
-		if (nx >= 0)
-			return ID_ANI_MARIO_KICK_RIGHT;
-		else
-			return ID_ANI_MARIO_KICK_LEFT;
-	}
+		return (nx >= 0) ? ID_ANI_MARIO_KICK_RIGHT : ID_ANI_MARIO_KICK_LEFT;
 
+	// Handle holding animations
 	if (isHolding)
 	{
-		// Handle holding animations for all scenarios
-		if (!isOnPlatform)
-		{
-			// Jumping while holding
-			if (abs(ax) == MARIO_ACCEL_RUN_X)
-			{
-				if (nx >= 0)
-					aniId = ID_ANI_MARIO_JUMP_RUN_RIGHT;
-				else
-					aniId = ID_ANI_MARIO_JUMP_RUN_LEFT;
-			}
-			else
-			{
-				if (nx >= 0)
-					aniId = ID_ANI_MARIO_JUMP_WALK_RIGHT;
-				else
-					aniId = ID_ANI_MARIO_JUMP_WALK_LEFT;
-			}
-		}
-		else if (vx == 0)
-		{
-			// Idle while holding
-			if (nx >= 0)
-				aniId = ID_ANI_MARIO_HOLD_IDLE_RIGHT;
-			else
-				aniId = ID_ANI_MARIO_HOLD_IDLE_LEFT;
-		}
-		else if (vx > 0)
-		{
-			aniId = ID_ANI_MARIO_HOLD_RUNNING_RIGHT;
-		}
-		else // vx < 0
-		{
-			aniId = ID_ANI_MARIO_HOLD_RUNNING_LEFT;
-		}
-
+		int aniId = GetBigHoldingAniId();
 		if (aniId != -1) return aniId;
 	}
 
+	// Handle jumping animations
 	if (!isOnPlatform)
-	{
-		if (abs(ax) == MARIO_ACCEL_RUN_X)
-		{
-			if (nx >= 0)
-				aniId = ID_ANI_MARIO_JUMP_RUN_RIGHT;
-			else
-				aniId = ID_ANI_MARIO_JUMP_RUN_LEFT;
-		}
-		else
-		{
-			if (nx >= 0)
-				aniId = ID_ANI_MARIO_JUMP_WALK_RIGHT;
-			else
-				aniId = ID_ANI_MARIO_JUMP_WALK_LEFT;
-		}
-	}
-	else
-		if (isSitting)
-		{
-			if (nx > 0)
-				aniId = ID_ANI_MARIO_SIT_RIGHT;
-			else
-				aniId = ID_ANI_MARIO_SIT_LEFT;
-		}
-		else
-			if (vx == 0)
-			{
-				if (nx > 0) aniId = ID_ANI_MARIO_IDLE_RIGHT;
-				else aniId = ID_ANI_MARIO_IDLE_LEFT;
-			}
-			else if (vx > 0)
-			{
-				if (ax < 0)
-					aniId = ID_ANI_MARIO_BRACE_RIGHT;
-				else if (ax == MARIO_ACCEL_RUN_X)
-					aniId = ID_ANI_MARIO_RUNNING_RIGHT;
-				else if (ax == MARIO_ACCEL_WALK_X)
-					aniId = ID_ANI_MARIO_WALKING_RIGHT;
-			}
-			else // vx < 0
-			{
-				if (ax > 0)
-					aniId = ID_ANI_MARIO_BRACE_LEFT;
-				else if (ax == -MARIO_ACCEL_RUN_X)
-					aniId = ID_ANI_MARIO_RUNNING_LEFT;
-				else if (ax == -MARIO_ACCEL_WALK_X)
-					aniId = ID_ANI_MARIO_WALKING_LEFT;
-			}
+		return GetBigJumpingAniId();
 
-	if (aniId == -1) aniId = ID_ANI_MARIO_IDLE_RIGHT;
+	// Handle sitting
+	if (isSitting)
+		return (nx > 0) ? ID_ANI_MARIO_SIT_RIGHT : ID_ANI_MARIO_SIT_LEFT;
 
-	return aniId;
+	// Handle idle
+	if (vx == 0)
+		return (nx > 0) ? ID_ANI_MARIO_IDLE_RIGHT : ID_ANI_MARIO_IDLE_LEFT;
+
+	// Handle moving right
+	if (vx > 0)
+		return GetBigRightMovingAniId();
+
+	// Handle moving left
+	return GetBigLeftMovingAniId();
 }
 
 void CMario::Render()

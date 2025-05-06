@@ -95,49 +95,6 @@ void Koopas::OnNoCollision(DWORD dt)
 
 void Koopas::OnCollisionWith(LPCOLLISIONEVENT e)
 {
-	if (state == KOOPAS_STATE_SHELL_MOVING)
-	{
-		if (dynamic_cast<CGoomba*>(e->obj))
-		{
-			CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
-			if (goomba->GetState() != GOOMBA_STATE_DIE)
-			{
-				goomba->SetState(GOOMBA_STATE_DIE);
-				DebugOut(L">>> Koopa shell killed Goomba! >>> \n");
-			}
-		}
-		else if (dynamic_cast<Koopas*>(e->obj))
-		{
-			Koopas* otherKoopas = dynamic_cast<Koopas*>(e->obj);
-			if (otherKoopas->GetState() != KOOPAS_STATE_SHELL &&
-				otherKoopas->GetState() != KOOPAS_STATE_SHELL_MOVING)
-			{
-				otherKoopas->SetState(KOOPAS_STATE_SHELL);
-				DebugOut(L">>> Koopa shell hit another Koopa! >>> \n");
-			}
-		}
-		else if (dynamic_cast<CCoinBrick*>(e->obj))
-		{
-			CCoinBrick* coinBrick = dynamic_cast<CCoinBrick*>(e->obj);
-			if (coinBrick->GetState() != BRICK_STATE_HIT)
-			{
-				coinBrick->SpawnCoin();
-				coinBrick->SetState(BRICK_STATE_HIT);
-				DebugOut(L">>> Koopa shell hit Coin Brick! >>> \n");
-			}
-		}
-		else if (dynamic_cast<CMushroomBrick*>(e->obj))
-		{
-			CMushroomBrick* mushroomBrick = dynamic_cast<CMushroomBrick*>(e->obj);
-			if (mushroomBrick->GetState() != BRICK_STATE_HIT)
-			{
-				mushroomBrick->SpawnMushroom();
-				mushroomBrick->SetState(BRICK_STATE_HIT);
-				DebugOut(L">>> Koopa shell hit Mushroom Brick! >>> \n");
-			}
-		}
-	}
-
 	if (e->obj->IsBlocking())
 	{
 		if (e->ny != 0)
@@ -150,7 +107,63 @@ void Koopas::OnCollisionWith(LPCOLLISIONEVENT e)
 			ResetSensors();
 		}
 	}
+
+	if (state != KOOPAS_STATE_SHELL_MOVING)
+		return;
+
+	if (dynamic_cast<CGoomba*>(e->obj))
+		OnCollisionWithGoomba(e);
+	else if (dynamic_cast<Koopas*>(e->obj))
+		OnCollisionWithOtherKoopas(e);
+	else if (dynamic_cast<CCoinBrick*>(e->obj))
+		OnCollisionWithCoinBrick(e);
+	else if (dynamic_cast<CMushroomBrick*>(e->obj))
+		OnCollisionWithMushroomBrick(e);
 }
+
+void Koopas::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
+{
+	CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
+	if (goomba->GetState() != GOOMBA_STATE_DIE)
+	{
+		goomba->SetState(GOOMBA_STATE_DIE);
+		DebugOut(L">>> Koopa shell killed Goomba! >>> \n");
+	}
+}
+
+void Koopas::OnCollisionWithOtherKoopas(LPCOLLISIONEVENT e)
+{
+	Koopas* otherKoopas = dynamic_cast<Koopas*>(e->obj);
+	if (otherKoopas->GetState() != KOOPAS_STATE_SHELL &&
+		otherKoopas->GetState() != KOOPAS_STATE_SHELL_MOVING)
+	{
+		otherKoopas->SetState(KOOPAS_STATE_SHELL);
+		DebugOut(L">>> Koopa shell hit another Koopa! >>> \n");
+	}
+}
+
+void Koopas::OnCollisionWithCoinBrick(LPCOLLISIONEVENT e)
+{
+	CCoinBrick* coinBrick = dynamic_cast<CCoinBrick*>(e->obj);
+	if (coinBrick->GetState() != BRICK_STATE_HIT)
+	{
+		coinBrick->SpawnCoin();
+		coinBrick->SetState(BRICK_STATE_HIT);
+		DebugOut(L">>> Koopa shell hit Coin Brick! >>> \n");
+	}
+}
+
+void Koopas::OnCollisionWithMushroomBrick(LPCOLLISIONEVENT e)
+{
+	CMushroomBrick* mushroomBrick = dynamic_cast<CMushroomBrick*>(e->obj);
+	if (mushroomBrick->GetState() != BRICK_STATE_HIT)
+	{
+		mushroomBrick->SpawnMushroom();
+		mushroomBrick->SetState(BRICK_STATE_HIT);
+		DebugOut(L">>> Koopa shell hit Mushroom Brick! >>> \n");
+	}
+}
+
 
 Koopas::Koopas(float x, float y)
 {

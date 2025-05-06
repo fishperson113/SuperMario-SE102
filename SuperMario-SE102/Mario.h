@@ -10,7 +10,10 @@
 #define MARIO_RUNNING_SPEED		0.2f
 
 #define MARIO_ACCEL_WALK_X	0.0005f
-#define MARIO_ACCEL_RUN_X	0.0007f
+#define MARIO_ACCEL_RUN_X	0.0004f
+#define MARIO_PMETER_MAX          6        
+#define MARIO_PMETER_GAIN_RATE    0.008f   
+#define MARIO_PMETER_DECAY_RATE   0.02f
 
 #define MARIO_JUMP_SPEED_Y		0.5f
 #define MARIO_JUMP_RUN_SPEED_Y	0.6f
@@ -155,6 +158,7 @@ class CMario : public CGameObject
 	float maxVx;
 	float ax;				// acceleration on x 
 	float ay;				// acceleration on y 
+	float powerMeter;
 
 	int level; 
 	int untouchable; 
@@ -182,6 +186,34 @@ class CMario : public CGameObject
 	int GetAniIdSmall();
 	int GetAniIdTail();
 
+	int GetSmallHoldingAniId();
+	int GetSmallJumpingAniId();
+	int GetSmallRightMovingAniId();
+	int GetSmallLeftMovingAniId();
+
+	int GetBigHoldingAniId();
+	int GetBigJumpingAniId();
+	int GetBigRightMovingAniId();
+	int GetBigLeftMovingAniId();
+
+	int GetTailHoldingAniId();
+	int GetTailJumpingAniId();
+	int GetTailRightMovingAniId();
+	int GetTailLeftMovingAniId();
+
+
+	void HandleKoopasJumpedOn(Koopas* koopas);
+	void HandleKoopasSideCollision(Koopas* koopas, LPCOLLISIONEVENT e);
+	void KickKoopasShell(Koopas* koopas, LPCOLLISIONEVENT e);
+	void TakeDamage();
+	void LevelDown();
+
+	void UpdateVelocity(DWORD dt);
+	void UpdateUntouchableState();
+	void UpdateKickingState();
+	void UpdatePowerMeter(DWORD dt);
+	void UpdateHeldKoopas();
+
 public:
 	CMario(float x, float y) : CGameObject(x, y)
 	{
@@ -190,7 +222,7 @@ public:
 		ax = 0.0f;
 		ay = MARIO_GRAVITY; 
 
-		level = MARIO_LEVEL_SMALL;
+		level = MARIO_LEVEL_TAIL;
 		untouchable = 0;
 		untouchable_start = -1;
 		isOnPlatform = false;
@@ -199,6 +231,7 @@ public:
 		isHolding = false;
 		isKicking = false;
 		kick_start = 0;
+		powerMeter = 0.0f;
 	}
 
 	void HoldKoopas(Koopas* koopas);

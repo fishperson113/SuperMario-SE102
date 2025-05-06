@@ -45,6 +45,10 @@ protected:
 	virtual void OnNoCollision(DWORD dt);
 
 	virtual void OnCollisionWith(LPCOLLISIONEVENT e);
+	void OnCollisionWithGoomba(LPCOLLISIONEVENT e);
+	void OnCollisionWithOtherKoopas(LPCOLLISIONEVENT e);
+	void OnCollisionWithCoinBrick(LPCOLLISIONEVENT e);
+	void OnCollisionWithMushroomBrick(LPCOLLISIONEVENT e);
 
 public:
 	Koopas(float x, float y);

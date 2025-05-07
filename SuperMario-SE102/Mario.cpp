@@ -73,7 +73,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	UpdateHeldKoopas();
 
 	// Debug output
-	DebugOut(L"Coins: %d | P-Meter: %.2f/%.0f", coin, powerMeter, MARIO_PMETER_MAX);
+	//DebugOut(L"Coins: %d | P-Meter: %.2f/%.0f", coin, powerMeter, MARIO_PMETER_MAX);
 }
 
 void CMario::OnNoCollision(DWORD dt)

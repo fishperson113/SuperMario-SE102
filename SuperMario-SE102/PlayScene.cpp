@@ -63,6 +63,7 @@ CGameObject* CPlayScene::CreateEnemy(int enemyType, float x, float y)
 
 	case OBJECT_TYPE_PARAGOOMBA:
 		obj = new CParaGoomba(x, y);
+		DebugOut(L"[INFO] Creating ParaGoomba at (%f, %f)\n", x, y);
 		break;
 
 	case OBJECT_TYPE_PIRANHAPLANT:
@@ -355,6 +356,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 			CGameObject* enemyObj = CreateEnemy(enemyType, enemyX, enemyY);
 
 			if (enemyObj) {
+				enemyObj->SetActive(false);
+				objectManager.Add(enemyObj); 
 				checkpoint->AddObjectToSpawn(enemyObj);
 				DebugOut(L"[INFO] Added enemy type %d to checkpoint\n", enemyType);
 			}

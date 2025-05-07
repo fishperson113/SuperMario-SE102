@@ -25,7 +25,7 @@ public:
     void SpawnObjects();
 
     virtual void Render();
-    virtual void Update(DWORD dt);
+    virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects=NULL);
     virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
     virtual int IsBlocking() { return 0; }
     virtual void SetState(int state);

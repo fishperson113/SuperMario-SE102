@@ -29,6 +29,7 @@ protected:
 	int state;
 
 	bool isDeleted; 
+	bool isActive;
 
 public: 
 	void SetPosition(float x, float y) { this->x = x, this->y = y; }
@@ -43,21 +44,22 @@ public:
 	void RenderBoundingBox();
 
 	CGameObject();
-	CGameObject(float x, float y) :CGameObject() { this->x = x; this->y = y; }
+	CGameObject(float x, float y) :CGameObject() { this->x = x; this->y = y; isActive = true;}
 
 
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom) = 0;
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects = NULL) {};
 	virtual void Render() = 0;
 	virtual void SetState(int state) { this->state = state; }
-
+	bool IsActive() const { return isActive; }
+	void SetActive(bool active) { isActive = active; }
 	//
 	// Collision ON or OFF ? This can change depending on object's state. For example: die
 	//
 	virtual int IsCollidable() { return 0; };
 
 	// When no collision has been detected (triggered by CCollision::Process)
-	virtual void OnNoCollision(DWORD dt) {};
+	virtual void OnNoCollision(DWORD dt) { if (!isActive) return; };
 
 	// When collision with an object has been detected (triggered by CCollision::Process)
 	virtual void OnCollisionWith(LPCOLLISIONEVENT e) {};

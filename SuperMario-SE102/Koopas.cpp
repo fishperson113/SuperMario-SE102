@@ -165,7 +165,7 @@ void Koopas::OnCollisionWithMushroomBrick(LPCOLLISIONEVENT e)
 }
 
 
-Koopas::Koopas(float x, float y)
+Koopas::Koopas(float x, float y) :CGameObject(x, y)
 {
 	this->ax = 0;
 	this->ay = KOOPAS_GRAVITY;

@@ -1,4 +1,5 @@
 #include "ParaGoomba.h"
+#include "debug.h"
 #define PARAGOOMBA_STATE_DIE 200
 
 void CParaGoomba::GetBoundingBox(float& left, float& top, float& right, float& bottom)
@@ -28,6 +29,7 @@ void CParaGoomba::GetBoundingBox(float& left, float& top, float& right, float& b
 
 void CParaGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	if (!isActive) return;
 	vy += ay * dt;
 	vx += ax * dt;
 
@@ -36,7 +38,7 @@ void CParaGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		isDeleted = true;
 		return;
 	}
-
+	DebugOut(L"ParaGoomba: %f, %f\n", x, y);
 	if (state == PARAGOOMBA_STATE_JUMPING && GetTickCount64() - jump_start > 500) // Jump duration
 	{
 		SetState(PARAGOOMBA_STATE_WALKING);
@@ -68,6 +70,7 @@ void CParaGoomba::Render()
 
 void CParaGoomba::OnNoCollision(DWORD dt)
 {
+	if (!isActive) return;
 	x += vx * dt;
 	y += vy * dt;
 }
@@ -87,7 +90,7 @@ void CParaGoomba::OnCollisionWith(LPCOLLISIONEVENT e)
 	}
 }
 
-CParaGoomba::CParaGoomba(float x, float y)
+CParaGoomba::CParaGoomba(float x, float y) :CGameObject(x, y)
 {
 	this->ax = 0;
 	this->ay = PARAGOOMBA_GRAVITY;
@@ -114,9 +117,6 @@ void CParaGoomba::SetState(int state)
 	case PARAGOOMBA_STATE_JUMPING:
 		vy = PARAGOOMBA_JUMP_SPEED;
 		jump_start = GetTickCount64();
-		break;
-	case PARAGOOMBA_STATE_WALKING2:
-		vx = -PARAGOOMBA_WALKING_SPEED;
 		break;
 	}
 }

@@ -1,6 +1,7 @@
 #include "Checkpoint.h"
 #include"ObjectManager.h"
 #include "debug.h"
+#include "Game.h"
 Checkpoint::Checkpoint(float x, float y, float width, float height,ObjectManager* objectManager) : CGameObject(x, y)
 {
 	this->width = width;
@@ -32,7 +33,7 @@ void Checkpoint::SpawnObjects()
 	{
 		if (obj && !obj->IsDeleted())
 		{
-			objectManager->Add(obj);
+			obj->SetActive(true);
 		}
 	}
 	objectsToSpawn.clear();
@@ -43,8 +44,17 @@ void Checkpoint::Render()
 	RenderBoundingBox();
 }
 
-void Checkpoint::Update(DWORD dt)
+void Checkpoint::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	CGame* game = CGame::GetInstance();
+	if (game->IsKeyDown(DIK_C))
+	{
+		if (!isActivated)
+		{
+			DebugOut(L"[INFO] Manually triggering checkpoint at position (%.2f, %.2f)\n", x, y);
+			SetState(CHECKPOINT_STATE_ACTIVE);
+		}
+	}
 }
 
 void Checkpoint::GetBoundingBox(float& left, float& top, float& right, float& bottom)

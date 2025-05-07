@@ -60,7 +60,7 @@ void ObjectManager::Update(DWORD dt)
     ProcessCollisions(dt);
     for (auto obj : objects)
     {
-        if (obj && !obj->IsDeleted())
+        if (obj && !obj->IsDeleted() && obj->IsActive())
             obj->Update(dt);
     }
 }
@@ -69,7 +69,7 @@ void ObjectManager::Render()
 {
     for (auto obj : objects)
     {
-        if (obj && !obj->IsDeleted())
+        if (obj && !obj->IsDeleted() && obj->IsActive())
             obj->Render();
     }
 }

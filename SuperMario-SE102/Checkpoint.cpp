@@ -2,13 +2,12 @@
 #include"ObjectManager.h"
 #include "debug.h"
 #include "Game.h"
-Checkpoint::Checkpoint(float x, float y, float width, float height,ObjectManager* objectManager) : CGameObject(x, y)
+Checkpoint::Checkpoint(float x, float y, float width, float height) : CGameObject(x, y)
 {
 	this->width = width;
 	this->height = height;
 	isActivated = false;
 	state = CHECKPOINT_STATE_INACTIVE;
-	this->objectManager = objectManager;
 }
 
 void Checkpoint::AddObjectToSpawn(LPGAMEOBJECT obj)
@@ -24,7 +23,7 @@ void Checkpoint::AddObjectsToSpawn(const std::vector<LPGAMEOBJECT>& objects)
 
 void Checkpoint::SpawnObjects()
 {
-	if (objectsToSpawn.empty() || objectManager == nullptr)
+	if (objectsToSpawn.empty())
 		return;
 
 	DebugOut(L"[INFO] Checkpoint triggered! Spawning %d objects\n", objectsToSpawn.size());
@@ -41,7 +40,7 @@ void Checkpoint::SpawnObjects()
 
 void Checkpoint::Render()
 {
-	RenderBoundingBox();
+	//RenderBoundingBox();
 }
 
 void Checkpoint::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)

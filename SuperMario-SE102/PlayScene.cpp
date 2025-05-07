@@ -324,7 +324,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 			height = (float)atof(tokens[4].c_str());
 		}
 
-		Checkpoint* checkpoint = new Checkpoint(x, y, width, height, &objectManager);
+		Checkpoint* checkpoint = new Checkpoint(x, y, width, height);
 		obj = checkpoint;
 		int enemyCount = 0;
 		if (tokens.size() >= 6) {

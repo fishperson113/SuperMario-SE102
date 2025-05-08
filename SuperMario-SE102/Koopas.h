@@ -49,6 +49,7 @@ protected:
 	void OnCollisionWithOtherKoopas(LPCOLLISIONEVENT e);
 	void OnCollisionWithCoinBrick(LPCOLLISIONEVENT e);
 	void OnCollisionWithMushroomBrick(LPCOLLISIONEVENT e);
+	void OnCollisionWithLeafBrick(LPCOLLISIONEVENT e);
 
 public:
 	Koopas(float x, float y);

@@ -1,4 +1,5 @@
 #include "Bullet.h"
+#include "Mario.h"
 
 CBullet::CBullet(float x, float y)
 {
@@ -17,8 +18,8 @@ void CBullet::GetBoundingBox(float& left, float& top, float& right, float& botto
 
 void CBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	vy += ay * dt;
-	vx += ax * dt;
+	vy += -0.02f * dt;
+	vx += -0.02f * dt;
 }
 
 void CBullet::Render()
@@ -29,7 +30,33 @@ void CBullet::Render()
 
 void CBullet::OnNoCollision(DWORD dt)
 {
-	x += vx * dt;
-	y += vy * dt;
+	x += -0.02f * dt;
+	y += -0.02f * dt;
 }
 
+void CBullet::OnCollisionWith(LPCOLLISIONEVENT e)
+{
+	if (dynamic_cast<CMario*>(e->obj))
+		OnCollisionWithMario(e);
+}
+
+void CBullet::OnCollisionWithMario(LPCOLLISIONEVENT e)
+{
+	DebugOut(L"OnCollisionWithBullet2 \n");
+
+	CMario* mario = (CMario*)e->obj;
+
+	if (mario->GetUntouchable() == 0)
+	{
+		if (mario->GetLevel() > MARIO_LEVEL_SMALL)
+		{
+			mario->SetLevel(MARIO_LEVEL_SMALL);
+			mario->StartUntouchable();
+		}
+		else
+		{
+			DebugOut(L">>> Mario DIE >>> \n");
+			mario->SetState(MARIO_STATE_DIE);
+		}
+	}
+}

@@ -39,11 +39,7 @@ void CParaGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		return;
 	}
 	DebugOut(L"ParaGoomba: %f, %f\n", x, y);
-	if (state == PARAGOOMBA_STATE_JUMPING && GetTickCount64() - jump_start > 500) // Jump duration
-	{
-		SetState(PARAGOOMBA_STATE_WALKING);
-	}
-	if (state == PARAGOOMBA_STATE_WALKING && GetTickCount64() - jump_start > 500) // Walk duration
+	if (state != PARAGOOMBA_STATE_WALKING2 && GetTickCount64() - jump_start > 500) // Walk duration
 	{
 		SetState(PARAGOOMBA_STATE_JUMPING);
 	}
@@ -88,6 +84,13 @@ void CParaGoomba::OnCollisionWith(LPCOLLISIONEVENT e)
 	{
 		vx = -vx;
 	}
+	if (dynamic_cast<CFallPitch*>(e->obj))
+		OnCollisionWithFallPitch(e);
+}
+
+void CParaGoomba::OnCollisionWithFallPitch(LPCOLLISIONEVENT e)
+{
+	this->SetState(PARAGOOMBA_STATE_DIE);
 }
 
 CParaGoomba::CParaGoomba(float x, float y) :CGameObject(x, y)

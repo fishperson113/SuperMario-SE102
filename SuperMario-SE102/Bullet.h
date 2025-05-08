@@ -9,6 +9,7 @@ class CBullet : public CGameObject
 protected:
 	float ax;
 	float ay;
+	ULONGLONG spawnTime;
 public:
 	CBullet(float x, float y);
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
@@ -18,5 +19,7 @@ public:
 	virtual int IsCollidable() { return 1; };
 	virtual int IsBlocking() { return 0; }
 	virtual void OnNoCollision(DWORD dt);
+	virtual void OnCollisionWith(LPCOLLISIONEVENT e);
+	void OnCollisionWithMario(LPCOLLISIONEVENT e);
 };
 

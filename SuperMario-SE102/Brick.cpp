@@ -21,7 +21,7 @@ void CBrick::GetBoundingBox(float &l, float &t, float &r, float &b)
 
 int CBrick::IsDirectionColliable(float nx, float ny)
 {
-	if (this->aniId != 10000)
+	if (this->aniId != 10000 && this->aniId != 10014)
 	{
 		if (nx == 0 && ny == -1) return 1;
 		else return 0;

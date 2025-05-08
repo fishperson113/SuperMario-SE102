@@ -2,19 +2,15 @@
 
 CPiranhaPlant::CPiranhaPlant(float x, float y)
 {
-	CPipe* pipe = new CPipe(x, y, 31, 15, 3, 52001, 51001, 51001);
+	this->spawnTime = GetTickCount64();
 
-	CPlayScene* currentScene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-
-	currentScene->GetObjectManager()->Add(pipe);
 	this->x = x;
 	this->y = y;
 }
 
 void CPiranhaPlant::Render()
 {
-	int aniId = ID_ANI_PIRANHA_PLANT;
-	CAnimations::GetInstance()->Get(aniId)->Render(x, y - 20);
+	CAnimations::GetInstance()->Get(aniId)->Render(x, y);
 }
 
 void CPiranhaPlant::GetBoundingBox(float& l, float& t, float& r, float& b)
@@ -27,8 +23,7 @@ void CPiranhaPlant::GetBoundingBox(float& l, float& t, float& r, float& b)
 
 int CPiranhaPlant::IsDirectionColliable(float nx, float ny)
 {
-	if (nx == 0 && ny == -1) return 1;
-	return 0;
+	return 1;
 }
 
 void CPiranhaPlant::ShootBullet()
@@ -40,5 +35,5 @@ void CPiranhaPlant::ShootBullet()
 
 void CPiranhaPlant::Update(DWORD dt)
 {
-	ShootBullet();
+	
 }

@@ -22,6 +22,8 @@
 #include "SuperLeaf.h"
 #include "SuperLeafBrick.h"
 #include "SpecialPipe.h"
+#include "Bullet.h"
+#include "FireTrap.h"
 
 using namespace std;
 
@@ -66,8 +68,9 @@ CGameObject* CPlayScene::CreateEnemy(int enemyType, float x, float y)
 		DebugOut(L"[INFO] Creating ParaGoomba at (%f, %f)\n", x, y);
 		break;
 
-	case OBJECT_TYPE_PIRANHAPLANT:
-		obj = new CPiranhaPlant(x, y);
+	case OBJECT_TYPE_FIRETRAP:
+		obj = new CFireTrap(x, y);
+		DebugOut(L"[INFO] Fire Trap object has been created!\n");
 		break;
 
 		// Add other enemy types as needed
@@ -169,7 +172,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 	case OBJECT_TYPE_GOOMBA:
 	case OBJECT_TYPE_KOOPAS:
 	case OBJECT_TYPE_PARAGOOMBA:
-	case OBJECT_TYPE_PIRANHAPLANT:
+	case OBJECT_TYPE_FIRETRAP:
 		obj = CreateEnemy(object_type, x, y);
 		break;
 	case OBJECT_TYPE_BRICK:

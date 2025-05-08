@@ -9,7 +9,7 @@
 
 #define MUSHROOM_STATE_WALKING 101
 
-#define ID_ANI_MUSHROOM_WALKING 90000
+#define ID_ANI_MUSHROOM_WALKING 90002
 
 class CMushroom : public CGameObject
 {

@@ -14,6 +14,8 @@ piranhaplant.txt
 paragoomba.txt
 background_item.txt
 platform.txt
+bullet.txt
+
 #
 [OBJECTS]
 # type	x	y	extra_settings per object type
@@ -212,31 +214,33 @@ platform.txt
 7	176	116
 7	192	116
 7	224	68
-7	240	68
+#7	240	68
 7	442	84
-7	672	148
+#7	672	148
 7	720	116
-7	1462	-108
-7	1472	132
+#7	1462	-108
+#7	1472	132
 
 #Mushroom
 #9	20	10
 
 #Mushroom Brick
-#11	90	116
+11	240	68
+11	1462	-108
 
 #Fall Pitch
 13	0	200	2000	10
 
 #Super Leaf Brick
-#14	90	116
+14	672	148
+14	1472	132
 
 #Special Pipe
 15	2104	196	31	15	2	51098	51099	51099
 15	2328	196	31	15	2	51098	51099	51099
 
 #Portal 
-50	250	110	316	140	2
+#50	250	110	316	140	2
 #Enemies
 2	240	164
 2	552	164
@@ -249,3 +253,4 @@ platform.txt
 
 #MARIO
 0	20	10
+#0	1360	-120

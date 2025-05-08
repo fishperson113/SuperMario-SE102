@@ -1,5 +1,7 @@
 #pragma once
 #include "GameObject.h"
+#include "FallPitch.h"
+
 #define PARAGOOMBA_GRAVITY 0.002f
 #define PARAGOOMBA_WALKING_SPEED 0.05f
 #define PARAGOOMBA_JUMP_SPEED -0.2f
@@ -40,6 +42,7 @@ protected:
 	virtual void OnNoCollision(DWORD dt);
 
 	virtual void OnCollisionWith(LPCOLLISIONEVENT e);
+	void OnCollisionWithFallPitch(LPCOLLISIONEVENT e);
 public:
 	CParaGoomba(float x, float y);
 	virtual void SetState(int state);

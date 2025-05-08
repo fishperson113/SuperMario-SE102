@@ -17,6 +17,7 @@
 #include "PiranhaPlant.h"
 #include "SuperLeaf.h"
 #include "SuperLeafBrick.h"
+#include "Bullet.h"
 
 void CMario::HoldKoopas(Koopas* koopas)
 {
@@ -144,6 +145,8 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithSuperLeafBrick(e);
 	else if (dynamic_cast<Checkpoint*>(e->obj))
 		OnCollisionWithCheckpoint(e);
+	else if (dynamic_cast<CBullet*>(e->obj))
+		OnCollisionWithBullet(e);
 }
 
 void CMario::UpdateHeldKoopasPosition()
@@ -313,6 +316,23 @@ void CMario::OnCollisionWithCheckpoint(LPCOLLISIONEVENT e)
 	{
 		checkpoint->SetState(CHECKPOINT_STATE_ACTIVE);
 		DebugOut(L">>> Mario triggered a checkpoint! >>> \n");
+	}
+}
+
+void CMario::OnCollisionWithBullet(LPCOLLISIONEVENT e)
+{
+	if (this->untouchable == 0)
+	{
+		if (level > MARIO_LEVEL_SMALL)
+		{
+			level = MARIO_LEVEL_SMALL;
+			StartUntouchable();
+		}
+		else
+		{
+			DebugOut(L">>> Mario DIE >>> \n");
+			SetState(MARIO_STATE_DIE);
+		}
 	}
 }
 

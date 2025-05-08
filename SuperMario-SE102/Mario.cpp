@@ -290,7 +290,13 @@ void CMario::OnCollisionWithPiranhaPlant(LPCOLLISIONEVENT e)
 void CMario::OnCollisionWithSuperLeaf(LPCOLLISIONEVENT e)
 {
 	e->obj->Delete();
-	this->SetLevel(MARIO_LEVEL_TAIL);
+	if (level == MARIO_LEVEL_SMALL)
+	{
+		this->SetLevel(MARIO_LEVEL_BIG);
+	}
+	else {
+		this->SetLevel(MARIO_LEVEL_TAIL);
+	}
 }
 
 void CMario::OnCollisionWithSuperLeafBrick(LPCOLLISIONEVENT e)

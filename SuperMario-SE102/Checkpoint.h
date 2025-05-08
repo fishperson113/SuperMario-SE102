@@ -16,7 +16,7 @@ private:
     bool isActivated;
 	ObjectManager* objectManager;
 public:
-    Checkpoint(float x, float y, float width = CHECKPOINT_BBOX_WIDTH, float height = CHECKPOINT_BBOX_HEIGHT,ObjectManager* objectManager = nullptr);
+    Checkpoint(float x, float y, float width = CHECKPOINT_BBOX_WIDTH, float height = CHECKPOINT_BBOX_HEIGHT);
 
     void AddObjectToSpawn(LPGAMEOBJECT obj);
 

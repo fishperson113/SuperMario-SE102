@@ -87,7 +87,7 @@ void ObjectManager::ProcessCollisions(DWORD dt)
 
     for (auto obj : objects)
     {
-        if (!obj || obj->IsDeleted()) continue; 
+        if (!obj || obj->IsDeleted()|| !obj->IsActive()) continue;
 
         std::vector<LPGAMEOBJECT> coObjects;
         for (auto other : objects)

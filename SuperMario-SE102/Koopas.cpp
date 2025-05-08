@@ -2,6 +2,7 @@
 #include "Goomba.h"
 #include "CoinBrick.h"
 #include "MushroomBrick.h"
+#include "SuperLeafBrick.h"
 void Koopas::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
 	if (state == KOOPAS_STATE_SHELL || state == KOOPAS_STATE_SHELL_MOVING)
@@ -119,6 +120,8 @@ void Koopas::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithCoinBrick(e);
 	else if (dynamic_cast<CMushroomBrick*>(e->obj))
 		OnCollisionWithMushroomBrick(e);
+	else if (dynamic_cast<CSuperLeafBrick*>(e->obj))
+		OnCollisionWithLeafBrick(e);
 }
 
 void Koopas::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
@@ -161,6 +164,17 @@ void Koopas::OnCollisionWithMushroomBrick(LPCOLLISIONEVENT e)
 		mushroomBrick->SpawnMushroom();
 		mushroomBrick->SetState(BRICK_STATE_HIT);
 		DebugOut(L">>> Koopa shell hit Mushroom Brick! >>> \n");
+	}
+}
+
+void Koopas::OnCollisionWithLeafBrick(LPCOLLISIONEVENT e)
+{
+	CSuperLeafBrick* leafBrick = dynamic_cast<CSuperLeafBrick*>(e->obj);
+	if (leafBrick->GetState() != BRICK_STATE_HIT)
+	{
+		leafBrick->SpawnSuperLeaf();
+		leafBrick->SetState(BRICK_STATE_HIT);
+		DebugOut(L">>> Koopa shell hit Leaf Brick! >>> \n");
 	}
 }
 

@@ -767,13 +767,7 @@ void CMario::LevelDown()
 
 void CMario::UpdateVelocity(DWORD dt)
 {
-	if (abs(ax) == MARIO_ACCEL_RUN_X) {
-		float accelMultiplier = 1.0f + (0.2f * powerMeter / MARIO_PMETER_MAX);
-		vx += ax * accelMultiplier * dt;
-	}
-	else {
-		vx += ax * dt;
-	}
+	vx += ax * dt;
 }
 
 void CMario::UpdateUntouchableState()
@@ -882,15 +876,18 @@ void CMario::HandleEnemyCollisionsInGodMode(LPCOLLISIONEVENT e)
 
 void CMario::UpdatePowerMeter(DWORD dt)
 {
-	if (isOnPlatform && !isSitting)
+	if (isRunning && isOnPlatform && !isSitting)
 	{
-		powerMeter += MARIO_PMETER_GAIN_RATE * dt;
+		float speedFactor = min(abs(vx) / MARIO_RUNNING_SPEED, 1.0f);
+		powerMeter += MARIO_PMETER_GAIN_RATE * speedFactor * dt;
+
 		if (powerMeter > MARIO_PMETER_MAX)
 			powerMeter = MARIO_PMETER_MAX;
 	}
 	else
 	{
 		powerMeter -= MARIO_PMETER_DECAY_RATE * dt;
+
 		if (powerMeter < 0)
 			powerMeter = 0;
 	}
@@ -962,10 +959,7 @@ void CMario::UpdateFlyingState()
 	powerMeter -= 0.01f;  
 	if (powerMeter < 0) powerMeter = 0;
 
-	if (CGame::GetInstance()->IsKeyDown(DIK_S))
-	{
-		vy = MARIO_FLY_SPEED_Y;
-	}
+	vy = MARIO_FLY_SPEED_Y;
 
 	if (isOnPlatform)
 	{
@@ -1040,40 +1034,34 @@ void CMario::SetState(int state)
 	{
 	case MARIO_STATE_RUNNING_RIGHT:
 		if (isSitting) break;
+		isRunning = true;
 		maxVx = MARIO_RUNNING_SPEED;
 		ax = MARIO_ACCEL_RUN_X;
 		nx = 1;
 		break;
 	case MARIO_STATE_RUNNING_LEFT:
 		if (isSitting) break;
+		isRunning = true;
 		maxVx = -MARIO_RUNNING_SPEED;
 		ax = -MARIO_ACCEL_RUN_X;
 		nx = -1;
 		break;
 	case MARIO_STATE_WALKING_RIGHT:
 		if (isSitting) break;
+		isRunning = false;
 		maxVx = MARIO_WALKING_SPEED;
 		ax = MARIO_ACCEL_WALK_X;
 		nx = 1;
 		break;
 	case MARIO_STATE_WALKING_LEFT:
 		if (isSitting) break;
+		isRunning = false;
 		maxVx = -MARIO_WALKING_SPEED;
 		ax = -MARIO_ACCEL_WALK_X;
 		nx = -1;
 		break;
 	case MARIO_STATE_JUMP:
 		if (isSitting) break;
-
-		if (level == MARIO_LEVEL_TAIL && !isOnPlatform && powerMeter >= MARIO_PMETER_MAX/2)
-		{
-			isFlying = true;
-			isGliding = false; 
-			fly_start = GetTickCount64();
-			vy = MARIO_FLY_SPEED_Y;
-			DebugOut(L">>> Mario started flying! >>> \n");
-			break;
-		}
 
 		if (isOnPlatform)
 		{
@@ -1083,7 +1071,13 @@ void CMario::SetState(int state)
 				vy = -MARIO_JUMP_SPEED_Y;
 		}
 		break;
-
+	case MARIO_STATE_FLY:
+		isFlying = true;
+		isGliding = false;
+		fly_start = GetTickCount64();
+		vy = MARIO_FLY_SPEED_Y;
+		DebugOut(L">>> Mario started flying! >>> \n");
+		break;
 	case MARIO_STATE_RELEASE_JUMP:
 		if (vy < 0) vy += MARIO_JUMP_SPEED_Y / 2;
 		break;

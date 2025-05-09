@@ -17,7 +17,17 @@ void CSampleKeyHandler::OnKeyDown(int KeyCode)
 		mario->SetState(MARIO_STATE_SIT);
 		break;
 	case DIK_S:
-		mario->SetState(MARIO_STATE_JUMP);
+		if (mario->GetLevel() == MARIO_LEVEL_TAIL &&
+			mario->IsOnPlatform() &&
+			mario->GetPowerMeter() >= MARIO_PMETER_MAX)
+		{
+			mario->SetState(MARIO_STATE_FLY);
+		}
+		else
+		{
+			// Normal jump if can't fly
+			mario->SetState(MARIO_STATE_JUMP);
+		}
 		break;
 	case DIK_1:
 		mario->SetLevel(MARIO_LEVEL_SMALL);
@@ -74,11 +84,7 @@ void CSampleKeyHandler::KeyState(BYTE *states)
 		float vx,vy;
 		mario->GetSpeed(vx, vy);
 
-		if (mario->IsFlying())
-		{
-			mario->SetState(MARIO_STATE_FLY);
-		}
-		else if (!mario->IsOnPlatform() && vy > 0 && !mario->IsFlying())
+		if (!mario->IsOnPlatform() && vy > 0 && !mario->IsFlying())
 		{
 			mario->SetState(MARIO_STATE_GLIDE);
 		}

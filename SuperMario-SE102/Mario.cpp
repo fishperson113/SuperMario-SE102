@@ -53,8 +53,6 @@ void CMario::ReleaseKoopas()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
-	vy += ay * dt;
-
 	// Update velocity based on acceleration
 	UpdateVelocity(dt);
 
@@ -768,6 +766,7 @@ void CMario::LevelDown()
 void CMario::UpdateVelocity(DWORD dt)
 {
 	vx += ax * dt;
+	vy += ay * dt;
 }
 
 void CMario::UpdateUntouchableState()

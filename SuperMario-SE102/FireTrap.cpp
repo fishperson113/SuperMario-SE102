@@ -35,12 +35,18 @@ void CFireTrap::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		player->GetPosition(playerX, playerY);
     }
 
-    bool isHiding;
+    bool isHiding = false;
 
     if (playerX < 340 || playerX > 400)
         isHiding = false;
     else
         isHiding = true;
+
+    bool isLeft = false, isRight = false;
+    if (playerX < 340)
+        isLeft = true;
+    if (playerX > 400)
+		isRight = true;
 
 	DebugOut(L"playerX %f, playerY %f\n", playerX, playerY);
     DebugOut(L"isHiding %d!\n", isHiding);
@@ -74,7 +80,7 @@ void CFireTrap::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
                 this->hasFired = true;
             }
 
-            if (currentTime - spawnTime > CHANGE_DIRECTION_TIME)
+            if (isRight)
             {
                 this->piranhaPlant->SetAnimationId(ID_ANI_PIRANHA_CHANGE_DIRECTION);
             }

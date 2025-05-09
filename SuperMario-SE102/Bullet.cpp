@@ -18,8 +18,7 @@ void CBullet::GetBoundingBox(float& left, float& top, float& right, float& botto
 
 void CBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	vy += -0.02f * dt;
-	vx += -0.02f * dt;
+
 }
 
 void CBullet::Render()

@@ -76,10 +76,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	// Handle spinning state
 	UpdateSpinningState();
 
+	UpdateFlyingState();
+	
 	// Handle gliding state
-	UpdateGlidingState();
+	if(!isFlying)
+		UpdateGlidingState();
 	// Debug output
-	//DebugOut(L"Coins: %d | P-Meter: %.2f/%.0f", coin, powerMeter, MARIO_PMETER_MAX);
+	DebugOut(L"Coins: %d | P-Meter: %.2f/%.0f", coin, powerMeter, MARIO_PMETER_MAX);
 }
 
 void CMario::OnNoCollision(DWORD dt)
@@ -469,6 +472,11 @@ int CMario::GetAniIdTail()
 	{
 		if (nx > 0) return ID_ANI_MARIO_TAIL_GLIDE_RIGHT;
 		else return ID_ANI_MARIO_TAIL_GLIDE_LEFT;
+	}
+
+	if (isFlying)
+	{
+		return (nx > 0) ? ID_ANI_MARIO_TAIL_FLY_RIGHT : ID_ANI_MARIO_TAIL_FLY_LEFT;
 	}
 
 	// Handle jumping animations
@@ -872,7 +880,7 @@ void CMario::HandleEnemyCollisionsInGodMode(LPCOLLISIONEVENT e)
 
 void CMario::UpdatePowerMeter(DWORD dt)
 {
-	if (isOnPlatform && !isSitting && abs(vx) == MARIO_RUNNING_SPEED)
+	if (isOnPlatform && !isSitting)
 	{
 		powerMeter += MARIO_PMETER_GAIN_RATE * dt;
 		if (powerMeter > MARIO_PMETER_MAX)
@@ -918,17 +926,49 @@ void CMario::UpdateHeldKoopas()
 
 void CMario::UpdateGlidingState()
 {
-	if (isGliding)
+	if (!isGliding)
 	{
-		// Check if glide timeout has been reached
-		if (GetTickCount64() - glide_start > MARIO_GLIDE_TIMEOUT)
-		{
-			isGliding = false;
-		}
+		isGliding = false;
+		return;
+	}
+	if (isOnPlatform)
+	{
+		isGliding = false;
+		return;
+	}
+	if (GetTickCount64() - glide_start > MARIO_GLIDE_TIMEOUT)
+	{
+		isGliding = false;
+	}
 
-		// Apply slower falling speed while gliding
-		if (vy > 0) // Only when falling down
-			vy = MARIO_GLIDE_SPEED_Y;
+	if (vy > 0)
+		vy = MARIO_GLIDE_SPEED_Y;
+
+}
+
+void CMario::UpdateFlyingState()
+{
+	if (!isFlying)
+		return;
+	if (powerMeter <= 0)
+	{
+		isFlying = false;
+		DebugOut(L">>> Mario flight ended due to depleted power meter! >>> \n");
+		return;
+	}
+
+	powerMeter -= 0.01f;  
+	if (powerMeter < 0) powerMeter = 0;
+
+	if (CGame::GetInstance()->IsKeyDown(DIK_S))
+	{
+		vy = MARIO_FLY_SPEED_Y;
+	}
+
+	if (isOnPlatform)
+	{
+		isFlying = false;
+		DebugOut(L">>> Mario flight ended by landing! >>> \n");
 	}
 }
 
@@ -984,7 +1024,7 @@ void CMario::Render()
 
 	animations->Get(aniId)->Render(x, y);
 
-	RenderBoundingBox();
+	//RenderBoundingBox();
 	
 	DebugOutTitle(L"Coins: %d", coin);
 }
@@ -1022,6 +1062,17 @@ void CMario::SetState(int state)
 		break;
 	case MARIO_STATE_JUMP:
 		if (isSitting) break;
+
+		if (level == MARIO_LEVEL_TAIL && !isOnPlatform && powerMeter >= MARIO_PMETER_MAX/2)
+		{
+			isFlying = true;
+			isGliding = false; 
+			fly_start = GetTickCount64();
+			vy = MARIO_FLY_SPEED_Y;
+			DebugOut(L">>> Mario started flying! >>> \n");
+			break;
+		}
+
 		if (isOnPlatform)
 		{
 			if (abs(this->vx) == MARIO_RUNNING_SPEED)

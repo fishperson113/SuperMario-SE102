@@ -12,8 +12,8 @@
 #define MARIO_ACCEL_WALK_X	0.0005f
 #define MARIO_ACCEL_RUN_X	0.0004f
 #define MARIO_PMETER_MAX          6        
-#define MARIO_PMETER_GAIN_RATE    0.008f   
-#define MARIO_PMETER_DECAY_RATE   0.02f
+#define MARIO_PMETER_GAIN_RATE    0.016f  
+#define MARIO_PMETER_DECAY_RATE   0.008f
 
 #define MARIO_JUMP_SPEED_Y		0.5f
 #define MARIO_JUMP_RUN_SPEED_Y	0.6f
@@ -21,6 +21,9 @@
 #define MARIO_GRAVITY			0.002f
 
 #define MARIO_JUMP_DEFLECT_SPEED  0.4f
+
+#define MARIO_STATE_FLY 810
+#define MARIO_FLY_SPEED_Y -0.2f 
 
 #define MARIO_STATE_DIE				-10
 #define MARIO_STATE_IDLE			0
@@ -140,6 +143,10 @@
 // RACCOON MARIO GLIDE ANIMATIONS
 #define ID_ANI_MARIO_TAIL_GLIDE_RIGHT 4100
 #define ID_ANI_MARIO_TAIL_GLIDE_LEFT 4101
+
+#define ID_ANI_MARIO_TAIL_FLY_RIGHT 4200
+#define ID_ANI_MARIO_TAIL_FLY_LEFT 4201
+
 #pragma endregion
 
 #define GROUND_Y 160.0f
@@ -188,6 +195,9 @@ class CMario : public CGameObject
 
 	BOOLEAN isGliding;
 	ULONGLONG glide_start;
+
+	BOOLEAN isFlying;
+	ULONGLONG fly_start;
 
 	void UpdateHeldKoopasPosition();
 	void OnCollisionWithGoomba(LPCOLLISIONEVENT e);
@@ -240,6 +250,7 @@ class CMario : public CGameObject
 	void UpdatePowerMeter(DWORD dt);
 	void UpdateHeldKoopas();
 	void UpdateGlidingState();
+	void UpdateFlyingState();
 
 public:
 	CMario(float x, float y) : CGameObject(x, y)
@@ -249,7 +260,7 @@ public:
 		ax = 0.0f;
 		ay = MARIO_GRAVITY; 
 
-		level = MARIO_LEVEL_TAIL;
+		level = MARIO_LEVEL_SMALL;
 		untouchable = 0;
 		untouchable_start = -1;
 		isOnPlatform = false;
@@ -265,6 +276,9 @@ public:
 		canSpin = true;
 		isGliding = false;
 		glide_start = 0;
+
+		isFlying = false;
+		fly_start = 0;
 	}
 
 	void HoldKoopas(Koopas* koopas);
@@ -272,6 +286,8 @@ public:
 	bool IsHolding() { return isHolding; }
 	bool IsSpinning() { return isSpinning; }
 	bool IsGliding() { return isGliding; }
+	bool IsFlying() { return isFlying; }
+	void EndFly() { isFlying = false; }
 
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();

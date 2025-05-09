@@ -89,7 +89,7 @@
 
 # JUMP RUN RIGHT & LEFT
 16420	360	712	385	741	0   	# Big Mario Tail - Jump Run Right
-16430	61	712	85	741	0	# Big Mario Tail - Jump Run Left
+16430	61	712	85	741	0		# Big Mario Tail - Jump Run Left
 
 # SIT RIGHT & LEFT
 16500	421	717	444	737	0   	# Big Mario Tail - Sit Right
@@ -104,6 +104,10 @@
 16701	302	874	325	902	0    # Glide Right Frame 2
 16710	0	793	25	821	0    # Glide Left Frame 1
 16711	121	874	144	902	0    # Glide Left Frame 2
+
+# FLYING RIGHT & LEFT
+16440	330	712	355	741	0	# Big Mario Tail - Flying Right 
+16450	90	712	116	741	0	# Big Mario Tail - Flying Left
 
 # BIG MARIO WITH TAIL HOLDING SHELL
 # IDLE RIGHT & LEFT
@@ -314,4 +318,5 @@
 4100	16700	100	16701	100   # Glide Right Animation
 4101	16710	100	16711	100   # Glide Left Animation
 
-
+4200	16420	100	16440	100   # Fly Right Animation
+4201	16430	100	16450	100   # Fly Left Animation

@@ -9,6 +9,7 @@ class CBullet : public CGameObject
 protected:
 	float ax;
 	float ay;
+	int direction;
 	ULONGLONG spawnTime;
 public:
 	CBullet(float x, float y);
@@ -21,5 +22,7 @@ public:
 	virtual void OnNoCollision(DWORD dt);
 	virtual void OnCollisionWith(LPCOLLISIONEVENT e);
 	void OnCollisionWithMario(LPCOLLISIONEVENT e);
+	void SetDirection(int direction) { this->direction = direction; }
+	int GetDirection() { return direction; }
 };
 

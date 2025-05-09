@@ -12,7 +12,10 @@ CFireTrap::CFireTrap(float x, float y) : CGameObject(x, y)
 
 	currentScene->GetObjectManager()->Add(pipe);
 
+
 	this->spawnTime = GetTickCount64();
+
+	this->state = FIRETRAP_STATE_APPEARING;
 }
 
 void CFireTrap::Render()
@@ -21,42 +24,94 @@ void CFireTrap::Render()
 
 void CFireTrap::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+    CPlayScene* currentScene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+    LPGAMEOBJECT player = currentScene->GetPlayer();
+
+    float playerX = 0.0f;
+    float playerY = 0.0f;
+
+    if (player != nullptr)
+	{
+		player->GetPosition(playerX, playerY);
+    }
+
+    bool isHiding;
+
+    if (playerX < 340 || playerX > 400)
+        isHiding = false;
+    else
+        isHiding = true;
+
+	DebugOut(L"playerX %f, playerY %f\n", playerX, playerY);
+    DebugOut(L"isHiding %d!\n", isHiding);
+
 	ULONGLONG currentTime = GetTickCount64();
-	if (currentTime - spawnTime > SHOOTING_TIME)
-	{
-		if (this->offset > OFFSET)
-		{
-			this->offset -= 0.5f;
-			this->piranhaPlant->SetPosition(this->x, this->y + this->offset);
-		}
-		else
-		{
-			if (!this->hasFired)
-			{
-				this->piranhaPlant->ShootBullet();
-				this->hasFired = true;
-			}
-		}
-	}
+    if (currentTime - this->spawnTime > SHOOTING_TIME)
+    {
+        switch (state)
+        {
+        case FIRETRAP_STATE_APPEARING:
+        if (isHiding == false)
+        {
+            this->piranhaPlant->SetAnimationId(ID_ANI_PIRANHA_LONG_LEFT);
+            if (this->offset > OFFSET)
+            {
+                this->offset -= 0.5f;
+                this->piranhaPlant->SetPosition(this->x, this->y + this->offset);
+            }
+            else
+            {
+                state = FIRETRAP_STATE_SHOOTING;
+                this->hasFired = false; 
+            }
+            break;
+        }
 
-	if (currentTime - spawnTime > CHANGE_DIRECTION_TIME)
-	{
-		this->piranhaPlant->SetAnimationId(ID_ANI_PIRANHA_CHANGE_DIRECTION);
-	}
+        case FIRETRAP_STATE_SHOOTING:
+            if (!this->hasFired)
+            {
+                this->piranhaPlant->ShootBullet();
+                this->hasFired = true;
+            }
 
-	if (currentTime - spawnTime > HIDING_TIME)
-	{
-		if (this->offset2 < -OFFSET - 1)
-		{
+            if (currentTime - spawnTime > CHANGE_DIRECTION_TIME)
+            {
+                this->piranhaPlant->SetAnimationId(ID_ANI_PIRANHA_CHANGE_DIRECTION);
+            }
 
-			this->offset2 += 0.5f;
-			this->piranhaPlant->SetPosition(this->x, this->y + this->offset2);
-		}
-		else
-		{
-			this->piranhaPlant->SetActive(false);
-		}
-	}
+            if (currentTime - spawnTime > HIDING_TIME)
+            {
+                state = FIRETRAP_STATE_HIDING;
+            }
+            break;
+
+        case FIRETRAP_STATE_HIDING:
+            if (this->offset2 < -OFFSET - 1)
+            {
+                this->offset2 += 0.5f;
+                this->piranhaPlant->SetPosition(this->x, this->y + this->offset2);
+            }
+            else
+            {
+                state = FIRETRAP_STATE_HIDDEN;
+                this->piranhaPlant->SetActive(false);
+            }
+            break;
+
+        case FIRETRAP_STATE_HIDDEN:
+            if (currentTime - spawnTime > HIDING_TIME + 2000) 
+            {
+                state = FIRETRAP_STATE_APPEARING;
+                this->offset = 0.0f;  
+                this->offset2 = 0.0f;
+                this->piranhaPlant->SetActive(true);
+                this->spawnTime = currentTime; 
+            }
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 void CFireTrap::GetBoundingBox(float& l, float& t, float& r, float& b)

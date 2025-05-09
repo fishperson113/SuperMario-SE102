@@ -121,5 +121,8 @@ void CParaGoomba::SetState(int state)
 		vy = PARAGOOMBA_JUMP_SPEED;
 		jump_start = GetTickCount64();
 		break;
+	case PARAGOOMBA_STATE_WALKING2:
+		vx = -PARAGOOMBA_WALKING_SPEED;
+		break;
 	}
 }

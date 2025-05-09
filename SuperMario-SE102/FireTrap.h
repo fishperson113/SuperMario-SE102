@@ -10,6 +10,10 @@
 #define CHANGE_DIRECTION_TIME 8000
 #define HIDING_TIME 10000
 #define OFFSET -23
+#define FIRETRAP_STATE_APPEARING 0
+#define FIRETRAP_STATE_SHOOTING 1
+#define FIRETRAP_STATE_HIDING 2
+#define FIRETRAP_STATE_HIDDEN 3
 
 class CFireTrap : public CGameObject
 {
@@ -27,5 +31,6 @@ protected:
 	float offset = 0.0f;
 	float offset2 = 0.0f;
 	bool hasFired = false;
+	int state;
 };
 

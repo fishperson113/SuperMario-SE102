@@ -30,8 +30,26 @@ void CBullet::Render()
 
 void CBullet::OnNoCollision(DWORD dt)
 {
-	x += -0.02f * dt;
-	y += -0.02f * dt;
+	if (this->direction == 1)
+	{
+		x += -0.02f * dt;
+		y += -0.02f * dt;
+	}
+	else if (this->direction == 2)
+	{
+		x += 0.02f * dt;
+		y += -0.02f * dt;
+	}
+	else if (this->direction == 3)
+	{
+		x += -0.02f * dt;
+		y += 0.02f * dt;
+	}
+	else if (this->direction == 4)
+	{
+		x += 0.02f * dt;
+		y += 0.02f * dt;
+	}
 }
 
 void CBullet::OnCollisionWith(LPCOLLISIONEVENT e)
@@ -42,7 +60,7 @@ void CBullet::OnCollisionWith(LPCOLLISIONEVENT e)
 
 void CBullet::OnCollisionWithMario(LPCOLLISIONEVENT e)
 {
-	DebugOut(L"OnCollisionWithBullet2 \n");
+	DebugOut(L"OnCollisionWithBullet \n");
 
 	CMario* mario = (CMario*)e->obj;
 

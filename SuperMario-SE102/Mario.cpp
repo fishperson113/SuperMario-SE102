@@ -77,7 +77,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	UpdateSpinningState();
 
 	UpdateFlyingState();
-	
+
 	// Handle gliding state
 	if(!isFlying)
 		UpdateGlidingState();
@@ -269,6 +269,8 @@ void CMario::OnCollisionWithPiranhaPlant(LPCOLLISIONEVENT e)
 {
 	if (this->untouchable == 0)
 	{
+		if (e->ny < 0)
+			vy = -MARIO_JUMP_DEFLECT_SPEED;
 		if (level > MARIO_LEVEL_SMALL)
 		{
 			LevelDown();

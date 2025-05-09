@@ -62,14 +62,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	// Handle untouchable state
 	UpdateUntouchableState();
 
+	UpdateHeldKoopas();
 	// Handle kicking timeout
 	UpdateKickingState();
 
 	// Update power meter
 	UpdatePowerMeter(dt);
-
-	// Handle shell holding
-	UpdateHeldKoopas();
 
 	// Handle spinning state
 	UpdateSpinningState();
@@ -897,20 +895,22 @@ void CMario::UpdateHeldKoopas()
 	if (!isHolding || heldKoopas == NULL)
 		return;
 
-	if (heldKoopas->IsAboutToWakeUp())
+	if (heldKoopas->GetState()== KOOPAS_STATE_WALKING)
 	{
-		isHolding = false;
-		heldKoopas = NULL;
+		heldKoopas->SetBeingHeld(false);
 
 		if (level > MARIO_LEVEL_SMALL)
 		{
-			level = MARIO_LEVEL_SMALL;
+			LevelDown();
 			StartUntouchable();
 		}
 		else
 		{
 			SetState(MARIO_STATE_DIE);
 		}
+
+		isHolding = false;
+		heldKoopas = NULL;
 		return;
 	}
 

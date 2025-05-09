@@ -75,6 +75,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 
 	// Handle spinning state
 	UpdateSpinningState();
+
+	// Handle gliding state
+	UpdateGlidingState();
 	// Debug output
 	//DebugOut(L"Coins: %d | P-Meter: %.2f/%.0f", coin, powerMeter, MARIO_PMETER_MAX);
 }
@@ -461,6 +464,12 @@ int CMario::GetAniIdTail()
 		int aniId = GetTailHoldingAniId();
 		if (aniId != -1) return aniId;
 	}
+	// Handle gliding animations
+	if (isGliding)
+	{
+		if (nx > 0) return ID_ANI_MARIO_TAIL_GLIDE_RIGHT;
+		else return ID_ANI_MARIO_TAIL_GLIDE_LEFT;
+	}
 
 	// Handle jumping animations
 	if (!isOnPlatform)
@@ -829,6 +838,23 @@ void CMario::HandleEnemyCollisionsInGodMode(LPCOLLISIONEVENT e)
 			koopas->SetState(KOOPAS_STATE_SHELL);
 			return;
 		}
+		else if (koopas->GetState() == KOOPAS_STATE_SHELL)
+		{
+			float shellDirection = (nx > 0) ? 1.0f : -1.0f;
+			koopas->SetState(KOOPAS_STATE_SHELL_MOVING);
+			koopas->SetSpeed(shellDirection * KOOPAS_SHELL_SPEED, 0);
+			DebugOut(L">>> Mario kicked Koopa shell with spin attack! >>> \n");
+			return;
+		}
+		else if (koopas->GetState() == KOOPAS_STATE_SHELL_MOVING)
+		{
+			// If shell is already moving, reverse its direction
+			float vx, vy;
+			koopas->GetSpeed(vx, vy);
+			koopas->SetSpeed(-vx, vy);
+			DebugOut(L">>> Mario reversed Koopa shell direction with spin attack! >>> \n");
+			return;
+		}
 	}
 	// Handle PiranhaPlant collisions
 	else if (CPiranhaPlant* plant = dynamic_cast<CPiranhaPlant*>(e->obj))
@@ -887,6 +913,22 @@ void CMario::UpdateHeldKoopas()
 	if (!CGame::GetInstance()->IsKeyDown(DIK_A))
 	{
 		ReleaseKoopas();
+	}
+}
+
+void CMario::UpdateGlidingState()
+{
+	if (isGliding)
+	{
+		// Check if glide timeout has been reached
+		if (GetTickCount64() - glide_start > MARIO_GLIDE_TIMEOUT)
+		{
+			isGliding = false;
+		}
+
+		// Apply slower falling speed while gliding
+		if (vy > 0) // Only when falling down
+			vy = MARIO_GLIDE_SPEED_Y;
 	}
 }
 
@@ -1021,6 +1063,15 @@ void CMario::SetState(int state)
 			StartSpinAttack();
 		}
 		break;
+
+	case MARIO_STATE_GLIDE:
+		if (level == MARIO_LEVEL_TAIL && !isOnPlatform && vy > 0)
+		{
+			isGliding = true;
+			glide_start = GetTickCount64();
+		}
+		break;
+
 	case MARIO_STATE_IDLE:
 		ax = 0.0f;
 		vx = 0.0f;

@@ -99,6 +99,12 @@
 16600	423	631	442	663	0   # Big Mario Tail - Brace Right
 16610	3	631	22	663	0   # Big Mario Tail - Brace Left
 
+# GLIDE RIGHT & LEFT
+16700	421	793	445	821	0    # Glide Right Frame 1
+16701	302	874	325	902	0    # Glide Right Frame 2
+16710	0	793	25	821	0    # Glide Left Frame 1
+16711	121	874	144	902	0    # Glide Left Frame 2
+
 # BIG MARIO WITH TAIL HOLDING SHELL
 # IDLE RIGHT & LEFT
 17000	242	794	264	822	0   # Big Mario Tail - Hold Idle Right
@@ -304,4 +310,8 @@
 
 # BIG MARIO WITH TAIL - SPIN ATTACK
 4010	17400	100	17402	100	17401	100	17403	100 
+# GLIDE RIGHT & LEFT
+4100	16700	100	16701	100   # Glide Right Animation
+4101	16710	100	16711	100   # Glide Left Animation
+
 

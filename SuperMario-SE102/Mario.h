@@ -41,6 +41,10 @@
 #define MARIO_STATE_SPIN_ATTACK           700
 #define MARIO_SPIN_ATTACK_TIMEOUT         400
 #define MARIO_SPIN_ATTACK_COOLDOWN        400
+
+#define MARIO_STATE_GLIDE 800
+#define MARIO_GLIDE_SPEED_Y 0.05f  // Slower falling speed while gliding
+#define MARIO_GLIDE_TIMEOUT 5000   // Max glide time in milliseconds
 #pragma region ANIMATION_ID
 //BIG MARIO
 #define ID_ANI_MARIO_IDLE_RIGHT 400
@@ -132,6 +136,10 @@
 #define ID_ANI_MARIO_TAIL_KICK_LEFT 3901
 
 #define ID_ANI_MARIO_TAIL_SPIN_ATTACK     4010 
+
+// RACCOON MARIO GLIDE ANIMATIONS
+#define ID_ANI_MARIO_TAIL_GLIDE_RIGHT 4100
+#define ID_ANI_MARIO_TAIL_GLIDE_LEFT 4101
 #pragma endregion
 
 #define GROUND_Y 160.0f
@@ -177,6 +185,9 @@ class CMario : public CGameObject
 	ULONGLONG spin_start;
 	ULONGLONG spin_cooldown_start;
 	bool canSpin;
+
+	BOOLEAN isGliding;
+	ULONGLONG glide_start;
 
 	void UpdateHeldKoopasPosition();
 	void OnCollisionWithGoomba(LPCOLLISIONEVENT e);
@@ -228,6 +239,7 @@ class CMario : public CGameObject
 	void UpdateSpinningState();
 	void UpdatePowerMeter(DWORD dt);
 	void UpdateHeldKoopas();
+	void UpdateGlidingState();
 
 public:
 	CMario(float x, float y) : CGameObject(x, y)
@@ -251,12 +263,15 @@ public:
 		spin_start = 0;
 		spin_cooldown_start = 0;
 		canSpin = true;
+		isGliding = false;
+		glide_start = 0;
 	}
 
 	void HoldKoopas(Koopas* koopas);
 	void ReleaseKoopas();
 	bool IsHolding() { return isHolding; }
 	bool IsSpinning() { return isSpinning; }
+	bool IsGliding() { return isGliding; }
 
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();
@@ -266,6 +281,7 @@ public:
 	{ 
 		return (state != MARIO_STATE_DIE); 
 	}
+	bool IsOnPlatform() { return isOnPlatform; }
 
 	int IsBlocking() { return (state != MARIO_STATE_DIE && untouchable==0); }
 
@@ -276,6 +292,6 @@ public:
 	int GetLevel() { return level; }
 	int GetUntouchable() { return untouchable; }
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount64(); }
-
+	void EndGlide() { isGliding = false; }
 	void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 };

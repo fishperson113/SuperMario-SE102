@@ -11,7 +11,6 @@ CPiranhaPlant::CPiranhaPlant(float x, float y)
 void CPiranhaPlant::Render()
 {
 	CAnimations::GetInstance()->Get(aniId)->Render(x, y);
-	RenderBoundingBox();
 }
 
 void CPiranhaPlant::GetBoundingBox(float& l, float& t, float& r, float& b)

@@ -38,6 +38,9 @@
 
 #define MARIO_KICK_TIMEOUT 150
 
+#define MARIO_STATE_SPIN_ATTACK           700
+#define MARIO_SPIN_ATTACK_TIMEOUT         400
+#define MARIO_SPIN_ATTACK_COOLDOWN        400
 #pragma region ANIMATION_ID
 //BIG MARIO
 #define ID_ANI_MARIO_IDLE_RIGHT 400
@@ -128,6 +131,7 @@
 #define ID_ANI_MARIO_TAIL_KICK_RIGHT 3900
 #define ID_ANI_MARIO_TAIL_KICK_LEFT 3901
 
+#define ID_ANI_MARIO_TAIL_SPIN_ATTACK     4010 
 #pragma endregion
 
 #define GROUND_Y 160.0f
@@ -137,6 +141,7 @@
 #define MARIO_LEVEL_TAIL     3
 
 #define MARIO_BIG_BBOX_WIDTH  14
+#define MARIO_TAIL_SPIN_BBOX_WIDTH  22
 #define MARIO_BIG_BBOX_HEIGHT 24
 #define MARIO_BIG_SITTING_BBOX_WIDTH  14
 #define MARIO_BIG_SITTING_BBOX_HEIGHT 16
@@ -167,6 +172,11 @@ class CMario : public CGameObject
 	int coin; 
 	BOOLEAN isKicking;
 	ULONGLONG kick_start;
+
+	BOOLEAN isSpinning;
+	ULONGLONG spin_start;
+	ULONGLONG spin_cooldown_start;
+	bool canSpin;
 
 	void UpdateHeldKoopasPosition();
 	void OnCollisionWithGoomba(LPCOLLISIONEVENT e);
@@ -209,10 +219,13 @@ class CMario : public CGameObject
 	void KickKoopasShell(Koopas* koopas, LPCOLLISIONEVENT e);
 	void TakeDamage();
 	void LevelDown();
+	void StartSpinAttack();
+	void HandleEnemyCollisionsInGodMode(LPCOLLISIONEVENT e);
 
 	void UpdateVelocity(DWORD dt);
 	void UpdateUntouchableState();
 	void UpdateKickingState();
+	void UpdateSpinningState();
 	void UpdatePowerMeter(DWORD dt);
 	void UpdateHeldKoopas();
 
@@ -224,7 +237,7 @@ public:
 		ax = 0.0f;
 		ay = MARIO_GRAVITY; 
 
-		level = MARIO_LEVEL_SMALL;
+		level = MARIO_LEVEL_TAIL;
 		untouchable = 0;
 		untouchable_start = -1;
 		isOnPlatform = false;
@@ -234,11 +247,16 @@ public:
 		isKicking = false;
 		kick_start = 0;
 		powerMeter = 0.0f;
+		isSpinning = false; 
+		spin_start = 0;
+		spin_cooldown_start = 0;
+		canSpin = true;
 	}
 
 	void HoldKoopas(Koopas* koopas);
 	void ReleaseKoopas();
 	bool IsHolding() { return isHolding; }
+	bool IsSpinning() { return isSpinning; }
 
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();

@@ -73,6 +73,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	// Handle shell holding
 	UpdateHeldKoopas();
 
+	// Handle spinning state
+	UpdateSpinningState();
 	// Debug output
 	//DebugOut(L"Coins: %d | P-Meter: %.2f/%.0f", coin, powerMeter, MARIO_PMETER_MAX);
 }
@@ -99,24 +101,8 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 
 	if (IsGodMode())
 	{
-		if (dynamic_cast<CGoomba*>(e->obj))
-		{
-			CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
-			if (goomba->GetState() != GOOMBA_STATE_DIE)
-			{
-				goomba->SetState(GOOMBA_STATE_DIE);
-				return; 
-			}
-		}
-		else if (dynamic_cast<Koopas*>(e->obj))
-		{
-			Koopas* koopas = dynamic_cast<Koopas*>(e->obj);
-			if (koopas->GetState() != KOOPAS_STATE_SHELL)
-			{
-				koopas->SetState(KOOPAS_STATE_SHELL);
-				return; 
-			}
-		}
+		HandleEnemyCollisionsInGodMode(e);
+		return;
 	}
 
 	if (dynamic_cast<CGoomba*>(e->obj))
@@ -462,6 +448,10 @@ int CMario::GetAniIdSmall()
 
 int CMario::GetAniIdTail()
 {
+	// Handle spin attack animation first
+	if (isSpinning)
+		return ID_ANI_MARIO_TAIL_SPIN_ATTACK;
+
 	if (isKicking)
 		return (nx >= 0) ? ID_ANI_MARIO_TAIL_KICK_RIGHT : ID_ANI_MARIO_TAIL_KICK_LEFT;
 
@@ -784,6 +774,76 @@ void CMario::UpdateKickingState()
 	}
 }
 
+void CMario::UpdateSpinningState()
+{
+	if (isSpinning && GetTickCount64() - spin_start > MARIO_SPIN_ATTACK_TIMEOUT)
+	{
+		isSpinning = false;
+		DebugOut(L">>> Mario spin attack ended! >>> \n");
+
+		spin_cooldown_start = GetTickCount64();
+		canSpin = false;
+	}
+
+	if (!canSpin && GetTickCount64() - spin_cooldown_start > MARIO_SPIN_ATTACK_COOLDOWN)
+	{
+		canSpin = true;
+		DebugOut(L">>> Mario can spin again! >>> \n");
+	}
+}
+void CMario::StartSpinAttack()
+{
+	if (level == MARIO_LEVEL_TAIL && !isSpinning && canSpin)
+	{
+		isSpinning = true;
+		spin_start = GetTickCount64();
+		DebugOut(L">>> Mario started spin attack! >>> \n");
+	}
+}
+
+void CMario::HandleEnemyCollisionsInGodMode(LPCOLLISIONEVENT e)
+{
+	// Handle Goomba collisions
+	if (CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj))
+	{
+		if (goomba->GetState() != GOOMBA_STATE_DIE)
+		{
+			goomba->SetState(GOOMBA_STATE_DIE);
+			return;
+		}
+	}
+	// Handle ParaGoomba collisions
+	else if (CParaGoomba* paraGoomba = dynamic_cast<CParaGoomba*>(e->obj))
+	{
+		if (paraGoomba->GetState() != PARAGOOMBA_STATE_DIE)
+		{
+			paraGoomba->SetState(PARAGOOMBA_STATE_DIE);
+			return;
+		}
+	}
+	// Handle Koopas collisions
+	else if (Koopas* koopas = dynamic_cast<Koopas*>(e->obj))
+	{
+		if (koopas->GetState() != KOOPAS_STATE_SHELL)
+		{
+			koopas->SetState(KOOPAS_STATE_SHELL);
+			return;
+		}
+	}
+	// Handle PiranhaPlant collisions
+	else if (CPiranhaPlant* plant = dynamic_cast<CPiranhaPlant*>(e->obj))
+	{
+		plant->Delete();
+		return;
+	}
+	// Handle Bullet collisions
+	else if (CBullet* bullet = dynamic_cast<CBullet*>(e->obj))
+	{
+		bullet->Delete();
+		return;
+	}
+}
+
 void CMario::UpdatePowerMeter(DWORD dt)
 {
 	if (isOnPlatform && !isSitting && abs(vx) == MARIO_RUNNING_SPEED)
@@ -882,7 +942,7 @@ void CMario::Render()
 
 	animations->Get(aniId)->Render(x, y);
 
-	//RenderBoundingBox();
+	RenderBoundingBox();
 	
 	DebugOutTitle(L"Coins: %d", coin);
 }
@@ -955,7 +1015,12 @@ void CMario::SetState(int state)
 			y -= MARIO_SIT_HEIGHT_ADJUST;
 		}
 		break;
-
+	case MARIO_STATE_SPIN_ATTACK:
+		if (level == MARIO_LEVEL_TAIL) 
+		{
+			StartSpinAttack();
+		}
+		break;
 	case MARIO_STATE_IDLE:
 		ax = 0.0f;
 		vx = 0.0f;
@@ -973,7 +1038,8 @@ void CMario::SetState(int state)
 
 bool CMario::IsGodMode()
 {
-	return isHolding && heldKoopas && !heldKoopas->IsAboutToWakeUp();
+	return (isHolding && heldKoopas && !heldKoopas->IsAboutToWakeUp()) ||
+		(level == MARIO_LEVEL_TAIL && isSpinning);
 }
 
 void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom)
@@ -989,9 +1055,11 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 		}
 		else 
 		{
-			left = x - MARIO_BIG_BBOX_WIDTH/2;
-			top = y - MARIO_BIG_BBOX_HEIGHT/2;
-			right = left + MARIO_BIG_BBOX_WIDTH;
+			float width = (level == MARIO_LEVEL_TAIL && isSpinning) ?
+				MARIO_TAIL_SPIN_BBOX_WIDTH : MARIO_BIG_BBOX_WIDTH;
+			left = x - width / 2;
+			top = y - MARIO_BIG_BBOX_HEIGHT / 2;
+			right = left + width;
 			bottom = top + MARIO_BIG_BBOX_HEIGHT;
 		}
 	}

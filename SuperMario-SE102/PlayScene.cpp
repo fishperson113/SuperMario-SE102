@@ -327,6 +327,35 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		DebugOut(L"[INFO] SuperLeafBrick object has been created!\n");
 		break;
 	}
+	case OBJECT_TYPE_CAMERA:
+	{
+		// Make sure we don't create multiple cameras
+		if (cameraController != NULL)
+		{
+			DebugOut(L"[ERROR] CAMERA object was created before!\n");
+			return;
+		}
+
+		// Check if we have a camera mode parameter
+		int cameraMode = 2;
+		if (tokens.size() >= 4)
+		{
+			cameraMode = atoi(tokens[3].c_str());
+		}
+
+		// Create the camera controller
+		cameraController = new CameraController(player, CGame::GetInstance());
+
+		// Set the camera mode
+		SetCameraMode(cameraMode);
+
+		// Add camera to scene objects for collision detection
+		objectManager.Add(cameraController);
+
+		DebugOut(L"[INFO] Camera controller initialized with mode %d\n", cameraMode);
+		break;
+	}
+
 	case OBJECT_TYPE_CHECKPOINT:
 	{
 		float width = CHECKPOINT_BBOX_WIDTH;
@@ -393,35 +422,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 	}
 }
 
-void CPlayScene::LoadCamera()
-{
-	if (cameraController == NULL)
-	{
-		//cameraController = new CameraController(player, CGame::GetInstance());
-
-		//if (player == NULL)
-		//{
-		//	SetCameraMode(3);
-		//	DebugOut(L"[INFO] Camera initialized in free move mode (no player)\n");
-		//}
-		//else
-		//{
-		//	// Default to follow player
-		//	SetCameraMode(2);
-		//	DebugOut(L"[INFO] Camera controller initialized\n");
-		//}
-		cameraController = new CameraController(player, CGame::GetInstance());
-
-		// Add camera to scene objects for collision detection
-		objectManager.Add(cameraController);
-
-		// Set default camera mode
-		//SetCameraMode(0);
-
-		DebugOut(L"[INFO] Camera controller initialized\n");
-
-	}
-}
 
 
 void CPlayScene::LoadAssets(LPCWSTR assetFile)
@@ -490,7 +490,6 @@ void CPlayScene::Load()
 	}
 
 	f.close();
-	LoadCamera();
 	DebugOut(L"[INFO] Done loading scene  %s\n", sceneFilePath);
 }
 
@@ -499,11 +498,13 @@ void CPlayScene::Update(DWORD dt)
 	// Update all game objects first
 	objectManager.Update(dt);
 
-	// Update camera position using the new controller
-	/*if (cameraController != NULL)
+	if (cameraController == NULL)
 	{
-		cameraController->Update(dt);
-	}*/
+		cameraController = new CameraController(player, CGame::GetInstance());
+		cameraController->SwitchToThresholdMode(); // Default mode
+		objectManager.Add(cameraController);
+		DebugOut(L"[INFO] Default camera controller created\n");
+	}
 
 	if (cameraController->IsInFreeMove())
 	{

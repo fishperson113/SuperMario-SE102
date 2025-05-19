@@ -1,0 +1,92 @@
+#pragma once
+#include "Game.h"
+#include "GameObject.h"
+
+class CMario;
+class CameraController : public CGameObject {
+private:
+    enum CameraMoveMode {
+        FOLLOW_PLAYER,     
+        PUSH_FORWARD,      
+        THRESHOLD_BASED,
+		FREE_MOVE
+    };
+
+    CameraMoveMode mode;
+
+    float x, y;
+
+    // Camera boundaries
+    float leftBoundary;
+    float rightBoundary;
+    float topBoundary;     
+    float bottomBoundary;
+
+    float leftThreshold;    
+    float rightThreshold;   
+	float topThreshold;
+	float bottomThreshold;
+    // Push speed when in PUSH_FORWARD mode
+    float pushSpeed;
+	// Free movement speed
+    float freeMovementSpeed; 
+    int freeCameraDirection;
+
+    int screenWidth;
+    int screenHeight;
+    // Reference to the game and player
+    CGame* game;
+    LPGAMEOBJECT player;
+
+public:
+    CameraController(LPGAMEOBJECT player, CGame* game);
+    virtual ~CameraController() = default;
+
+    virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects = NULL);
+    virtual void Render() {}  // Empty render - camera doesn't need to be drawn
+    virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
+
+    void SetMode(CameraMoveMode newMode) { mode = newMode; }
+
+    void SetBoundaries(float left, float right, float top, float bottom) {
+        leftBoundary = left; rightBoundary = right;
+        topBoundary = top; bottomBoundary = bottom;
+    }
+
+    void SetThresholds(float left, float right) {
+        leftThreshold = left; rightThreshold = right;
+    }
+
+    void SetVerticalThresholds(float top, float bottom) {
+        topThreshold = top; bottomThreshold = bottom;
+    }
+
+    void SetPushSpeed(float speed) { pushSpeed = speed; }
+    void SetFreeMovementSpeed(float speed) { freeMovementSpeed = speed; }
+
+    void SetFreeCameraDirection(int direction, bool enable);
+
+    // Override GameObject methods to make camera a special object
+    virtual int IsCollidable() { return 1; }
+    virtual int IsBlocking() { return 0; }
+
+    // Special methods for collision handling
+    void OnCollisionWith(CMario* mario);
+
+    // Debug functions to switch modes
+    void SwitchToFollowMode() { mode = FOLLOW_PLAYER; }
+    void SwitchToPushMode() { mode = PUSH_FORWARD; }
+    void SwitchToThresholdMode() { mode = THRESHOLD_BASED; }
+    void SwitchToFreeMove() { mode = FREE_MOVE; }
+
+    bool IsInFreeMove() const { return mode == FREE_MOVE; }
+};
+enum FreeCameraDirection {
+    FREE_CAM_NONE = 0,
+    FREE_CAM_LEFT = 1,
+    FREE_CAM_RIGHT = 2,
+    FREE_CAM_UP = 4,
+    FREE_CAM_DOWN = 8
+};
+
+

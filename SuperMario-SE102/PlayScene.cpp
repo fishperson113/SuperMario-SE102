@@ -32,6 +32,16 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 {
 	player = NULL;
 	key_handler = new CSampleKeyHandler(this);
+	cameraController = NULL;
+}
+
+CPlayScene::~CPlayScene()
+{
+	if (cameraController != NULL)
+	{
+		delete cameraController;
+		cameraController = NULL;
+	}
 }
 
 
@@ -383,6 +393,37 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 	}
 }
 
+void CPlayScene::LoadCamera()
+{
+	if (cameraController == NULL)
+	{
+		//cameraController = new CameraController(player, CGame::GetInstance());
+
+		//if (player == NULL)
+		//{
+		//	SetCameraMode(3);
+		//	DebugOut(L"[INFO] Camera initialized in free move mode (no player)\n");
+		//}
+		//else
+		//{
+		//	// Default to follow player
+		//	SetCameraMode(2);
+		//	DebugOut(L"[INFO] Camera controller initialized\n");
+		//}
+		cameraController = new CameraController(player, CGame::GetInstance());
+
+		// Add camera to scene objects for collision detection
+		objectManager.Add(cameraController);
+
+		// Set default camera mode
+		//SetCameraMode(0);
+
+		DebugOut(L"[INFO] Camera controller initialized\n");
+
+	}
+}
+
+
 void CPlayScene::LoadAssets(LPCWSTR assetFile)
 {
 	DebugOut(L"[INFO] Start loading assets from : %s \n", assetFile);
@@ -449,7 +490,7 @@ void CPlayScene::Load()
 	}
 
 	f.close();
-
+	LoadCamera();
 	DebugOut(L"[INFO] Done loading scene  %s\n", sceneFilePath);
 }
 
@@ -458,43 +499,21 @@ void CPlayScene::Update(DWORD dt)
 	// Update all game objects first
 	objectManager.Update(dt);
 
-	// Control camera position
-	float cx = 0, cy = 0;
-	CGame* game = CGame::GetInstance();
+	// Update camera position using the new controller
+	/*if (cameraController != NULL)
+	{
+		cameraController->Update(dt);
+	}*/
 
-	// If player exists, follow player
-	if (player != NULL) {
-		player->GetPosition(cx, cy);
+	if (cameraController->IsInFreeMove())
+	{
+		CGame* game = CGame::GetInstance();
 
-		// Center the camera on the player
-		cx -= game->GetBackBufferWidth() / 2;
-		cy -= game->GetBackBufferHeight() / 2;
-
-		game->SetCamPos(cx, 20);
+		cameraController->SetFreeCameraDirection(FREE_CAM_LEFT, game->IsKeyDown(DIK_LEFT));
+		cameraController->SetFreeCameraDirection(FREE_CAM_RIGHT, game->IsKeyDown(DIK_RIGHT));
+		cameraController->SetFreeCameraDirection(FREE_CAM_UP, game->IsKeyDown(DIK_UP));
+		cameraController->SetFreeCameraDirection(FREE_CAM_DOWN, game->IsKeyDown(DIK_DOWN));
 	}
-	// If no player exists, allow manual camera control
-	else {
-		// Get current camera position
-		game->GetCamPos(cx, cy);
-
-		// Move camera based on keyboard input
-		if (game->IsKeyDown(DIK_RIGHT))
-			cx += 0.5f * dt;
-		if (game->IsKeyDown(DIK_LEFT))
-			cx -= 0.5f * dt;
-		if (game->IsKeyDown(DIK_DOWN))
-			cy += 0.5f * dt;
-		if (game->IsKeyDown(DIK_UP))
-			cy -= 0.5f * dt;
-
-		game->SetCamPos(cx, cy);
-	}
-
-	// Constrain camera to not go below 0
-	if (cx < 0) cx = 0;
-
-	if (cy < 0) cy = 0;
-	// Update camera position
 
 	// Clean up deleted objects
 	PurgeDeletedObjects();
@@ -523,6 +542,11 @@ void CPlayScene::Clear()
 */
 void CPlayScene::Unload()
 {
+	if (cameraController != NULL)
+	{
+		delete cameraController;
+		cameraController = NULL;
+	}
 	objectManager.Clear();
 	player = NULL;
 
@@ -530,6 +554,35 @@ void CPlayScene::Unload()
 }
 
 bool CPlayScene::IsGameObjectDeleted(const LPGAMEOBJECT& o) { return o == NULL; }
+
+void CPlayScene::SetCameraMode(int mode)
+{
+	if (cameraController == NULL)
+		return;
+
+	switch (mode)
+	{
+	case 0:
+		cameraController->SwitchToFollowMode();
+		DebugOut(L"[INFO] Camera mode set to Follow Player\n");
+		break;
+	case 1:
+		cameraController->SwitchToPushMode();
+		DebugOut(L"[INFO] Camera mode set to Push Forward\n");
+		break;
+	case 2:
+		cameraController->SwitchToThresholdMode();
+		DebugOut(L"[INFO] Camera mode set to Threshold Based\n");
+		break;
+	case 3:
+		cameraController->SwitchToFreeMove();
+		DebugOut(L"[INFO] Camera mode set to Free Move\n");
+		break;
+	default:
+		DebugOut(L"[WARNING] Unknown camera mode: %d\n", mode);
+		break;
+	}
+}
 
 void CPlayScene::PurgeDeletedObjects()
 {

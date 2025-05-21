@@ -43,7 +43,7 @@ public:
     virtual ~CameraController() = default;
 
     virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects = NULL);
-    virtual void Render() {}  // Empty render - camera doesn't need to be drawn
+    virtual void Render() { RenderBoundingBox(); }  // Empty render - camera doesn't need to be drawn
     virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 
     void SetMode(CameraMoveMode newMode) { mode = newMode; }
@@ -60,6 +60,7 @@ public:
     void SetVerticalThresholds(float top, float bottom) {
         topThreshold = top; bottomThreshold = bottom;
     }
+    void RenderBoundingBox() override;
 
     void SetPushSpeed(float speed) { pushSpeed = speed; }
     void SetFreeMovementSpeed(float speed) { freeMovementSpeed = speed; }
@@ -67,11 +68,11 @@ public:
     void SetFreeCameraDirection(int direction, bool enable);
 
     // Override GameObject methods to make camera a special object
-    virtual int IsCollidable() { return 1; }
-    virtual int IsBlocking() { return 0; }
-
-    // Special methods for collision handling
-    void OnCollisionWith(CMario* mario);
+    virtual int IsCollidable() { return (mode == PUSH_FORWARD) ? 1 : 0; }
+    virtual int IsBlocking();
+	virtual int IsDynamic() { return 1; } 
+    virtual void OnCollisionWith(LPCOLLISIONEVENT e);
+    virtual void OnOverlapWith(LPGAMEOBJECT obj) override;
 
     // Debug functions to switch modes
     void SwitchToFollowMode() { mode = FOLLOW_PLAYER; }

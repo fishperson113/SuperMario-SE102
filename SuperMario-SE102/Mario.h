@@ -216,6 +216,7 @@ class CMario : public CGameObject
 	void OnCollisionWithSuperLeafBrick(LPCOLLISIONEVENT e);
 	void OnCollisionWithCheckpoint(LPCOLLISIONEVENT e);
 	void OnCollisionWithBullet(LPCOLLISIONEVENT e);
+	void OnCollisionWithCamera(LPCOLLISIONEVENT e);
 
 	int GetAniIdBig();
 	int GetAniIdSmall();
@@ -304,9 +305,10 @@ public:
 	bool IsOnPlatform() { return isOnPlatform; }
 
 	int IsBlocking() { return (state != MARIO_STATE_DIE && untouchable==0); }
-
+	int IsDynamic() { return 1; } // Mario is always dynamic
 	void OnNoCollision(DWORD dt);
 	void OnCollisionWith(LPCOLLISIONEVENT e);
+	void OnOverlapWith(LPGAMEOBJECT e);
 
 	float GetPowerMeter() { return powerMeter; }
 	void SetLevel(int l);
@@ -315,4 +317,5 @@ public:
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount64(); }
 	void EndGlide() { isGliding = false; }
 	void GetBoundingBox(float& left, float& top, float& right, float& bottom);
+
 };

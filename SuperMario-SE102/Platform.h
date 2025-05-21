@@ -30,7 +30,9 @@ public:
 	void Update(DWORD dt) {}
 	void GetBoundingBox(float& l, float& t, float& r, float& b);
 	void RenderBoundingBox();
-
+	//int IsCollidable() override { return 1; }  
+	int IsBlocking() override { return 1; }    
+	int IsDynamic() override { return 0; }
 	int IsDirectionColliable(float nx, float ny);
 };
 

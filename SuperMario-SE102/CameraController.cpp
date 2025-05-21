@@ -1,8 +1,8 @@
-#include "CameraController.h"
+﻿#include "CameraController.h"
 #include "Mario.h"
 #include "Collision.h"
 #include "debug.h"
-
+#include "Textures.h"
 CameraController::CameraController(LPGAMEOBJECT player, CGame* game) : CGameObject()
 {
     this->player = player;
@@ -19,7 +19,7 @@ CameraController::CameraController(LPGAMEOBJECT player, CGame* game) : CGameObje
     topThreshold = 0.3f;
     bottomThreshold = 0.7f;
 
-    pushSpeed = 0.05f;
+    pushSpeed = 0.01f;
     freeMovementSpeed = 0.2f;
     freeCameraDirection = 0;
 
@@ -33,11 +33,15 @@ CameraController::CameraController(LPGAMEOBJECT player, CGame* game) : CGameObje
 
 void CameraController::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
-    // The camera's bounding box is the entire screen
-    left = x;
-    top = y;
-    right = x + screenWidth;
-    bottom = y + screenHeight;
+    // In PUSH_FORWARD mode, create a narrow padding zone on the left edge
+    if (mode == PUSH_FORWARD)
+    {
+        // Create a narrow strip (50 pixels wide) on the left side of the screen
+        left = x;
+        top = y;
+        right = x;
+        bottom = y + 500;
+    }
 }
 
 void CameraController::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
@@ -120,50 +124,73 @@ void CameraController::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
         break;
     }
 
-    // Apply boundaries
-    x = max(leftBoundary, min(x, rightBoundary - screenWidth));
-    y = max(topBoundary, min(y, bottomBoundary - screenHeight));
-
-    // Only in PUSH_FORWARD mode, check for collision with player
-    if (mode == PUSH_FORWARD && player != NULL)
-    {
-        CMario* mario = dynamic_cast<CMario*>(player);
-        if (mario)
-        {
-            OnCollisionWith(mario);
-        }
-    }
-
-    // Update the actual camera position in the game engine
     game->SetCamPos(x, y);
 }
-
-void CameraController::OnCollisionWith(CMario* mario)
+// Add to CameraController.cpp
+void CameraController::OnCollisionWith(LPCOLLISIONEVENT e)
 {
-    float marioX, marioY;
-    mario->GetPosition(marioX, marioY);
+}
+
+void CameraController::OnOverlapWith(LPGAMEOBJECT obj)
+{
+    // Check if this is Mario
+    CMario* mario = dynamic_cast<CMario*>(obj);
+    if (!mario) return;
+
+    // Get bounding boxes
+    float camLeft, camTop, camRight, camBottom;
+    this->GetBoundingBox(camLeft, camTop, camRight, camBottom);
 
     float marioLeft, marioTop, marioRight, marioBottom;
     mario->GetBoundingBox(marioLeft, marioTop, marioRight, marioBottom);
 
-    float cameraLeft, cameraTop, cameraRight, cameraBottom;
-    GetBoundingBox(cameraLeft, cameraTop, cameraRight, cameraBottom);
+    if (marioLeft < camRight) {
+        float pushDistance = camRight - marioLeft + 1.0f;  
 
-    // Check if Mario is inside the camera view
-    // If Mario's right edge is beyond the left edge of camera (plus buffer)
-    if (marioRight < cameraLeft + 50)
-    {
+        float marioX, marioY;
+        mario->GetPosition(marioX, marioY);
+
         // Push Mario to the right
-        mario->SetPosition(cameraLeft + 50 + (marioRight - marioLeft) / 2, marioY);
+        mario->SetPosition(marioX + pushDistance, marioY);
 
-        // Optionally stop horizontal movement
+        // Optionally prevent Mario from moving left 
         float vx, vy;
         mario->GetSpeed(vx, vy);
-        mario->SetSpeed(0.0f, vy);
+        if (vx < 0)
+            mario->SetSpeed(0, vy);
 
-        DebugOut(L">>> Camera pushed Mario to the right! >>> \n");
+        DebugOut(L"[CAMERA PUSH] Camera pushed Mario: %.2f units\n", pushDistance);
     }
 }
+
+
+int CameraController::IsBlocking()
+{
+    return 1;
+}
+
+void CameraController::RenderBoundingBox()
+{
+    if (mode != PUSH_FORWARD) return;
+
+    float l, t, r, b;
+    GetBoundingBox(l, t, r, b);
+
+    RECT rect;
+    rect.left = 0;
+    rect.top = 0;
+    rect.right = (int)(r - l);
+    rect.bottom = (int)(b - t);
+
+    float cx, cy;
+    CGame::GetInstance()->GetCamPos(cx, cy);
+
+    LPTEXTURE bbox = CTextures::GetInstance()->Get(ID_TEX_BBOX);
+
+    // ✅ Đây mới là cách đúng: dịch theo camera
+    CGame::GetInstance()->Draw(x - cx, y - cy, bbox, &rect, BBOX_ALPHA);
+}
+
 
 void CameraController::SetFreeCameraDirection(int direction, bool enable)
 {

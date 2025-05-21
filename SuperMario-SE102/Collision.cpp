@@ -1,4 +1,4 @@
-#include "Collision.h"
+﻿#include "Collision.h"
 #include "GameObject.h"
 
 #include "debug.h"
@@ -17,7 +17,11 @@ CCollision* CCollision::GetInstance()
 	if (__instance == NULL) __instance = new CCollision();
 	return __instance;
 }
-
+bool IsOverlap(float l1, float t1, float r1, float b1,
+	float l2, float t2, float r2, float b2)
+{
+	return !(r1 < l2 || r2 < l1 || b1 < t2 || b2 < t1);
+}
 /*
 	SweptAABB 
 */
@@ -357,4 +361,26 @@ void CCollision::Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* co
 
 
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
+	// --- [NEW] Check for dynamic overlap (moving platform, camera push, etc.) ---
+	float sl, st, sr, sb;
+	objSrc->GetBoundingBox(sl, st, sr, sb);
+
+	for (LPGAMEOBJECT obj : *coObjects)
+	{
+		if (obj == objSrc) continue;
+
+		if (!obj->IsDynamic()) continue;             
+		if (!obj->IsCollidable()) continue;          
+		if (!obj->IsBlocking()) continue;            
+
+		float ol, ot, or_, ob;
+		obj->GetBoundingBox(ol, ot, or_, ob);
+
+		if (IsOverlap(sl, st, sr, sb, ol, ot, or_, ob))
+		{
+			objSrc->OnOverlapWith(obj);      
+		}
+	}
+
 }
+

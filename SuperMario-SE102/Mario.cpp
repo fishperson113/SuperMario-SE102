@@ -1,4 +1,4 @@
-#include <algorithm>
+﻿#include <algorithm>
 #include "debug.h"
 
 #include "Mario.h"
@@ -135,6 +135,10 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithCheckpoint(e);
 	else if (dynamic_cast<CBullet*>(e->obj))
 		OnCollisionWithBullet(e);
+}
+
+void CMario::OnOverlapWith(LPGAMEOBJECT e)
+{
 }
 
 void CMario::UpdateHeldKoopasPosition()

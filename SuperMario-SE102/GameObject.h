@@ -60,10 +60,10 @@ public:
 
 	// When no collision has been detected (triggered by CCollision::Process)
 	virtual void OnNoCollision(DWORD dt) { if (!isActive) return; };
-
+	virtual void OnCollisionExit(LPGAMEOBJECT obj) {};
 	// When collision with an object has been detected (triggered by CCollision::Process)
 	virtual void OnCollisionWith(LPCOLLISIONEVENT e) {};
-	
+	virtual void OnCollisionStay(LPCOLLISIONEVENT e) {};
 	virtual void OnOverlapWith(LPGAMEOBJECT obj) {}
 
 	// Is this object blocking other object? If YES, collision framework will automatically push the other object

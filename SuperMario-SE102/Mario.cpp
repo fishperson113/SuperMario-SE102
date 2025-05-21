@@ -18,7 +18,7 @@
 #include "SuperLeaf.h"
 #include "SuperLeafBrick.h"
 #include "Bullet.h"
-
+#include"CMovingPlatform.h"
 void CMario::HoldKoopas(Koopas* koopas)
 {
 	if (isHolding) return; 
@@ -77,8 +77,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	// Handle gliding state
 	if(!isFlying)
 		UpdateGlidingState();
-	// Debug output
-	DebugOut(L"Coins: %d | P-Meter: %.2f/%.0f", coin, powerMeter, MARIO_PMETER_MAX);
 }
 
 void CMario::OnNoCollision(DWORD dt)
@@ -93,7 +91,10 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 	if (e->ny != 0 && e->obj->IsBlocking())
 	{
 		vy = 0;
-		if (e->ny < 0) isOnPlatform = true;
+		if (e->ny < 0||dynamic_cast<CPlatform*>(e->obj))
+		{
+			isOnPlatform = true;
+		}
 	}
 	else 
 	if (e->nx != 0 && e->obj->IsBlocking())
@@ -137,8 +138,38 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithBullet(e);
 }
 
-void CMario::OnOverlapWith(LPGAMEOBJECT e)
+void CMario::OnOverlapWith(LPGAMEOBJECT obj)
 {
+	CMovingPlatform* platform = dynamic_cast<CMovingPlatform*>(obj);
+	if (platform)
+	{
+		float platLeft, platTop, platRight, platBottom;
+		platform->GetBoundingBox(platLeft, platTop, platRight, platBottom);
+
+		float marioLeft, marioTop, marioRight, marioBottom;
+		this->GetBoundingBox(marioLeft, marioTop, marioRight, marioBottom);
+
+		if (marioBottom >= platTop && marioBottom <= platTop + 2.0f &&
+			marioRight > platLeft && marioLeft < platRight)
+		{
+			isOnPlatform = true;
+
+			if (vy >= 0)
+			{
+				vy = 0;
+
+				float newY = platTop - (marioBottom - y);
+				SetPosition(x, newY);
+			}
+
+		}
+	}
+}
+
+void CMario::OnCollisionExit(LPGAMEOBJECT obj)
+{
+	//if((CPlatform*)(obj))
+	//	isOnPlatform = false;
 }
 
 void CMario::UpdateHeldKoopasPosition()

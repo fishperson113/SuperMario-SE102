@@ -173,6 +173,7 @@ int Run()
 		{
 			frameStart = now;
 
+			CGame::GetInstance()->SetDeltaTime(dt);
 			CGame::GetInstance()->ProcessKeyboard();			
 			Update(dt);
 			Render();

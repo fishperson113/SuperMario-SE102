@@ -60,6 +60,9 @@ class CGame
 	void _ParseSection_SETTINGS(string line);
 	void _ParseSection_SCENES(string line);
 
+	DWORD deltaTime = 0;
+
+
 public:
 	// Init DirectX, Sprite Handler
 	void Init(HWND hWnd, HINSTANCE hInstance);
@@ -88,6 +91,8 @@ public:
 	void ProcessKeyboard();
 	void SetKeyHandler(LPKEYEVENTHANDLER handler) { keyHandler = handler; }
 
+	void SetDeltaTime(DWORD dt) { this->deltaTime = dt; }
+	DWORD GetDeltaTime() { return deltaTime; }
 
 	ID3D10Device* GetDirect3DDevice() { return this->pD3DDevice; }
 	IDXGISwapChain* GetSwapChain() { return this->pSwapChain; }

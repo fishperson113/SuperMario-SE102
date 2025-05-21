@@ -3,7 +3,8 @@
 #include <Windows.h>
 #include <vector>
 #include <algorithm>
-
+#include<unordered_map>
+#include<unordered_set>
 using namespace std;
 
 class CGameObject;
@@ -46,6 +47,8 @@ struct CCollisionEvent
 class CCollision
 {
 	static CCollision* __instance;
+	std::unordered_map<LPGAMEOBJECT, std::unordered_set<LPGAMEOBJECT>> previousCollisions;
+
 public: 
 	static void SweptAABB(
 		float ml,			// move left 
@@ -82,6 +85,6 @@ public:
 		int filterY);
 
 	void Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* coObjects);
-
+	void ProcessCollisionExit(LPGAMEOBJECT objSrc, vector<LPGAMEOBJECT>* coObjects);
 	static CCollision* GetInstance();
 };

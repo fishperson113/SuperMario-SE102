@@ -24,7 +24,8 @@
 #include "SpecialPipe.h"
 #include "Bullet.h"
 #include "FireTrap.h"
-
+#include "CameraController.h"
+#include"CMovingPlatform.h"
 using namespace std;
 
 CPlayScene::CPlayScene(int id, LPCWSTR filePath):
@@ -408,6 +409,65 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		DebugOut(L"[INFO] Checkpoint object has been created with %d enemies!\n", enemyCount);
 		break;
 	}
+	case OBJECT_TYPE_MOVING_PLATFORM:
+	{
+		float cell_width = (float)atof(tokens[3].c_str());
+		float cell_height = (float)atof(tokens[4].c_str());
+		int length = atoi(tokens[5].c_str());
+		int sprite_begin = atoi(tokens[6].c_str());
+		int sprite_middle = atoi(tokens[7].c_str());
+		int sprite_end = atoi(tokens[8].c_str());
+
+		// Default speed value
+		float moveSpeed = 0.05f;
+
+		// Set custom speed if provided
+		if (tokens.size() >= 16)
+		{
+			moveSpeed = (float)atof(tokens[15].c_str());
+		}
+
+		// Create the moving platform with the specified speed
+		CMovingPlatform* movingPlatform = new CMovingPlatform(
+			x, y,
+			cell_width, cell_height, length,
+			sprite_begin, sprite_middle, sprite_end,
+			moveSpeed  // Pass the speed parameter
+		);
+		// Set movement attributes if provided
+		if (tokens.size() >= 13)
+		{
+			float leftLimit = (float)atof(tokens[9].c_str());
+			float rightLimit = (float)atof(tokens[10].c_str());
+			float topLimit = (float)atof(tokens[11].c_str());
+			float bottomLimit = (float)atof(tokens[12].c_str());
+
+			movingPlatform->SetLimits(leftLimit, rightLimit, topLimit, bottomLimit);
+			DebugOut(L"[INFO] Platform limits set to: L=%.2f, R=%.2f, T=%.2f, B=%.2f\n",
+				leftLimit, rightLimit, topLimit, bottomLimit);
+		}
+
+		// Set movement direction if provided
+		if (tokens.size() >= 14)
+		{
+			int direction = atoi(tokens[13].c_str());
+			movingPlatform->SetMoveDirection(direction);
+			DebugOut(L"[INFO] Platform direction set to: %d\n", direction);
+		}
+
+		// Set auto-movement flag if provided
+		if (tokens.size() >= 15)
+		{
+			bool autoMove = (atoi(tokens[14].c_str()) != 0);
+			movingPlatform->SetAutoMoving(autoMove);
+			DebugOut(L"[INFO] Platform auto-moving set to: %d\n", autoMove);
+		}
+
+		obj = movingPlatform;
+		DebugOut(L"[INFO] Moving Platform object has been created!\n");
+		break;
+	}
+
 	default:
 		DebugOut(L"[ERROR] Invalid object type: %d\n", object_type);
 		return;

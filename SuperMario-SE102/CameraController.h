@@ -68,8 +68,6 @@ public:
     void SetFreeCameraDirection(int direction, bool enable);
 
     // Override GameObject methods to make camera a special object
-    virtual int IsCollidable() { return (mode == PUSH_FORWARD) ? 1 : 0; }
-    virtual int IsBlocking();
 	virtual int IsDynamic() { return 1; } 
     virtual void OnCollisionWith(LPCOLLISIONEVENT e);
     virtual void OnOverlapWith(LPGAMEOBJECT obj) override;

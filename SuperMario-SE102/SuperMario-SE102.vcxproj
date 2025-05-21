@@ -142,6 +142,7 @@
     <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="CBackgroundObject.cpp" />
     <ClCompile Include="Checkpoint.cpp" />
+    <ClCompile Include="CMovingPlatform.cpp" />
     <ClCompile Include="Coin.cpp" />
     <ClCompile Include="CoinBrick.cpp" />
     <ClCompile Include="Collision.cpp" />
@@ -184,6 +185,7 @@
     <ClInclude Include="CameraController.h" />
     <ClInclude Include="CBackgroundObject.h" />
     <ClInclude Include="Checkpoint.h" />
+    <ClInclude Include="CMovingPlatform.h" />
     <ClInclude Include="Coin.h" />
     <ClInclude Include="CoinBrick.h" />
     <ClInclude Include="Collision.h" />

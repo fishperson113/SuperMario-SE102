@@ -164,11 +164,6 @@ void CameraController::OnOverlapWith(LPGAMEOBJECT obj)
 }
 
 
-int CameraController::IsBlocking()
-{
-    return 1;
-}
-
 void CameraController::RenderBoundingBox()
 {
     if (mode != PUSH_FORWARD) return;

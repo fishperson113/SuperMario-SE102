@@ -359,9 +359,10 @@ void CCollision::Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* co
 		objSrc->OnCollisionWith(e);			
 	}
 
+	//ProcessCollisionExit(objSrc, coObjects);
 
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
-	// --- [NEW] Check for dynamic overlap (moving platform, camera push, etc.) ---
+
 	float sl, st, sr, sb;
 	objSrc->GetBoundingBox(sl, st, sr, sb);
 
@@ -369,9 +370,7 @@ void CCollision::Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* co
 	{
 		if (obj == objSrc) continue;
 
-		if (!obj->IsDynamic()) continue;             
-		if (!obj->IsCollidable()) continue;          
-		if (!obj->IsBlocking()) continue;            
+		if (!obj->IsDynamic()) continue;                
 
 		float ol, ot, or_, ob;
 		obj->GetBoundingBox(ol, ot, or_, ob);
@@ -379,8 +378,68 @@ void CCollision::Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* co
 		if (IsOverlap(sl, st, sr, sb, ol, ot, or_, ob))
 		{
 			objSrc->OnOverlapWith(obj);      
+			obj->OnOverlapWith(objSrc);      
 		}
 	}
 
 }
 
+void CCollision::ProcessCollisionExit(LPGAMEOBJECT objSrc, vector<LPGAMEOBJECT>* coObjects)
+{
+	if (!objSrc || objSrc->IsDeleted())
+		return;
+
+	// Get current collisions
+	std::unordered_set<LPGAMEOBJECT> currentCollisions;
+
+	// Collect all objects currently colliding with objSrc
+	float ml, mt, mr, mb;
+	objSrc->GetBoundingBox(ml, mt, mr, mb);
+
+	for (LPGAMEOBJECT obj : *coObjects)
+	{
+		if (obj == objSrc || obj->IsDeleted() || !obj->IsCollidable())
+			continue;
+
+		float ol, ot, or_, ob;
+		obj->GetBoundingBox(ol, ot, or_, ob);
+
+		if (IsOverlap(ml, mt, mr, mb, ol, ot, or_, ob))
+		{
+			currentCollisions.insert(obj);
+		}
+	}
+
+	// Check for objects that were in collision last frame but not this frame
+	auto it = previousCollisions.find(objSrc);
+	if (it != previousCollisions.end())
+	{
+		for (LPGAMEOBJECT obj : it->second)
+		{
+			if (obj->IsDeleted())
+				continue;
+
+			// If object was in collision last frame but not in this frame
+			if (currentCollisions.find(obj) == currentCollisions.end())
+			{
+				// Call OnCollisionExit
+				objSrc->OnCollisionExit(obj);
+				obj->OnCollisionExit(objSrc);
+			}
+		}
+	}
+
+	previousCollisions[objSrc] = currentCollisions;
+
+	for (auto it = previousCollisions.begin(); it != previousCollisions.end();)
+	{
+		if (it->first->IsDeleted())
+		{
+			it = previousCollisions.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+}

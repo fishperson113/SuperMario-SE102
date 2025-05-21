@@ -48,9 +48,6 @@ void CFireTrap::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
     if (playerX > 400)
 		isRight = true;
 
-	DebugOut(L"playerX %f, playerY %f\n", playerX, playerY);
-    DebugOut(L"isHiding %d!\n", isHiding);
-
 	ULONGLONG currentTime = GetTickCount64();
     if (currentTime - this->spawnTime > SHOOTING_TIME)
     {

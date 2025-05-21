@@ -169,6 +169,7 @@
 
 #define MARIO_UNTOUCHABLE_TIME 2500
 class Koopas;
+class CMovingPlatform;
 class CMario : public CGameObject
 {
 	Koopas* heldKoopas;  
@@ -216,7 +217,6 @@ class CMario : public CGameObject
 	void OnCollisionWithSuperLeafBrick(LPCOLLISIONEVENT e);
 	void OnCollisionWithCheckpoint(LPCOLLISIONEVENT e);
 	void OnCollisionWithBullet(LPCOLLISIONEVENT e);
-	void OnCollisionWithCamera(LPCOLLISIONEVENT e);
 
 	int GetAniIdBig();
 	int GetAniIdSmall();
@@ -282,7 +282,6 @@ public:
 
 		isFlying = false;
 		fly_start = 0;
-		
 		isRunning = false;
 	}
 
@@ -293,7 +292,7 @@ public:
 	bool IsGliding() { return isGliding; }
 	bool IsFlying() { return isFlying; }
 	void EndFly() { isFlying = false; }
-
+	void SetIsOnPlatform(bool isOn) { isOnPlatform = isOn; }
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();
 	void SetState(int state);
@@ -309,6 +308,7 @@ public:
 	void OnNoCollision(DWORD dt);
 	void OnCollisionWith(LPCOLLISIONEVENT e);
 	void OnOverlapWith(LPGAMEOBJECT e);
+	void OnCollisionExit(LPGAMEOBJECT obj);
 
 	float GetPowerMeter() { return powerMeter; }
 	void SetLevel(int l);

@@ -63,3 +63,103 @@ int CPipe::IsDirectionColliable(float nx, float ny)
 	if (nx != 0) return 1;
 	return 0;
 }
+
+void CPipe::SetAsEntrance(float targetX, float targetY, PipeDirection entryDir, PipeDirection exitDir)
+{
+	this->isEntrance = true;
+	this->isExit = false;
+	this->targetX = targetX;
+	this->targetY = targetY;
+	this->entryDirection = entryDir;
+	this->exitDirection = exitDir;
+}
+
+void CPipe::SetAsExit()
+{
+	this->isExit = true;
+	this->isEntrance = false;
+}
+
+void CPipe::GetTargetPosition(float& x, float& y) const
+{
+	x = this->targetX;
+	y = this->targetY;
+}
+
+void CPipe::GetEntryPosition(float& x, float& y) const
+{
+	// Return the position based on entry direction
+	x = this->x; // Default to pipe center
+
+	switch (entryDirection)
+	{
+	case PipeDirection::UP:
+		// If entering from below, position at the bottom of the pipe
+		y = this->y + (this->cellHeight * this->length) / 2;
+		break;
+
+	case PipeDirection::DOWN:
+		// If entering from above, position at the top of the pipe
+		y = this->y - this->cellHeight / 2;
+		break;
+
+	case PipeDirection::LEFT:
+		// For horizontal entry from right side
+		x = this->x + this->cellWidth / 2;
+		y = this->y;
+		break;
+
+	case PipeDirection::RIGHT:
+		// For horizontal entry from left side
+		x = this->x - this->cellWidth / 2;
+		y = this->y;
+		break;
+
+	default:
+		y = this->y;
+		break;
+	}
+}
+
+void CPipe::GetExitPosition(float& x, float& y) const
+{
+	x = this->x; // Default to pipe center
+
+	if (isExit)
+	{
+		// For exit pipes, calculate based on the pipe's own direction
+		switch (entryDirection)
+		{
+		case PipeDirection::UP:
+			// When exiting upward, position above the pipe
+			y = this->y - this->cellHeight / 2;
+			break;
+
+		case PipeDirection::DOWN:
+			// When exiting downward, position below the pipe
+			y = this->y + (this->cellHeight * this->length) / 2;
+			break;
+
+		case PipeDirection::LEFT:
+			// When exiting leftward
+			x = this->x - this->cellWidth / 2;
+			y = this->y;
+			break;
+
+		case PipeDirection::RIGHT:
+			// When exiting rightward
+			x = this->x + this->cellWidth / 2;
+			y = this->y;
+			break;
+
+		default:
+			y = this->y;
+			break;
+		}
+	}
+	else
+	{
+		// Default fallback
+		y = this->y;
+	}
+}

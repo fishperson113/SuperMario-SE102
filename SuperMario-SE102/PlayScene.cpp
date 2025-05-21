@@ -223,11 +223,61 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		int sprite_middle = atoi(tokens[7].c_str());
 		int sprite_end = atoi(tokens[8].c_str());
 
-		obj = new CPipe(
+		CPipe* pipe = new CPipe(
 			x, y,
 			cell_width, cell_height, length,
 			sprite_begin, sprite_middle, sprite_end
 		);
+
+		// Check if it's a teleport pipe
+		if (tokens.size() >= 12)
+		{
+			// Entry Direction: 0=UP, 1=DOWN, 2=LEFT, 3=RIGHT
+			int entryDirection = atoi(tokens[9].c_str());
+			float target_x = (float)atof(tokens[10].c_str());
+			float target_y = (float)atof(tokens[11].c_str());
+
+			// Default exit direction (if not specified) is UP
+			int exitDirection = 0; // UP
+			if (tokens.size() >= 13)
+			{
+				exitDirection = atoi(tokens[12].c_str());
+			}
+
+			PipeDirection entryDir, exitDir;
+
+			// Convert entry direction
+			switch (entryDirection)
+			{
+			case 0: entryDir = PipeDirection::UP; break;
+			case 1: entryDir = PipeDirection::DOWN; break;
+			case 2: entryDir = PipeDirection::LEFT; break;
+			case 3: entryDir = PipeDirection::RIGHT; break;
+			default: entryDir = PipeDirection::DOWN; break;
+			}
+
+			// Convert exit direction
+			switch (exitDirection)
+			{
+			case 0: exitDir = PipeDirection::UP; break;
+			case 1: exitDir = PipeDirection::DOWN; break;
+			case 2: exitDir = PipeDirection::LEFT; break;
+			case 3: exitDir = PipeDirection::RIGHT; break;
+			default: exitDir = PipeDirection::UP; break;
+			}
+
+			pipe->SetAsEntrance(target_x, target_y, entryDir, exitDir);
+			DebugOut(L"[INFO] Teleport Pipe created with target (%f, %f), entry dir %d, exit dir %d\n",
+				target_x, target_y, entryDirection, exitDirection);
+		}
+		// Check if it's an exit pipe
+		else if (tokens.size() >= 10 && atoi(tokens[9].c_str()) == 1)
+		{
+			pipe->SetAsExit();
+			DebugOut(L"[INFO] Exit Pipe created\n");
+		}
+
+		obj = pipe;
 		DebugOut(L"[INFO] Pipe object has been created!\n");
 		break;
 	}

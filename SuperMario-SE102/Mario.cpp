@@ -74,6 +74,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 
 	UpdateFlyingState();
 
+	UpdateTeleportingState();
+
 	// Handle gliding state
 	if(!isFlying)
 		UpdateGlidingState();
@@ -147,6 +149,8 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithCheckpoint(e);
 	else if (dynamic_cast<CBullet*>(e->obj))
 		OnCollisionWithBullet(e);
+	else if (dynamic_cast<CPipe*>(e->obj))
+		OnCollisionWithPipe(e);
 }
 
 void CMario::OnOverlapWith(LPGAMEOBJECT obj)
@@ -382,6 +386,82 @@ void CMario::OnCollisionWithBullet(LPCOLLISIONEVENT e)
 		{
 			DebugOut(L">>> Mario DIE >>> \n");
 			SetState(MARIO_STATE_DIE);
+		}
+	}
+}
+void CMario::AlignWithPipe(CPipe* pipe, PipeDirection direction)
+{
+	float pipeX, pipeY;
+	pipe->GetPosition(pipeX, pipeY);
+
+	// Align Mario to the center of the pipe based on direction
+	switch (direction)
+	{
+	case PipeDirection::DOWN:
+	case PipeDirection::UP:
+		// Horizontally center Mario with the pipe
+		x = pipeX;
+		break;
+
+	case PipeDirection::LEFT:
+	case PipeDirection::RIGHT:
+		// Vertically center Mario with the pipe
+		y = pipeY;
+		break;
+	}
+}
+void CMario::OnCollisionWithPipe(LPCOLLISIONEVENT e)
+{
+	CPipe* pipe = dynamic_cast<CPipe*>(e->obj);
+
+	if (!pipe || isTeleporting) return;
+
+	CGame* game = CGame::GetInstance();
+
+	if (pipe->IsEntrance())
+	{
+		PipeDirection entryDir = pipe->GetEntryDirection();
+
+		bool canEnterPipe = false;
+
+		// Check if Mario can enter based on pipe direction and key press
+		switch (entryDir)
+		{
+		case PipeDirection::DOWN:
+			// Check if Mario is on top of pipe and pressing DOWN
+			canEnterPipe = (e->ny < 0) && game->IsKeyDown(DIK_DOWN);
+			break;
+
+		case PipeDirection::UP:
+			// Check if Mario is below pipe and pressing UP
+			canEnterPipe = (e->ny > 0) && game->IsKeyDown(DIK_UP);
+			break;
+
+		case PipeDirection::LEFT:
+			// Check if Mario is to the right of pipe and pressing LEFT
+			canEnterPipe = (e->nx > 0) && game->IsKeyDown(DIK_LEFT);
+			break;
+
+		case PipeDirection::RIGHT:
+			// Check if Mario is to the left of pipe and pressing RIGHT
+			canEnterPipe = (e->nx < 0) && game->IsKeyDown(DIK_RIGHT);
+			break;
+		}
+
+		if (canEnterPipe)
+		{
+			float targetX, targetY;
+			pipe->GetTargetPosition(targetX, targetY);
+			PipeDirection exitDir = pipe->GetExitDirection();
+
+			// Align Mario's position with the pipe entrance
+			AlignWithPipe(pipe, entryDir);
+
+			// Start teleport sequence
+			TeleportTo(targetX, targetY, exitDir);
+			StartPipeEntry(entryDir);
+
+			DebugOut(L">>> Mario entering pipe! Direction: %d >>> \n", static_cast<int>(entryDir));
 		}
 	}
 }
@@ -1032,6 +1112,108 @@ void CMario::UpdateFlyingState()
 	}
 }
 
+void CMario::UpdateTeleportingState()
+{
+
+	if (!isTeleporting) return;
+
+	ULONGLONG current_time = GetTickCount64();
+	ULONGLONG elapsed_time = current_time - teleport_start;
+
+	// Entry animation phase - Mario moves into the pipe
+	if (elapsed_time < MARIO_PIPE_ENTRY_TIME)
+	{
+		// Don't allow other movements while entering pipe
+		vx = 0;
+		ax = 0;
+
+		// Handle entry animation based on direction
+		switch (state)
+		{
+		case MARIO_STATE_PIPE_DOWN:
+			// Moving downward into pipe
+			pipe_offset += MARIO_PIPE_MOVE_SPEED;
+			y += MARIO_PIPE_MOVE_SPEED;
+			break;
+
+		case MARIO_STATE_PIPE_UP:
+			// Moving upward into pipe
+			pipe_offset -= MARIO_PIPE_MOVE_SPEED;
+			y -= MARIO_PIPE_MOVE_SPEED;
+			break;
+
+		case MARIO_STATE_PIPE_LEFT:
+			// Moving leftward into pipe
+			pipe_offset -= MARIO_PIPE_MOVE_SPEED;
+			x -= MARIO_PIPE_MOVE_SPEED;
+			break;
+
+		case MARIO_STATE_PIPE_RIGHT:
+			// Moving rightward into pipe
+			pipe_offset += MARIO_PIPE_MOVE_SPEED;
+			x += MARIO_PIPE_MOVE_SPEED;
+			break;
+		}
+	}
+	// Teleport phase - When entry is complete, move Mario to exit pipe
+	else if (elapsed_time >= MARIO_PIPE_ENTRY_TIME && elapsed_time < MARIO_PIPE_ENTRY_TIME + 100)
+	{
+		// Teleport Mario to the target location
+		this->SetPosition(teleport_target_x, teleport_target_y);
+
+		// Reset offset for exit animation
+		pipe_offset = 0.0f;
+
+		// Start exit animation
+		StartPipeExit(teleport_exit_direction);
+
+		// Reset teleport timer for exit animation
+		teleport_start = current_time;
+	}
+	// Exit animation phase - Mario appears from the exit pipe
+	else if (elapsed_time >= 0 && elapsed_time < MARIO_PIPE_EXIT_TIME)
+	{
+		// Don't allow other movements while exiting pipe
+		vx = 0;
+		ax = 0;
+
+		// Handle exit animation based on direction
+		switch (state)
+		{
+		case MARIO_STATE_PIPE_DOWN:
+			// Moving downward out of pipe (for UP exit)
+			pipe_offset += MARIO_PIPE_MOVE_SPEED;
+			y += MARIO_PIPE_MOVE_SPEED;
+			break;
+
+		case MARIO_STATE_PIPE_UP:
+			// Moving upward out of pipe (for DOWN exit)
+			pipe_offset -= MARIO_PIPE_MOVE_SPEED;
+			y -= MARIO_PIPE_MOVE_SPEED;
+			break;
+
+		case MARIO_STATE_PIPE_LEFT:
+			// Moving leftward out of pipe
+			pipe_offset -= MARIO_PIPE_MOVE_SPEED;
+			x -= MARIO_PIPE_MOVE_SPEED;
+			break;
+
+		case MARIO_STATE_PIPE_RIGHT:
+			// Moving rightward out of pipe
+			pipe_offset += MARIO_PIPE_MOVE_SPEED;
+			x += MARIO_PIPE_MOVE_SPEED;
+			break;
+		}
+	}
+	// End teleportation
+	else
+	{
+		isTeleporting = false;
+		SetState(MARIO_STATE_IDLE);
+		DebugOut(L">>> Mario teleportation complete! >>> \n");
+	}
+}
+
 
 //
 // Get animdation ID for big Mario
@@ -1196,7 +1378,17 @@ void CMario::SetState(int state)
 			vx = 0.0f;
 		}
 		break;
+	case MARIO_STATE_PIPE_DOWN:
+		vx = 0;
+		ax = 0;
+		vy = 0.05f; 
+		break;
 
+	case MARIO_STATE_PIPE_UP:
+		vx = 0;
+		ax = 0;
+		vy = -0.05f; 
+		break;
 	case MARIO_STATE_DIE:
 		vy = -MARIO_JUMP_DEFLECT_SPEED;
 		vx = 0;
@@ -1212,6 +1404,79 @@ bool CMario::IsGodMode()
 	return (isHolding && heldKoopas && !heldKoopas->IsAboutToWakeUp()) ||
 		(level == MARIO_LEVEL_TAIL && isSpinning);
 }
+
+void CMario::TeleportTo(float x, float y, PipeDirection exitDirection)
+{
+	if (isTeleporting) return;
+
+	isTeleporting = true;
+	teleport_start = GetTickCount64();
+	teleport_target_x = x;
+	teleport_target_y = y;
+	teleport_exit_direction = exitDirection;
+
+	// Reset pipe animation position offset
+	pipe_offset = 0.0f;
+
+	DebugOut(L">>> Mario teleporting to (%f, %f), exit direction: %d >>> \n",
+		x, y, static_cast<int>(exitDirection));
+}
+
+void CMario::StartPipeEntry(PipeDirection direction)
+{
+	// Stop all current movement
+	vx = 0;
+	vy = 0;
+	ax = 0;
+
+	// Set Mario's state based on pipe entry direction
+	switch (direction)
+	{
+	case PipeDirection::DOWN:
+		SetState(MARIO_STATE_PIPE_DOWN);
+		break;
+
+	case PipeDirection::UP:
+		SetState(MARIO_STATE_PIPE_UP);
+		break;
+
+	case PipeDirection::LEFT:
+		SetState(MARIO_STATE_PIPE_LEFT);
+		break;
+
+	case PipeDirection::RIGHT:
+		SetState(MARIO_STATE_PIPE_RIGHT);
+		break;
+	}
+}
+
+void CMario::StartPipeExit(PipeDirection direction)
+{
+	// Set Mario's state based on pipe exit direction
+	switch (direction)
+	{
+	case PipeDirection::DOWN:
+		// If exit is DOWN, Mario moves upward out of pipe
+		SetState(MARIO_STATE_PIPE_UP);
+		break;
+
+	case PipeDirection::UP:
+		// If exit is UP, Mario moves downward out of pipe
+		SetState(MARIO_STATE_PIPE_DOWN);
+		break;
+
+	case PipeDirection::LEFT:
+		// If exit is LEFT, Mario moves rightward out of pipe
+		SetState(MARIO_STATE_PIPE_RIGHT);
+		break;
+
+	case PipeDirection::RIGHT:
+		// If exit is RIGHT, Mario moves leftward out of pipe
+		SetState(MARIO_STATE_PIPE_LEFT);
+		break;
+	}
+}
+
 
 void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom)
 {

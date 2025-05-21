@@ -3,7 +3,7 @@
 
 #include "Animation.h"
 #include "Animations.h"
-
+#include "Pipe.h"
 #include "debug.h"
 
 #define MARIO_WALKING_SPEED		0.07f
@@ -48,6 +48,15 @@
 #define MARIO_STATE_GLIDE 800
 #define MARIO_GLIDE_SPEED_Y 0.05f  // Slower falling speed while gliding
 #define MARIO_GLIDE_TIMEOUT 5000   // Max glide time in milliseconds
+
+#define MARIO_STATE_PIPE_DOWN     910
+#define MARIO_STATE_PIPE_UP       911
+#define MARIO_STATE_PIPE_LEFT     912
+#define MARIO_STATE_PIPE_RIGHT    913
+#define MARIO_PIPE_ENTRY_TIME       800    // Time to enter pipe animation
+#define MARIO_PIPE_EXIT_TIME        800    // Time to exit pipe animation
+#define MARIO_PIPE_MOVE_SPEED       0.05f 
+
 #pragma region ANIMATION_ID
 //BIG MARIO
 #define ID_ANI_MARIO_IDLE_RIGHT 400
@@ -199,6 +208,11 @@ class CMario : public CGameObject
 	BOOLEAN isFlying;
 	ULONGLONG fly_start;
 	BOOLEAN isRunning;
+	float pipe_offset;  // Offset for pipe entry/exit animation
+	BOOLEAN isTeleporting;
+	ULONGLONG teleport_start;
+	float teleport_target_x, teleport_target_y;
+	PipeDirection teleport_exit_direction;
 
 	void UpdateHeldKoopasPosition();
 	void OnCollisionWithGoomba(LPCOLLISIONEVENT e);
@@ -215,6 +229,7 @@ class CMario : public CGameObject
 	void OnCollisionWithSuperLeafBrick(LPCOLLISIONEVENT e);
 	void OnCollisionWithCheckpoint(LPCOLLISIONEVENT e);
 	void OnCollisionWithBullet(LPCOLLISIONEVENT e);
+	void OnCollisionWithPipe(LPCOLLISIONEVENT e);
 
 	int GetAniIdBig();
 	int GetAniIdSmall();
@@ -252,6 +267,9 @@ class CMario : public CGameObject
 	void UpdateHeldKoopas();
 	void UpdateGlidingState();
 	void UpdateFlyingState();
+	void UpdateTeleportingState();
+
+	void AlignWithPipe(CPipe* pipe, PipeDirection direction);
 
 public:
 	CMario(float x, float y) : CGameObject(x, y)
@@ -280,6 +298,12 @@ public:
 		isFlying = false;
 		fly_start = 0;
 		isRunning = false;
+		isTeleporting = false;
+		teleport_start = 0;
+		teleport_target_x = 0;
+		teleport_target_y = 0;
+		teleport_exit_direction = PipeDirection::UP;
+		pipe_offset = 0.0f;
 	}
 
 	void HoldKoopas(Koopas* koopas);
@@ -298,6 +322,10 @@ public:
 	{ 
 		return (state != MARIO_STATE_DIE); 
 	}
+	void TeleportTo(float x, float y, PipeDirection exitDirection);
+	bool IsTeleporting() { return isTeleporting; }
+	void StartPipeEntry(PipeDirection direction);
+	void StartPipeExit(PipeDirection direction);
 	bool IsOnPlatform() { return isOnPlatform; }
 
 	int IsBlocking() { return (state != MARIO_STATE_DIE && untouchable==0); }

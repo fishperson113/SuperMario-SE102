@@ -169,18 +169,17 @@
 
 #define MARIO_UNTOUCHABLE_TIME 2500
 class Koopas;
-class CMovingPlatform;
+class CPlatform;
 class CMario : public CGameObject
 {
 	Koopas* heldKoopas;  
 	BOOLEAN isHolding;
-
 	BOOLEAN isSitting;
 	float maxVx;
 	float ax;				// acceleration on x 
 	float ay;				// acceleration on y 
 	float powerMeter;
-
+	CPlatform* platform; // The platform that Mario is on
 	int level; 
 	int untouchable; 
 	ULONGLONG untouchable_start;
@@ -199,7 +198,6 @@ class CMario : public CGameObject
 
 	BOOLEAN isFlying;
 	ULONGLONG fly_start;
-
 	BOOLEAN isRunning;
 
 	void UpdateHeldKoopasPosition();
@@ -262,7 +260,6 @@ public:
 		maxVx = 0.0f;
 		ax = 0.0f;
 		ay = MARIO_GRAVITY; 
-
 		level = MARIO_LEVEL_SMALL;
 		untouchable = 0;
 		untouchable_start = -1;
@@ -279,7 +276,7 @@ public:
 		canSpin = true;
 		isGliding = false;
 		glide_start = 0;
-
+		platform = NULL;
 		isFlying = false;
 		fly_start = 0;
 		isRunning = false;

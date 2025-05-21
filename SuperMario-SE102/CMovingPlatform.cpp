@@ -25,56 +25,64 @@ void CMovingPlatform::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
     if (!isAutoMoving)
         return; 
 
-    float dx = 0, dy = 0;
-
+    // Set vx, vy based on direction
     switch (moveDirection)
     {
     case PLATFORM_MOVE_LEFT:
-        dx = -moveSpeed * dt;
+        vx = -moveSpeed;
+        vy = 0;
         break;
     case PLATFORM_MOVE_RIGHT:
-        dx = moveSpeed * dt;
+        vx = moveSpeed;
+        vy = 0;
         break;
     case PLATFORM_MOVE_UP:
-        dy = -moveSpeed * dt;
+        vx = 0;
+        vy = -moveSpeed;
         break;
     case PLATFORM_MOVE_DOWN:
-        dy = moveSpeed * dt;
+        vx = 0;
+        vy = moveSpeed;
+        break;
+    default:
+        vx = 0;
+        vy = 0;
         break;
     }
 
-    if (dx < 0 && x + dx < leftLimit) {
+    // Predict new position
+    float newX = x + vx * dt;
+    float newY = y + vy * dt;
+
+    // Horizontal boundaries
+    if (vx < 0 && newX < leftLimit) {
         x = leftLimit;
-        moveDirection = PLATFORM_MOVE_RIGHT;  // Change direction
-        dx = 0;
+        moveDirection = PLATFORM_MOVE_RIGHT;
+        vx = moveSpeed;
     }
-    else if (dx > 0 && x + dx > rightLimit) {
-        // Reached right boundary
+    else if (vx > 0 && newX > rightLimit) {
         x = rightLimit;
-        moveDirection = PLATFORM_MOVE_LEFT;  // Change direction
-        dx = 0;
+        moveDirection = PLATFORM_MOVE_LEFT;
+        vx = -moveSpeed;
+    }
+    else {
+        x = newX;
     }
 
-    // Handle vertical movement boundaries
-    if (dy < 0 && y + dy < topLimit) {
-        // Reached top boundary
+    // Vertical boundaries
+    if (vy < 0 && newY < topLimit) {
         y = topLimit;
-        moveDirection = PLATFORM_MOVE_DOWN;  // Change direction
-        dy = 0;
+        moveDirection = PLATFORM_MOVE_DOWN;
+        vy = moveSpeed;
     }
-    else if (dy > 0 && y + dy > bottomLimit) {
-        // Reached bottom boundary
+    else if (vy > 0 && newY > bottomLimit) {
         y = bottomLimit;
-        moveDirection = PLATFORM_MOVE_UP;  // Change direction
-        dy = 0;
+        moveDirection = PLATFORM_MOVE_UP;
+        vy = -moveSpeed;
     }
-
-    // Apply movement
-    x += dx;
-    y += dy;
-
-    vx = dx / dt;
-    vy = dy / dt;
+    else {
+        y = newY;
+    }
 }
 
 
@@ -98,12 +106,12 @@ void CMovingPlatform::SetMoveDirection(int direction)
 
 float CMovingPlatform::GetSpeedX()
 {
-	return moveSpeed * (moveDirection == PLATFORM_MOVE_LEFT ? -1 : 1);
+	return vx;
 }
 
 float CMovingPlatform::GetSpeedY()
 {
-    return moveSpeed*(moveDirection== PLATFORM_MOVE_UP?-1:1);
+    return vy;
 }
 
 

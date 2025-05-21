@@ -77,21 +77,32 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	// Handle gliding state
 	if(!isFlying)
 		UpdateGlidingState();
+	if (!isOnPlatform) {
+		platform = nullptr;
+	}
 }
 
 void CMario::OnNoCollision(DWORD dt)
 {
+	isOnPlatform = false;
 	x += vx * dt;
 	y += vy * dt;
-	isOnPlatform = false;
 }
 
 void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 {
 	if (e->ny != 0 && e->obj->IsBlocking())
 	{
-		vy = 0;
-		if (e->ny < 0||dynamic_cast<CPlatform*>(e->obj))
+		if ((CMovingPlatform*)e->obj)
+		{
+			platform = (CMovingPlatform*)e->obj;
+			float platformVy,platformVx;
+			platform->GetSpeed(platformVx, platformVy);
+			vy = platformVy;
+		}
+		else
+			vy = 0;
+		if (e->ny < 0)
 		{
 			isOnPlatform = true;
 		}
@@ -140,36 +151,44 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 
 void CMario::OnOverlapWith(LPGAMEOBJECT obj)
 {
-	CMovingPlatform* platform = dynamic_cast<CMovingPlatform*>(obj);
-	if (platform)
-	{
-		float platLeft, platTop, platRight, platBottom;
-		platform->GetBoundingBox(platLeft, platTop, platRight, platBottom);
+	//CMovingPlatform* platform = dynamic_cast<CMovingPlatform*>(obj);
+	//if (platform)
+	//{
+	//	float platLeft, platTop, platRight, platBottom;
+	//	platform->GetBoundingBox(platLeft, platTop, platRight, platBottom);
 
-		float marioLeft, marioTop, marioRight, marioBottom;
-		this->GetBoundingBox(marioLeft, marioTop, marioRight, marioBottom);
+	//	float marioLeft, marioTop, marioRight, marioBottom;
+	//	this->GetBoundingBox(marioLeft, marioTop, marioRight, marioBottom);
 
-		if (marioBottom >= platTop && marioBottom <= platTop + 2.0f &&
-			marioRight > platLeft && marioLeft < platRight)
-		{
-			isOnPlatform = true;
+	//	if (marioBottom >= platTop && marioBottom <= platTop + 2.0f &&
+	//		marioRight > platLeft && marioLeft < platRight)
+	//	{
+	//		isOnPlatform = true;
 
-			if (vy >= 0)
-			{
-				vy = 0;
+	//		if (vy >= 0)
+	//		{
+	//			// Stop vertical movement
 
-				float newY = platTop - (marioBottom - y);
-				SetPosition(x, newY);
-			}
+	//			// Sync with platform's horizontal speed if needed
+	//			float platformVx = platform->GetSpeedX();
+	//			float platformVy = platform->GetSpeedY();
 
-		}
-	}
+	//			vy = platformVy;
+	//			// Optionally sync horizontal speed with platform
+	//			// If Mario isn't actively moving, make him move with the platform
+	//			/*if (ax == 0)
+	//			{
+	//				vx = platformVx;
+	//			}*/
+
+	//		}
+
+	//	}
+	//}
 }
 
 void CMario::OnCollisionExit(LPGAMEOBJECT obj)
 {
-	//if((CPlatform*)(obj))
-	//	isOnPlatform = false;
 }
 
 void CMario::UpdateHeldKoopasPosition()
@@ -799,7 +818,18 @@ void CMario::LevelDown()
 void CMario::UpdateVelocity(DWORD dt)
 {
 	vx += ax * dt;
-	vy += ay * dt;
+	//vy += ay * dt;
+
+	if (!isOnPlatform) {
+		vy += ay * dt;
+	}
+	else if (platform) {
+		float platformVx, platformVy;
+		platform->GetSpeed(platformVx, platformVy);
+		if (platformVy >= 0) {
+			vy += ay * dt;
+		}
+	}
 }
 
 void CMario::UpdateUntouchableState()
@@ -1155,7 +1185,16 @@ void CMario::SetState(int state)
 
 	case MARIO_STATE_IDLE:
 		ax = 0.0f;
-		vx = 0.0f;
+		if (isOnPlatform && platform != NULL)
+		{
+			float platformVx, platformVy;
+			platform->GetSpeed(platformVx, platformVy);
+			vx = platformVx;
+		}
+		else
+		{
+			vx = 0.0f;
+		}
 		break;
 
 	case MARIO_STATE_DIE:

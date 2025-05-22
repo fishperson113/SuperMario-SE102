@@ -15,6 +15,7 @@ paragoomba.txt
 background_item.txt
 platform.txt
 bullet.txt
+koopaparatroopa.txt
 
 #
 [OBJECTS]
@@ -250,6 +251,7 @@ bullet.txt
 2	912	128
 2	864	128
 10	976	128
+19	230	148
 
 18	20	120	16	16	3	51002	52002	53002	20	300	20	150	4	1	0.05
 #MARIO

@@ -25,7 +25,9 @@
 #include "Bullet.h"
 #include "FireTrap.h"
 #include "CameraController.h"
-#include"CMovingPlatform.h"
+#include "CMovingPlatform.h"
+#include "KoopaParatroopa.h"
+
 using namespace std;
 
 CPlayScene::CPlayScene(int id, LPCWSTR filePath):
@@ -82,6 +84,11 @@ CGameObject* CPlayScene::CreateEnemy(int enemyType, float x, float y)
 	case OBJECT_TYPE_FIRETRAP:
 		obj = new CFireTrap(x, y);
 		DebugOut(L"[INFO] Fire Trap object has been created!\n");
+		break;
+
+	case OBJECT_TYPE_KOOPA_PARATROOPA:
+		obj = new CKoopaParatroopa(x, y);
+		DebugOut(L"[INFO] Koopa Paratroopa object has been created!\n");
 		break;
 
 		// Add other enemy types as needed
@@ -184,6 +191,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 	case OBJECT_TYPE_KOOPAS:
 	case OBJECT_TYPE_PARAGOOMBA:
 	case OBJECT_TYPE_FIRETRAP:
+	case OBJECT_TYPE_KOOPA_PARATROOPA:
 		obj = CreateEnemy(object_type, x, y);
 		break;
 	case OBJECT_TYPE_BRICK:

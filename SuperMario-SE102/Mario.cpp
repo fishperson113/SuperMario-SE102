@@ -18,7 +18,9 @@
 #include "SuperLeaf.h"
 #include "SuperLeafBrick.h"
 #include "Bullet.h"
-#include"CMovingPlatform.h"
+#include "CMovingPlatform.h"
+#include "KoopaParatroopa.h"
+
 void CMario::HoldKoopas(Koopas* koopas)
 {
 	if (isHolding) return; 
@@ -151,6 +153,8 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithBullet(e);
 	else if (dynamic_cast<CPipe*>(e->obj))
 		OnCollisionWithPipe(e);
+	else if (dynamic_cast<CKoopaParatroopa*>(e->obj))
+		OnCollisionWithKoopaParatroopa(e);
 }
 
 void CMario::OnOverlapWith(LPGAMEOBJECT obj)
@@ -462,6 +466,40 @@ void CMario::OnCollisionWithPipe(LPCOLLISIONEVENT e)
 			StartPipeEntry(entryDir);
 
 			DebugOut(L">>> Mario entering pipe! Direction: %d >>> \n", static_cast<int>(entryDir));
+		}
+	}
+}
+
+void CMario::OnCollisionWithKoopaParatroopa(LPCOLLISIONEVENT e)
+{
+	CKoopaParatroopa* koopaParatroopa = dynamic_cast<CKoopaParatroopa*>(e->obj);
+	if (e->ny < 0)
+	{
+		if (koopaParatroopa->GetState() == KOOPA_PARATROOPA_STATE_WALKING_WINGS || koopaParatroopa->GetState() == KOOPA_PARATROOPA_STATE_JUMPING_WINGS)
+			koopaParatroopa->SetState(KOOPA_PARATROOPA_STATE_WALKING);
+		else if (koopaParatroopa->GetState() == KOOPA_PARATROOPA_STATE_WALKING)
+			koopaParatroopa->SetState(KOOPA_PARATROOPA_STATE_SHELL);
+		else if (koopaParatroopa->GetState() == KOOPA_PARATROOPA_STATE_SHELL || koopaParatroopa->GetState() == KOOPA_PARATROOPA_STATE_SHELL_FEET)
+			koopaParatroopa->SetState(KOOPA_PARATROOPA_STATE_DIE);
+		vy = -MARIO_JUMP_DEFLECT_SPEED;
+	}
+	else // hit by Koopa Paratroopa
+	{
+		if (untouchable == 0)
+		{
+			if (koopaParatroopa->GetState() != KOOPA_PARATROOPA_STATE_DIE && koopaParatroopa->GetState() != KOOPA_PARATROOPA_STATE_SHELL)
+			{
+				if (level > MARIO_LEVEL_SMALL)
+				{
+					LevelDown();
+					StartUntouchable();
+				}
+				else
+				{
+					DebugOut(L">>> Mario DIE >>> \n");
+					SetState(MARIO_STATE_DIE);
+				}
+			}
 		}
 	}
 }

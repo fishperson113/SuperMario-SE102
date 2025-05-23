@@ -11,7 +11,7 @@ CMovingPlatform::CMovingPlatform(
     CPlatform(x, y, cell_width, cell_height, length, sprite_id_begin, sprite_id_middle, sprite_id_end)
 {
     this->moveSpeed = move_speed;
-    this->moveDirection = PLATFORM_MOVE_RIGHT; // Always start moving right
+    this->moveDirection = PLATFORM_MOVE_LEFT; // Always start moving right
     this->hasMarioTouched = false; // Initialize to false
 }
 
@@ -26,6 +26,14 @@ void CMovingPlatform::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
         vx = 0;
         vy = moveSpeed;
     }
+    else if (moveDirection == PLATFORM_MOVE_LEFT) {
+        vx = -moveSpeed;
+        vy = 0;
+    }
+    else if (moveDirection == PLATFORM_MOVE_UP) {
+        vx = 0;
+        vy = -moveSpeed;
+	}
 
     // Update position
     x += vx * dt;

@@ -428,10 +428,13 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		Checkpoint* checkpoint = new Checkpoint(x, y, width, height);
 		obj = checkpoint;
 		int enemyCount = 0;
+		int platformCount = 0;
 		if (tokens.size() >= 6) {
 			enemyCount = atoi(tokens[5].c_str());
 		}
-
+		if (tokens.size() >= 7) {
+			platformCount = atoi(tokens[6].c_str());
+		}
 		// Load enemy definitions
 		for (int i = 0; i < enemyCount; i++) {
 			char enemyStr[MAX_SCENE_LINE];
@@ -464,7 +467,62 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 			}
 		}
 
-		DebugOut(L"[INFO] Checkpoint object has been created with %d enemies!\n", enemyCount);
+		for (int i = 0; i < platformCount; i++) {
+			char platformStr[MAX_SCENE_LINE];
+			if (!f.getline(platformStr, MAX_SCENE_LINE))
+				break;
+
+			string platformLine(platformStr);
+
+			// Skip comments
+			if (platformLine.empty() || platformLine[0] == '#') {
+				i--; // Don't count this as a platform
+				continue;
+			}
+
+			vector<string> platformTokens = split(platformLine);
+			if (platformTokens.size() < 9) // Need at least basic parameters for a platform
+				continue;
+
+			// Get platform parameters
+			int objectType = atoi(platformTokens[0].c_str());
+			float platformX = (float)atof(platformTokens[1].c_str());
+			float platformY = (float)atof(platformTokens[2].c_str());
+
+			// Only process if it's a moving platform
+			if (objectType == OBJECT_TYPE_MOVING_PLATFORM) {
+				float cell_width = (float)atof(platformTokens[3].c_str());
+				float cell_height = (float)atof(platformTokens[4].c_str());
+				int length = atoi(platformTokens[5].c_str());
+				int sprite_begin = atoi(platformTokens[6].c_str());
+				int sprite_middle = atoi(platformTokens[7].c_str());
+				int sprite_end = atoi(platformTokens[8].c_str());
+
+				// Default speed
+				float moveSpeed = 0.05f;
+				if (platformTokens.size() >= 10) {
+					moveSpeed = (float)atof(platformTokens[9].c_str());
+				}
+
+				// Create the platform
+				CMovingPlatform* platform = new CMovingPlatform(
+					platformX, platformY,
+					cell_width, cell_height, length,
+					sprite_begin, sprite_middle, sprite_end,
+					moveSpeed
+				);
+
+				if (platform) {
+					platform->SetActive(false); // Initially inactive
+					objectManager.Add(platform);
+					checkpoint->AddObjectToSpawn(platform);
+					DebugOut(L"[INFO] Added moving platform at (%f, %f) to checkpoint\n", platformX, platformY);
+				}
+			}
+		}
+
+		DebugOut(L"[INFO] Checkpoint object has been created with %d enemies and %d platforms!\n",
+			enemyCount, platformCount);
 		break;
 	}
 	case OBJECT_TYPE_MOVING_PLATFORM:
@@ -475,6 +533,12 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		int sprite_begin = atoi(tokens[6].c_str());
 		int sprite_middle = atoi(tokens[7].c_str());
 		int sprite_end = atoi(tokens[8].c_str());
+		// Check if this platform belongs to a checkpoint (optional parameter)
+		bool isCheckpointControlled = false;
+		if (tokens.size() >= 11) {
+			isCheckpointControlled = atoi(tokens[10].c_str()) != 0;
+			return; // Skip this object if it's checkpoint controlled
+		}
 
 		// Default speed value
 		float moveSpeed = 0.05f;
@@ -486,14 +550,15 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		}
 
 		// Create the moving platform with the specified parameters
-		obj = new CMovingPlatform(
+		CMovingPlatform* platform = new CMovingPlatform(
 			x, y,
 			cell_width, cell_height, length,
 			sprite_begin, sprite_middle, sprite_end,
 			moveSpeed
 		);
 
-		DebugOut(L"[INFO] Moving Platform object has been created!\n");
+		obj = platform;
+		DebugOut(L"[INFO] Moving Platform object has been created! Active: %d\n", !isCheckpointControlled);
 		break;
 	}
 

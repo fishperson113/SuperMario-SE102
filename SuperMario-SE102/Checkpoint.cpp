@@ -40,12 +40,12 @@ void Checkpoint::SpawnObjects()
 
 void Checkpoint::Render()
 {
-	//RenderBoundingBox();
+	RenderBoundingBox();
 }
 
 void Checkpoint::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	CGame* game = CGame::GetInstance();
+	/*CGame* game = CGame::GetInstance();
 	if (game->IsKeyDown(DIK_C))
 	{
 		if (!isActivated)
@@ -53,7 +53,7 @@ void Checkpoint::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			DebugOut(L"[INFO] Manually triggering checkpoint at position (%.2f, %.2f)\n", x, y);
 			SetState(CHECKPOINT_STATE_ACTIVE);
 		}
-	}
+	}*/
 }
 
 void Checkpoint::GetBoundingBox(float& left, float& top, float& right, float& bottom)

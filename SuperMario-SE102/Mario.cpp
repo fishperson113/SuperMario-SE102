@@ -55,10 +55,13 @@ void CMario::ReleaseKoopas()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
-	CMovingPlatform* currentPlatform = dynamic_cast<CMovingPlatform*>(this->platform);
-	if(currentPlatform&&currentPlatform->GetMoveDirection()==PLATFORM_MOVE_DOWN)
+	if (platform)
 	{
-		isOnPlatform = true;
+		CMovingPlatform* currentPlatform = dynamic_cast<CMovingPlatform*>(this->platform);
+		if(currentPlatform&&currentPlatform->GetMoveDirection()==PLATFORM_MOVE_DOWN)
+		{
+			isOnPlatform = true;
+		}
 	}
 	// Update velocity based on acceleration
 	UpdateVelocity(dt);

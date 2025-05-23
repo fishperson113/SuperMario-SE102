@@ -6,7 +6,6 @@
 #define CHECKPOINT_STATE_INACTIVE 0
 #define CHECKPOINT_STATE_ACTIVE 1
 
-class ObjectManager;
 class Checkpoint : public CGameObject
 {
 private:
@@ -14,7 +13,6 @@ private:
     float width;
     float height;
     bool isActivated;
-	ObjectManager* objectManager;
 public:
     Checkpoint(float x, float y, float width = CHECKPOINT_BBOX_WIDTH, float height = CHECKPOINT_BBOX_HEIGHT);
 

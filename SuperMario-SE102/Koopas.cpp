@@ -3,21 +3,70 @@
 #include "CoinBrick.h"
 #include "MushroomBrick.h"
 #include "SuperLeafBrick.h"
+
 void Koopas::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
-	if (state == KOOPAS_STATE_SHELL || state == KOOPAS_STATE_SHELL_MOVING)
+	if (this->type == KOOPAS_RED)
 	{
-		left = x - KOOPAS_BBOX_WIDTH / 2;
-		top = y - KOOPAS_BBOX_HEIGHT_SHELL / 2;
-		right = left + KOOPAS_BBOX_WIDTH;
-		bottom = top + KOOPAS_BBOX_HEIGHT_SHELL;
+		if (state == KOOPAS_STATE_SHELL || state == KOOPAS_STATE_SHELL_MOVING)
+		{
+			left = x - KOOPAS_BBOX_WIDTH / 2;
+			top = y - KOOPAS_BBOX_HEIGHT_SHELL / 2;
+			right = left + KOOPAS_BBOX_WIDTH;
+			bottom = top + KOOPAS_BBOX_HEIGHT_SHELL;
+		}
+		else
+		{
+			left = x - KOOPAS_BBOX_WIDTH / 2;
+			top = y - KOOPAS_BBOX_HEIGHT / 2;
+			right = left + KOOPAS_BBOX_WIDTH;
+			bottom = top + KOOPAS_BBOX_HEIGHT;
+		}
 	}
-	else 
+	else if (this->type == KOOPAS_GREEN || this->type == KOOPAS_GREEN_NO_WINGS)
 	{
-		left = x - KOOPAS_BBOX_WIDTH / 2;
-		top = y - KOOPAS_BBOX_HEIGHT / 2;
-		right = left + KOOPAS_BBOX_WIDTH;
-		bottom = top + KOOPAS_BBOX_HEIGHT;
+		if (state == KOOPA_PARATROOPA_STATE_DIE)
+		{
+			left = x - KOOPA_PARATROOPA_BBOX_WIDTH / 2;
+			top = y - KOOPA_PARATROOPA_BBOX_HEIGHT_DIE / 2;
+			right = left + KOOPA_PARATROOPA_BBOX_WIDTH;
+			bottom = top + KOOPA_PARATROOPA_BBOX_HEIGHT_DIE;
+		}
+		else if (state == KOOPA_PARATROOPA_STATE_JUMPING_WINGS || state == KOOPA_PARATROOPA_STATE_WALKING_WINGS)
+		{
+			left = x - KOOPA_PARATROOPA_WINGS_BBOX_WIDTH / 2;
+			top = y - KOOPA_PARATROOPA_WINGS_BBOX_HEIGHT / 2;
+			right = left + KOOPA_PARATROOPA_WINGS_BBOX_WIDTH;
+			bottom = top + KOOPA_PARATROOPA_WINGS_BBOX_HEIGHT;
+		}
+		else if (state == KOOPA_PARATROOPA_STATE_WALKING)
+		{
+			left = x - KOOPAS_BBOX_WIDTH / 2;
+			top = y - KOOPAS_BBOX_HEIGHT / 2;
+			right = left + KOOPAS_BBOX_WIDTH;
+			bottom = top + KOOPAS_BBOX_HEIGHT;
+		}
+		else if (state == KOOPA_PARATROOPA_STATE_SHELL)
+		{
+			left = x - KOOPAS_BBOX_WIDTH / 2;
+			top = y - KOOPAS_BBOX_HEIGHT_SHELL / 2;
+			right = left + KOOPAS_BBOX_WIDTH;
+			bottom = top + KOOPAS_BBOX_HEIGHT_SHELL;
+		}
+		else if (state == KOOPAS_STATE_SHELL_MOVING)
+		{
+			left = x - KOOPAS_BBOX_WIDTH / 2;
+			top = y - KOOPAS_BBOX_HEIGHT_SHELL / 2;
+			right = left + KOOPAS_BBOX_WIDTH;
+			bottom = top + KOOPAS_BBOX_HEIGHT_SHELL;
+		}
+		else
+		{
+			left = x - KOOPAS_BBOX_WIDTH / 2;
+			top = y - KOOPAS_BBOX_HEIGHT_SHELL / 2;
+			right = left + KOOPAS_BBOX_WIDTH;
+			bottom = top + KOOPAS_BBOX_HEIGHT_SHELL;
+		}
 	}
 }
 
@@ -50,39 +99,121 @@ void Koopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 			}
 		}
+		if (state == KOOPA_PARATROOPA_STATE_MOVING_SHELL)
+		{
+			if (vx > 0)
+			{
+				vx -= KOOPAS_SHELL_DECELERATION * dt;
+				if (vx < KOOPAS_MIN_SPEED)
+				{
+					vx = 0;
+					SetState(KOOPA_PARATROOPA_STATE_SHELL);
+				}
+			}
+			else if (vx < 0)
+			{
+				vx += KOOPAS_SHELL_DECELERATION * dt;
+				if (vx > -KOOPAS_MIN_SPEED)
+				{
+					vx = 0;
+					SetState(KOOPA_PARATROOPA_STATE_SHELL);
+				}
+			}
+		}
 	}
 	if (IsAboutToWakeUp())
 	{
-		SetState(KOOPAS_STATE_WALKING);
+		if (this->type == KOOPAS_RED)
+		{
+			SetState(KOOPAS_STATE_WALKING);
+		}
+		else
+		{
+			SetState(KOOPA_PARATROOPA_STATE_WALKING);
+		}
 	}
-	
+
+	if (state == KOOPA_PARATROOPA_STATE_WALKING_WINGS && GetTickCount64() - walk_start > 1000) // Walk duration
+	{
+		SetState(KOOPA_PARATROOPA_STATE_JUMPING_WINGS);
+	}
+	else if (state == KOOPA_PARATROOPA_STATE_JUMPING_WINGS && GetTickCount64() - jump_start > 3000) // Jump duration
+	{
+		SetState(KOOPA_PARATROOPA_STATE_WALKING_WINGS);
+	}
+
 	if (!isBeingHeld && state == KOOPAS_STATE_WALKING)
 	{
 		if (fallSensor) fallSensor->Update(dt, coObjects);
 	}
 
+	if (this->vx > 0)
+		this->SetDirection(1);
+	else
+		this->SetDirection(0);
 }
 
 void Koopas::Render()
 {
 	int aniId = ID_ANI_KOOPAS_WALKING_RIGHT;
-	if (state == KOOPAS_STATE_WALKING)
+	if (this->type == KOOPAS_RED)
 	{
-		if (vx > 0)
+		if (state == KOOPAS_STATE_WALKING)
 		{
-			aniId = ID_ANI_KOOPAS_WALKING_RIGHT;
+			if (vx > 0)
+			{
+				aniId = ID_ANI_KOOPAS_WALKING_RIGHT;
+			}
+			else if (vx < 0)
+			{
+				aniId = ID_ANI_KOOPAS_WALKING_LEFT;
+			}
 		}
-		else if (vx < 0)
+		else if (state == KOOPAS_STATE_SHELL || state == KOOPAS_STATE_SHELL_MOVING)
 		{
-			aniId = ID_ANI_KOOPAS_WALKING_LEFT;
+			aniId = ID_ANI_KOOPAS_SHELL;
 		}
 	}
-	else if (state == KOOPAS_STATE_SHELL || state == KOOPAS_STATE_SHELL_MOVING)
+	else if (this->type == KOOPAS_GREEN || this->type == KOOPAS_GREEN_NO_WINGS)
 	{
-		aniId = ID_ANI_KOOPAS_SHELL;
+		if (state == KOOPA_PARATROOPA_STATE_SHELL || state == KOOPA_PARATROOPA_STATE_MOVING_SHELL)
+		{
+			aniId = ID_ANI_KOOPA_PARATROOPA_SHELL;
+		}
+		else if (state == KOOPA_PARATROOPA_STATE_SHELL_FEET)
+		{
+			aniId = ID_ANI_KOOPA_PARATROOPA_SHELL_FEET;
+		}
+		else if (state == KOOPA_PARATROOPA_STATE_WALKING)
+		{
+			if (vx > 0)
+			{
+				aniId = ID_ANI_KOOPA_PARATROOPA_WALKING_RIGHT;
+			}
+			else if (vx < 0)
+			{
+				aniId = ID_ANI_KOOPA_PARATROOPA_WALKING_LEFT;
+			}
+		}
+		else if (state == KOOPA_PARATROOPA_STATE_WALKING_WINGS || state == KOOPA_PARATROOPA_STATE_JUMPING_WINGS)
+		{
+			if (vx > 0)
+			{
+				aniId = ID_ANI_KOOPA_PARATROOPA_WALKING_WINGS_RIGHT;
+			}
+			else if (vx < 0)
+			{
+				aniId = ID_ANI_KOOPA_PARATROOPA_WALKING_WINGS_LEFT;
+			}
+		}
+		else if (state == KOOPA_PARATROOPA_STATE_DIE)
+		{
+			aniId = ID_ANI_KOOPA_PARATROOPA_DIE;
+		}
 	}
-
+	
 	CAnimations::GetInstance()->Get(aniId)->Render(x, y);
+	RenderBoundingBox();
 }
 
 void Koopas::OnNoCollision(DWORD dt)
@@ -109,7 +240,7 @@ void Koopas::OnCollisionWith(LPCOLLISIONEVENT e)
 		}
 	}
 
-	if (state != KOOPAS_STATE_SHELL_MOVING)
+	if (state != KOOPAS_STATE_SHELL_MOVING && state != KOOPA_PARATROOPA_STATE_MOVING_SHELL)
 		return;
 
 	if (dynamic_cast<CGoomba*>(e->obj))
@@ -179,15 +310,27 @@ void Koopas::OnCollisionWithLeafBrick(LPCOLLISIONEVENT e)
 }
 
 
-Koopas::Koopas(float x, float y) :CGameObject(x, y)
+Koopas::Koopas(float x, float y, int type) :CGameObject(x, y)
 {
 	this->ax = 0;
 	this->ay = KOOPAS_GRAVITY;
+	this->type = type;
 	die_start = -1;
 	shell_start = 0;
 	isBeingHeld = false;
-	fallSensor = new FallSensor(x, y, this);
-	SetState(KOOPAS_STATE_SHELL);
+	if (this->type == KOOPAS_RED)
+	{
+		fallSensor = new FallSensor(x, y, this);
+		SetState(KOOPAS_STATE_SHELL);
+	}
+	else if (this->type == KOOPAS_GREEN)
+	{
+		SetState(KOOPA_PARATROOPA_STATE_WALKING);
+	}
+	else if (this->type = KOOPAS_GREEN_NO_WINGS)
+	{
+		SetState(KOOPA_PARATROOPA_STATE_WALKING_WINGS);
+	}
 	ResetSensors();
 }
 
@@ -197,6 +340,15 @@ void Koopas::SetState(int state)
 	this->state = state;
 	switch (state)
 	{
+	case KOOPA_PARATROOPA_STATE_WALKING:
+		vx = -KOOPAS_WALKING_SPEED;
+		ay = KOOPAS_GRAVITY;
+		isBeingHeld = false;
+		if (previousState == KOOPA_PARATROOPA_STATE_SHELL)
+		{
+			y -= (KOOPAS_BBOX_HEIGHT - KOOPAS_BBOX_HEIGHT_SHELL) / 2;
+		}
+		break;
 	case KOOPAS_STATE_WALKING:
 		vx = -KOOPAS_WALKING_SPEED;
 		ay = KOOPAS_GRAVITY;
@@ -206,11 +358,22 @@ void Koopas::SetState(int state)
 			y -= (KOOPAS_BBOX_HEIGHT - KOOPAS_BBOX_HEIGHT_SHELL) / 2;
 		}
 		break;
-
+	case KOOPA_PARATROOPA_STATE_MOVING_SHELL:
 	case KOOPAS_STATE_SHELL_MOVING:
 		ay = KOOPAS_GRAVITY; 
 		shell_start = 0;
 		isBeingHeld = false;
+		break;
+	case KOOPA_PARATROOPA_STATE_SHELL:
+		vx = 0;
+		ay = KOOPAS_GRAVITY;
+
+		if (previousState == KOOPA_PARATROOPA_STATE_WALKING)
+		{
+			y += (KOOPAS_BBOX_HEIGHT - KOOPAS_BBOX_HEIGHT_SHELL) / 2;
+		}
+
+		shell_start = GetTickCount64();
 		break;
 	case KOOPAS_STATE_SHELL:
 		vx = 0;
@@ -222,6 +385,29 @@ void Koopas::SetState(int state)
 		}
 
 		shell_start = GetTickCount64();
+		break;
+	case KOOPA_PARATROOPA_STATE_DIE:
+		die_start = GetTickCount64();
+		vx = 0;
+		vy = 0;
+		ay = 0;
+		break;
+	case KOOPA_PARATROOPA_STATE_WALKING_WINGS:
+		walk_start = GetTickCount64();
+		if (this->GetDirection() == 0)
+		{
+			vx = -KOOPA_PARATROOPA_WALKING_SPEED;
+		}
+		else
+		{
+			vx = KOOPA_PARATROOPA_WALKING_SPEED;
+		}
+		ay = KOOPAS_GRAVITY;
+		isBeingHeld = false;
+		break;
+	case KOOPA_PARATROOPA_STATE_JUMPING_WINGS:
+		vy = KOOPA_PARATROOPA_JUMP_SPEED;
+		jump_start = GetTickCount64();
 		break;
 	}
 }

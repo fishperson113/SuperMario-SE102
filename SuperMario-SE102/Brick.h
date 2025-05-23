@@ -18,7 +18,7 @@ class CBrick : public CGameObject {
 	int bboxWidth; // Bounding box width
 	int bboxHeight; // Bounding box height
 public:
-	CBrick(float x, float y, int brickNumber = 1, float offsetX = 0.0f, float offsetY = 0.0f, float aniId = ID_ANI_BRICK, int bboxWidth = BRICK_BBOX_WIDTH, int bboxHeight = BRICK_BBOX_HEIGHT)
+	CBrick(float x, float y, int brickNumber = 1, float offsetX = 0.0f, float offsetY = 0.0f, int aniId = ID_ANI_BRICK, int bboxWidth = BRICK_BBOX_WIDTH, int bboxHeight = BRICK_BBOX_HEIGHT)
 		: CGameObject(x, y), brickNumber(brickNumber), offsetX(offsetX), offsetY(offsetY), aniId(aniId), bboxWidth(bboxWidth), bboxHeight(bboxHeight){
 	}
 

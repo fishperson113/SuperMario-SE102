@@ -15,6 +15,7 @@ paragoomba.txt
 background_item.txt
 platform.txt
 bullet.txt
+Hud.txt
 #
 [OBJECTS]
 # type	x	y	extra_settings per object type

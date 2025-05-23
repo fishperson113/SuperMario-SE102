@@ -8,9 +8,21 @@
 
 void CSampleKeyHandler::OnKeyDown(int KeyCode)
 {
-	//DebugOut(L"[INFO] KeyDown: %d\n", KeyCode);
-	CMario* mario = (CMario *)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer(); 
+	LPPLAYSCENE scene = (LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene();
+	CMario* mario = (CMario *)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
 	if (!mario) return;
+
+	// Handle pause key (P)
+	if (KeyCode == DIK_P)
+	{
+		scene->TogglePause();
+		DebugOut(L"[INFO] Game %s\n", scene->IsPaused() ? L"Paused" : L"Resumed");
+		return;
+	}
+	// If the game is paused, don't process other keys except for P
+	if (scene->IsPaused())
+		return;
+
 	switch (KeyCode)
 	{
 	case DIK_DOWN:
@@ -35,6 +47,9 @@ void CSampleKeyHandler::OnKeyDown(int KeyCode)
 	case DIK_2:
 		mario->SetLevel(MARIO_LEVEL_BIG);
 		break;
+	case DIK_3:
+		mario->SetLevel(MARIO_LEVEL_TAIL);
+		break;
 	case DIK_0:
 		mario->SetState(MARIO_STATE_DIE);
 		break;
@@ -43,7 +58,7 @@ void CSampleKeyHandler::OnKeyDown(int KeyCode)
 		mario->SetState(MARIO_STATE_SPIN_ATTACK);
 		break;
 	case DIK_R: // reset
-		//Reload();
+		scene->Reload();
 		break;
 	}
 }
@@ -51,9 +66,12 @@ void CSampleKeyHandler::OnKeyDown(int KeyCode)
 void CSampleKeyHandler::OnKeyUp(int KeyCode)
 {
 	//DebugOut(L"[INFO] KeyUp: %d\n", KeyCode);
+	LPPLAYSCENE scene = (LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene();
 
 	CMario* mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
 	if (!mario) return;
+	if (scene->IsPaused())
+		return;
 	switch (KeyCode)
 	{
 	case DIK_S:
@@ -75,10 +93,13 @@ void CSampleKeyHandler::OnKeyUp(int KeyCode)
 
 void CSampleKeyHandler::KeyState(BYTE *states)
 {
+	LPPLAYSCENE scene = (LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene();
+
 	LPGAME game = CGame::GetInstance();
 	CMario* mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
 	if (!mario) return;
-
+	if (scene->IsPaused())
+		return;
 	if (game->IsKeyDown(DIK_S) && mario->GetLevel() == MARIO_LEVEL_TAIL)
 	{
 		float vx,vy;

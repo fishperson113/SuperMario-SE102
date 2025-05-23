@@ -13,7 +13,7 @@ using namespace std;
 
 #define ID_TEX_BBOX -100		// special texture to draw object bounding box
 #define BBOX_ALPHA 0.25f		// Bounding box transparency
-
+class HitBox;
 class CGameObject
 {
 protected:
@@ -27,7 +27,7 @@ protected:
 	int nx;	 
 
 	int state;
-
+	HitBox* spinHitbox;
 	bool isDeleted; 
 	bool isActive;
 
@@ -36,7 +36,7 @@ public:
 	void SetSpeed(float vx, float vy) { this->vx = vx, this->vy = vy; }
 	void GetPosition(float &x, float &y) { x = this->x; y = this->y; }
 	void GetSpeed(float &vx, float &vy) { vx = this->vx; vy = this->vy; }
-
+	int GetDirection() { return nx; }
 	int GetState() { return this->state; }
 	virtual void Delete() { isDeleted = true;  }
 	bool IsDeleted() { return isDeleted; }
@@ -74,7 +74,7 @@ public:
 
 	// Does this object collide with other object at certain direction ( like ColorBox )
 	virtual int IsDirectionColliable(float nx, float ny) { return 1; }
-
+	void SetHitbox(HitBox* hitBox) { spinHitbox = hitBox; };
 	~CGameObject();
 
 	static bool IsDeleted(const LPGAMEOBJECT &o) { return o->isDeleted; }

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include "AssetIDs.h"
+#include "HUD.h"
 
 #include "PlayScene.h"
 #include "Utils.h"
@@ -27,7 +28,7 @@
 #include "CameraController.h"
 #include "CMovingPlatform.h"
 #include "KoopaParatroopa.h"
-
+#include "HitBox.h"
 using namespace std;
 
 CPlayScene::CPlayScene(int id, LPCWSTR filePath):
@@ -36,6 +37,11 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 	player = NULL;
 	key_handler = new CSampleKeyHandler(this);
 	cameraController = NULL;
+	isPaused = false;
+	timeLimit = DEFAULT_TIME_LIMIT;
+	lastTick = GetTickCount64();
+	isGameOver = false;
+	gameOverStart = 0;
 }
 
 CPlayScene::~CPlayScene()
@@ -179,10 +185,15 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 			DebugOut(L"[ERROR] MARIO object was created before!\n");
 			return;
 		}
-		obj = new CMario(x,y); 
-		player = (CMario*)obj;  
-		objectManager.AddPlayer(player);
-		DebugOut(L"[INFO] Player object has been created!\n");
+		{  // Add a new scope with curly braces
+			obj = new CMario(x, y);
+			player = (CMario*)obj;
+			HitBox* hitbox = new HitBox(player);
+			player->SetHitbox(hitbox);
+			objectManager.AddPlayer(player);
+			objectManager.Add(hitbox);
+			DebugOut(L"[INFO] Player object has been created!\n");
+		}
 		break;
 
 	//Enemy Spawn Section
@@ -649,8 +660,19 @@ void CPlayScene::Load()
 
 void CPlayScene::Update(DWORD dt)
 {
+	if (isPaused) return;
+	UpdateTimer();
+	if (isGameOver)
+	{
+		ULONGLONG now = GetTickCount64();
+		if (now - gameOverStart > GAME_OVER_DELAY)
+		{
+			return;
+		}
+	}
 	// Update all game objects first
 	objectManager.Update(dt);
+	HUD::GetInstance()->Update();
 
 	if (cameraController == NULL)
 	{
@@ -678,6 +700,7 @@ void CPlayScene::Update(DWORD dt)
 void CPlayScene::Render()
 {
 	objectManager.Render();
+	HUD::GetInstance()->Render();
 }
 
 /*
@@ -737,6 +760,43 @@ void CPlayScene::SetCameraMode(int mode)
 		DebugOut(L"[WARNING] Unknown camera mode: %d\n", mode);
 		break;
 	}
+}
+
+void CPlayScene::UpdateTimer()
+{
+	ULONGLONG now = GetTickCount64();
+	if (now - lastTick >= 1000 && !isGameOver && timeLimit > 0)
+	{
+		timeLimit--;
+		lastTick = now;
+
+		if (timeLimit <= 0)
+		{
+			TriggerGameOver();
+		}
+	}
+}
+
+void CPlayScene::TriggerGameOver()
+{
+	if (isGameOver) return; 
+
+	isGameOver = true;
+	gameOverStart = GetTickCount64();
+
+	// Kill Mario if time ran out
+	CMario* mario = dynamic_cast<CMario*>(player);
+	if (mario && timeLimit <= 0 && mario->GetState() != MARIO_STATE_DIE)
+	{
+		mario->SetState(MARIO_STATE_DIE);
+	}
+}
+
+void CPlayScene::Reload()
+{
+	int currentSceneId = this->id;
+	CGame::GetInstance()->InitiateSwitchScene(currentSceneId);
+
 }
 
 void CPlayScene::PurgeDeletedObjects()

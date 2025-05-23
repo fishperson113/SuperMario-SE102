@@ -16,6 +16,7 @@ background_item.txt
 platform.txt
 bullet.txt
 koopaparatroopa.txt
+Hud.txt
 
 #
 [OBJECTS]

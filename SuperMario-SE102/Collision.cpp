@@ -361,7 +361,6 @@ void CCollision::Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* co
 
 	//ProcessCollisionExit(objSrc, coObjects);
 
-	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 
 	float sl, st, sr, sb;
 	objSrc->GetBoundingBox(sl, st, sr, sb);
@@ -378,10 +377,11 @@ void CCollision::Process(LPGAMEOBJECT objSrc, DWORD dt, vector<LPGAMEOBJECT>* co
 		if (IsOverlap(sl, st, sr, sb, ol, ot, or_, ob))
 		{
 			objSrc->OnOverlapWith(obj);      
-			obj->OnOverlapWith(objSrc);      
+			obj->OnOverlapWith(objSrc);
 		}
 	}
 
+	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 }
 
 void CCollision::ProcessCollisionExit(LPGAMEOBJECT objSrc, vector<LPGAMEOBJECT>* coObjects)

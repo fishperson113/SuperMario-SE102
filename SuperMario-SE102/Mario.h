@@ -194,6 +194,7 @@ class CMario : public CGameObject
 	ULONGLONG untouchable_start;
 	BOOLEAN isOnPlatform;
 	int coin; 
+	int points;
 	BOOLEAN isKicking;
 	ULONGLONG kick_start;
 
@@ -283,7 +284,7 @@ public:
 		untouchable = 0;
 		untouchable_start = -1;
 		isOnPlatform = false;
-		coin = 0;
+		coin = 10;
 		heldKoopas = NULL;
 		isHolding = false;
 		isKicking = false;
@@ -305,6 +306,7 @@ public:
 		teleport_target_y = 0;
 		teleport_exit_direction = PipeDirection::UP;
 		pipe_offset = 0.0f;
+		points = 0;
 	}
 
 	void HoldKoopas(Koopas* koopas);
@@ -344,4 +346,6 @@ public:
 	void EndGlide() { isGliding = false; }
 	void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 
+	int GetCoin() { return coin; }
+	int GetPoints() { return points; }
 };

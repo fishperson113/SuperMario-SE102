@@ -16,6 +16,7 @@ CGameObject::CGameObject()
 	state = -1;
 	isDeleted = false;
 	isActive = true;
+	spinHitbox = NULL;
 }
 
 void CGameObject::RenderBoundingBox()

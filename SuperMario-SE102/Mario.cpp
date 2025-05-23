@@ -20,7 +20,7 @@
 #include "Bullet.h"
 #include "CMovingPlatform.h"
 #include "KoopaParatroopa.h"
-
+#include"HitBox.h"
 void CMario::HoldKoopas(Koopas* koopas)
 {
 	if (isHolding) return; 
@@ -55,10 +55,14 @@ void CMario::ReleaseKoopas()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
-	if (platform)
+
+	if (!isOnPlatform) {
+		platform = nullptr;
+	}
+	if (dynamic_cast<CMovingPlatform*> (platform))
 	{
 		CMovingPlatform* currentPlatform = dynamic_cast<CMovingPlatform*>(this->platform);
-		if(currentPlatform&&currentPlatform->GetMoveDirection()==PLATFORM_MOVE_DOWN)
+		if(currentPlatform->GetMoveDirection()==PLATFORM_MOVE_DOWN)
 		{
 			isOnPlatform = true;
 		}
@@ -89,9 +93,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	// Handle gliding state
 	if(!isFlying)
 		UpdateGlidingState();
-	if (!isOnPlatform) {
-		platform = nullptr;
-	}
 }
 
 void CMario::OnNoCollision(DWORD dt)
@@ -233,6 +234,7 @@ void CMario::OnCollisionWithCoinBrick(LPCOLLISIONEVENT e)
 		if (coinBrick->GetState() == BRICK_STATE_HIT) return; // already hit
 		coinBrick->SpawnCoin();
 		coinBrick->SetState(BRICK_STATE_HIT);
+		coin++;
 	}
 }
 
@@ -948,6 +950,11 @@ void CMario::StartSpinAttack()
 	{
 		isSpinning = true;
 		spin_start = GetTickCount64();
+		// Activate the spin hitbox if it exists
+		if (spinHitbox) {
+			spinHitbox->Activate();
+		}
+
 		DebugOut(L">>> Mario started spin attack! >>> \n");
 	}
 }
@@ -1262,7 +1269,7 @@ void CMario::Render()
 
 	animations->Get(aniId)->Render(x, y);
 
-	//RenderBoundingBox();
+	RenderBoundingBox();
 	
 	DebugOutTitle(L"Coins: %d", coin);
 }
@@ -1270,7 +1277,13 @@ void CMario::Render()
 void CMario::SetState(int state)
 {
 	// DIE is the end state, cannot be changed! 
-	if (this->state == MARIO_STATE_DIE) return; 
+	if (this->state == MARIO_STATE_DIE)
+	{	
+		LPPLAYSCENE scene = (LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene();
+		scene->TriggerGameOver();
+		scene->SetPaused(true);
+		return;
+	}
 
 	switch (state)
 	{
@@ -1489,8 +1502,7 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 		}
 		else 
 		{
-			float width = (level == MARIO_LEVEL_TAIL && isSpinning) ?
-				MARIO_TAIL_SPIN_BBOX_WIDTH : MARIO_BIG_BBOX_WIDTH;
+			float width = MARIO_BIG_BBOX_WIDTH;
 			left = x - width / 2;
 			top = y - MARIO_BIG_BBOX_HEIGHT / 2;
 			right = left + width;

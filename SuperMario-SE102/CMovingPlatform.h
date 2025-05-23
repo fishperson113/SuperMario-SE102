@@ -11,12 +11,8 @@ class CMovingPlatform : public CPlatform
 {
 protected:
     float moveSpeed;        
-    int moveDirection;      
-    float leftLimit;        
-    float rightLimit;       
-    float topLimit;         
-    float bottomLimit;      
-    bool isAutoMoving;      
+    int moveDirection;         
+    bool hasMarioTouched; 
 
 public:
     CMovingPlatform(
@@ -28,22 +24,13 @@ public:
     virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects = NULL);
     virtual void Render();
 
-    // Set boundary limits
-    void SetLimits(float left, float right, float top, float bottom);
-
-    // Set movement direction
-    void SetMoveDirection(int direction);
-
-    // Enable/disable auto movement
-    void SetAutoMoving(bool isAuto) { isAutoMoving = isAuto; }
-
-    // Implement collision interfaces
+	void SetMarioTouched(bool touched) { hasMarioTouched = touched; }
+	void SetMoveDirection(int direction) { moveDirection = direction; }
     int IsCollidable() { return 0; }
     int IsBlocking() { return 1; }
 	int IsDynamic() { return 1; } 
     float GetSpeedX();
     float GetSpeedY();
 	void OnCollisionWith(LPCOLLISIONEVENT e);
-    // Handle overlap with other objects (especially Mario)
-    virtual void OnOverlapWith(LPGAMEOBJECT obj);
+	int GetMoveDirection() { return moveDirection; }
 };

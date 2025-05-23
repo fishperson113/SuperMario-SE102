@@ -333,7 +333,7 @@ public:
 	int IsDynamic() { return 1; } // Mario is always dynamic
 	void OnNoCollision(DWORD dt);
 	void OnCollisionWith(LPCOLLISIONEVENT e);
-	void OnOverlapWith(LPGAMEOBJECT e);
+	void OnOverlapWith(LPGAMEOBJECT e) {};
 	void OnCollisionExit(LPGAMEOBJECT obj);
 
 	float GetPowerMeter() { return powerMeter; }

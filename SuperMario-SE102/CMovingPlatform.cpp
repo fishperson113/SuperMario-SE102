@@ -2,6 +2,7 @@
 #include "Mario.h"
 #include "debug.h"
 #include "Game.h"
+
 CMovingPlatform::CMovingPlatform(
     float x, float y,
     float cell_width, float cell_height, int length,
@@ -10,103 +11,35 @@ CMovingPlatform::CMovingPlatform(
     CPlatform(x, y, cell_width, cell_height, length, sprite_id_begin, sprite_id_middle, sprite_id_end)
 {
     this->moveSpeed = move_speed;
-    this->moveDirection = PLATFORM_MOVE_RIGHT; // Default direction
-    this->isAutoMoving = true; // Auto move by default
-
-    this->leftLimit = x - 100.0f;
-    this->rightLimit = x + 100.0f;
-    this->topLimit = y - 100.0f;
-    this->bottomLimit = y + 100.0f;
+    this->moveDirection = PLATFORM_MOVE_RIGHT; // Always start moving right
+    this->hasMarioTouched = false; // Initialize to false
 }
-
 
 void CMovingPlatform::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-    if (!isAutoMoving)
-        return; 
-
-    // Set vx, vy based on direction
-    switch (moveDirection)
-    {
-    case PLATFORM_MOVE_LEFT:
-        vx = -moveSpeed;
-        vy = 0;
-        break;
-    case PLATFORM_MOVE_RIGHT:
+    // Set velocity based on current direction
+    if (moveDirection == PLATFORM_MOVE_RIGHT) {
         vx = moveSpeed;
         vy = 0;
-        break;
-    case PLATFORM_MOVE_UP:
-        vx = 0;
-        vy = -moveSpeed;
-        break;
-    case PLATFORM_MOVE_DOWN:
+    }
+    else if (moveDirection == PLATFORM_MOVE_DOWN) {
         vx = 0;
         vy = moveSpeed;
-        break;
-    default:
-        vx = 0;
-        vy = 0;
-        break;
     }
 
-    // Predict new position
-    float newX = x + vx * dt;
-    float newY = y + vy * dt;
-
-    // Horizontal boundaries
-    if (vx < 0 && newX < leftLimit) {
-        x = leftLimit;
-        moveDirection = PLATFORM_MOVE_RIGHT;
-        vx = moveSpeed;
-    }
-    else if (vx > 0 && newX > rightLimit) {
-        x = rightLimit;
-        moveDirection = PLATFORM_MOVE_LEFT;
-        vx = -moveSpeed;
-    }
-    else {
-        x = newX;
-    }
-
-    // Vertical boundaries
-    if (vy < 0 && newY < topLimit) {
-        y = topLimit;
-        moveDirection = PLATFORM_MOVE_DOWN;
-        vy = moveSpeed;
-    }
-    else if (vy > 0 && newY > bottomLimit) {
-        y = bottomLimit;
-        moveDirection = PLATFORM_MOVE_UP;
-        vy = -moveSpeed;
-    }
-    else {
-        y = newY;
-    }
+    // Update position
+    x += vx * dt;
+    y += vy * dt;
 }
-
 
 void CMovingPlatform::Render()
 {
-    CPlatform::Render(); 
-}
-
-void CMovingPlatform::SetLimits(float left, float right, float top, float bottom)
-{
-    this->leftLimit = left;
-    this->rightLimit = right;
-    this->topLimit = top;
-    this->bottomLimit = bottom;
-}
-
-void CMovingPlatform::SetMoveDirection(int direction)
-{
-    this->moveDirection = direction;
+    CPlatform::Render();
 }
 
 float CMovingPlatform::GetSpeedX()
 {
-	return vx;
+    return vx;
 }
 
 float CMovingPlatform::GetSpeedY()
@@ -114,13 +47,6 @@ float CMovingPlatform::GetSpeedY()
     return vy;
 }
 
-
 void CMovingPlatform::OnCollisionWith(LPCOLLISIONEVENT e)
 {
-   
-}
-
-void CMovingPlatform::OnOverlapWith(LPGAMEOBJECT obj)
-{
-
 }

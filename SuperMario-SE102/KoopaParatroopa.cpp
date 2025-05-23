@@ -3,28 +3,28 @@
 
 void CKoopaParatroopa::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
-	if (state == KOOPA_PARATROOPA_STATE_DIE)
+	if (state == KOOPA_PARATROOPA_STATE_DIE1)
 	{
 		left = x - KOOPA_PARATROOPA_BBOX_WIDTH / 2;
 		top = y - KOOPA_PARATROOPA_BBOX_HEIGHT_DIE / 2;
 		right = left + KOOPA_PARATROOPA_BBOX_WIDTH;
 		bottom = top + KOOPA_PARATROOPA_BBOX_HEIGHT_DIE;
 	}
-	else if (state == KOOPA_PARATROOPA_STATE_JUMPING_WINGS || state == KOOPA_PARATROOPA_STATE_WALKING_WINGS)
+	else if (state == KOOPA_PARATROOPA_STATE_JUMPING_WINGS1 || state == KOOPA_PARATROOPA_STATE_WALKING_WINGS1)
 	{
 		left = x - KOOPA_PARATROOPA_WINGS_BBOX_WIDTH / 2;
 		top = y - KOOPA_PARATROOPA_WINGS_BBOX_HEIGHT / 2;
 		right = left + KOOPA_PARATROOPA_WINGS_BBOX_WIDTH;
 		bottom = top + KOOPA_PARATROOPA_WINGS_BBOX_HEIGHT;
 	}
-	else if (state == KOOPA_PARATROOPA_STATE_WALKING)
+	else if (state == KOOPA_PARATROOPA_STATE_WALKING1)
 	{
 		left = x - KOOPA_PARATROOPA_BBOX_WIDTH / 2;
 		top = y - KOOPA_PARATROOPA_BBOX_HEIGHT / 2;
 		right = left + KOOPA_PARATROOPA_BBOX_WIDTH;
 		bottom = top + KOOPA_PARATROOPA_BBOX_HEIGHT;
 	}
-	else if (state = KOOPA_PARATROOPA_STATE_SHELL)
+	else if (state = KOOPA_PARATROOPA_STATE_SHELL1)
 	{
 		left = x - KOOPA_PARATROOPA_SHELL_BBOX_WIDTH / 2;
 		top = y - KOOPA_PARATROOPA_SHELL_BBOX_HEIGHT / 2;
@@ -46,7 +46,7 @@ void CKoopaParatroopa::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	vy += ay * dt;
 	vx += ax * dt;
 
-	if ((state == KOOPA_PARATROOPA_STATE_DIE) && (GetTickCount64() - die_start > KOOPA_PARATROOPA_DIE_TIMEOUT))
+	if ((state == KOOPA_PARATROOPA_STATE_DIE1) && (GetTickCount64() - die_start > KOOPA_PARATROOPA_DIE_TIMEOUT))
 	{
 		isDeleted = true;
 		return;
@@ -57,20 +57,20 @@ void CKoopaParatroopa::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		this->SetState(KOOPA_PARATROOPA_STATE_WALKING);
 		shell_feet_start = 0;
 	}*/
-	else if ((state == KOOPA_PARATROOPA_STATE_SHELL) && (GetTickCount64() - shell_start > KOOPA_PARATROOPA_SHELL_TIMEOUT))
+	else if ((state == KOOPA_PARATROOPA_STATE_SHELL1) && (GetTickCount64() - shell_start > KOOPA_PARATROOPA_SHELL_TIMEOUT))
 	{
 		//this->SetState(KOOPA_PARATROOPA_STATE_SHELL_FEET);
 		this->SetPosition(this->x, this->y - 10);
-		this->SetState(KOOPA_PARATROOPA_STATE_WALKING);
+		this->SetState(KOOPA_PARATROOPA_STATE_WALKING1);
 		shell_start = 0;
 	}
-	else if (state == KOOPA_PARATROOPA_STATE_WALKING_WINGS && GetTickCount64() - walk_start > 2000) // Walk duration
+	else if (state == KOOPA_PARATROOPA_STATE_WALKING_WINGS1 && GetTickCount64() - walk_start > 2000) // Walk duration
 	{
-		SetState(KOOPA_PARATROOPA_STATE_JUMPING_WINGS);
+		SetState(KOOPA_PARATROOPA_STATE_JUMPING_WINGS1);
 	}
-	else if (state == KOOPA_PARATROOPA_STATE_JUMPING_WINGS && GetTickCount64() - jump_start > 1000) // Jump duration
+	else if (state == KOOPA_PARATROOPA_STATE_JUMPING_WINGS1 && GetTickCount64() - jump_start > 1000) // Jump duration
 	{
-		SetState(KOOPA_PARATROOPA_STATE_WALKING_WINGS);
+		SetState(KOOPA_PARATROOPA_STATE_WALKING_WINGS1);
 	}
 	if (this->vx > 0)
 		this->SetDirection(1);
@@ -80,41 +80,41 @@ void CKoopaParatroopa::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 void CKoopaParatroopa::Render()
 {
-	int aniId = ID_ANI_KOOPA_PARATROOPA_WALKING_WINGS_LEFT;
+	int aniId = ID_ANI_KOOPA_PARATROOPA_WALKING_WINGS_LEFT1;
 
-	if (state == KOOPA_PARATROOPA_STATE_SHELL)
+	if (state == KOOPA_PARATROOPA_STATE_SHELL1)
 	{
-		aniId = ID_ANI_KOOPA_PARATROOPA_SHELL;
+		aniId = ID_ANI_KOOPA_PARATROOPA_SHELL1;
 	}
-	else if (state == KOOPA_PARATROOPA_STATE_SHELL_FEET)
+	else if (state == KOOPA_PARATROOPA_STATE_SHELL_FEET1)
 	{
-		aniId = ID_ANI_KOOPA_PARATROOPA_SHELL_FEET;
+		aniId = ID_ANI_KOOPA_PARATROOPA_SHELL_FEET1;
 	}
-	else if (state == KOOPA_PARATROOPA_STATE_WALKING)
+	else if (state == KOOPA_PARATROOPA_STATE_WALKING1)
 	{
 		if (vx > 0)
 		{
-			aniId = ID_ANI_KOOPA_PARATROOPA_WALKING_RIGHT;
+			aniId = ID_ANI_KOOPA_PARATROOPA_WALKING_RIGHT1;
 		}
 		else if (vx < 0)
 		{
-			aniId = ID_ANI_KOOPA_PARATROOPA_WALKING_LEFT;
+			aniId = ID_ANI_KOOPA_PARATROOPA_WALKING_LEFT1;
 		}
 	}
-	else if (state == KOOPA_PARATROOPA_STATE_WALKING_WINGS || state == KOOPA_PARATROOPA_STATE_JUMPING_WINGS)
+	else if (state == KOOPA_PARATROOPA_STATE_WALKING_WINGS1 || state == KOOPA_PARATROOPA_STATE_JUMPING_WINGS1)
 	{
 		if (vx > 0)
 		{
-			aniId = ID_ANI_KOOPA_PARATROOPA_WALKING_WINGS_RIGHT;
+			aniId = ID_ANI_KOOPA_PARATROOPA_WALKING_WINGS_RIGHT1;
 		}
 		else if (vx < 0)
 		{
-			aniId = ID_ANI_KOOPA_PARATROOPA_WALKING_WINGS_LEFT;
+			aniId = ID_ANI_KOOPA_PARATROOPA_WALKING_WINGS_LEFT1;
 		}
 	}
-	else if (state == KOOPA_PARATROOPA_STATE_DIE)
+	else if (state == KOOPA_PARATROOPA_STATE_DIE1)
 	{
-		aniId = ID_ANI_KOOPA_PARATROOPA_DIE;
+		aniId = ID_ANI_KOOPA_PARATROOPA_DIE1;
 	}
 
 	CAnimations::GetInstance()->Get(aniId)->Render(x, y);
@@ -147,7 +147,7 @@ void CKoopaParatroopa::OnCollisionWith(LPCOLLISIONEVENT e)
 
 void CKoopaParatroopa::OnCollisionWithFallPitch(LPCOLLISIONEVENT e)
 {
-	this->SetState(KOOPA_PARATROOPA_STATE_DIE);
+	this->SetState(KOOPA_PARATROOPA_STATE_DIE1);
 }
 
 CKoopaParatroopa::CKoopaParatroopa(float x, float y) : CGameObject(x, y)
@@ -160,7 +160,7 @@ CKoopaParatroopa::CKoopaParatroopa(float x, float y) : CGameObject(x, y)
 	walk_start = -1;
 	shell_start = -1;
 	shell_feet_start = -1;
-	SetState(KOOPA_PARATROOPA_STATE_WALKING_WINGS);
+	SetState(KOOPA_PARATROOPA_STATE_WALKING_WINGS1);
 }
 
 void CKoopaParatroopa::SetState(int state)
@@ -168,13 +168,13 @@ void CKoopaParatroopa::SetState(int state)
 	CGameObject::SetState(state);
 	switch (state)
 	{
-	case KOOPA_PARATROOPA_STATE_DIE:
+	case KOOPA_PARATROOPA_STATE_DIE1:
 		die_start = GetTickCount64();
 		vx = 0;
 		vy = 0;
 		ay = 0;
 		break;
-	case KOOPA_PARATROOPA_STATE_WALKING_WINGS:
+	case KOOPA_PARATROOPA_STATE_WALKING_WINGS1:
 		walk_start = GetTickCount64();
 		if (this->GetDirection() == 0)
 		{
@@ -185,11 +185,11 @@ void CKoopaParatroopa::SetState(int state)
 			vx = KOOPA_PARATROOPA_WALKING_SPEED;
 		}
 		break;
-	case KOOPA_PARATROOPA_STATE_JUMPING_WINGS:
+	case KOOPA_PARATROOPA_STATE_JUMPING_WINGS1:
 		vy = KOOPA_PARATROOPA_JUMP_SPEED;
 		jump_start = GetTickCount64();
 		break;
-	case KOOPA_PARATROOPA_STATE_WALKING:
+	case KOOPA_PARATROOPA_STATE_WALKING1:
 		if (this->GetDirection() == 0)
 		{
 			vx = -KOOPA_PARATROOPA_WALKING_SPEED;
@@ -199,12 +199,12 @@ void CKoopaParatroopa::SetState(int state)
 			vx = KOOPA_PARATROOPA_WALKING_SPEED;
 		}
 		break;
-	case KOOPA_PARATROOPA_STATE_SHELL:
+	case KOOPA_PARATROOPA_STATE_SHELL1:
 		shell_start = GetTickCount64();
 		vx = 0;
 		vy = 0;
 		break;
-	case KOOPA_PARATROOPA_STATE_SHELL_FEET:
+	case KOOPA_PARATROOPA_STATE_SHELL_FEET1:
 		shell_feet_start = GetTickCount64();
 		vx = 0;
 		vy = 0;

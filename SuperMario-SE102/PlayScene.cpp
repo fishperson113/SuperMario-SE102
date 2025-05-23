@@ -68,14 +68,6 @@ CGameObject* CPlayScene::CreateEnemy(int enemyType, float x, float y)
 		obj = new CGoomba(x, y);
 		break;
 
-	case OBJECT_TYPE_KOOPAS:
-	{
-		Koopas* koopas = new Koopas(x, y);
-		objectManager.Add(koopas->GetFallSensor());
-		obj = koopas;
-		break;
-	}
-
 	case OBJECT_TYPE_PARAGOOMBA:
 		obj = new CParaGoomba(x, y);
 		DebugOut(L"[INFO] Creating ParaGoomba at (%f, %f)\n", x, y);
@@ -187,8 +179,15 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 
 	//Enemy Spawn Section
 
-	case OBJECT_TYPE_GOOMBA:
 	case OBJECT_TYPE_KOOPAS:
+	{
+		int type = atoi(tokens[3].c_str());
+		Koopas* koopas = new Koopas(x, y, type);
+		objectManager.Add(koopas->GetFallSensor());
+		obj = koopas;
+		break;
+	}
+	case OBJECT_TYPE_GOOMBA:
 	case OBJECT_TYPE_PARAGOOMBA:
 	case OBJECT_TYPE_FIRETRAP:
 	case OBJECT_TYPE_KOOPA_PARATROOPA:

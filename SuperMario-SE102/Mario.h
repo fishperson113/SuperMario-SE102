@@ -5,6 +5,8 @@
 #include "Animations.h"
 #include "Pipe.h"
 #include "debug.h"
+#include "KoopaParatroopa.h"
+
 
 #define MARIO_WALKING_SPEED		0.07f
 #define MARIO_RUNNING_SPEED		0.16f
@@ -308,7 +310,9 @@ public:
 	}
 
 	void HoldKoopas(Koopas* koopas);
+	void HoldKoopaParatroopa(CKoopaParatroopa* koopaParatroopa);
 	void ReleaseKoopas();
+	void ReleaseKoopaParatroopa();
 	bool IsHolding() { return isHolding; }
 	bool IsSpinning() { return isSpinning; }
 	bool IsGliding() { return isGliding; }

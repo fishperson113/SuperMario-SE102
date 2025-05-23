@@ -28,8 +28,16 @@ void CMario::HoldKoopas(Koopas* koopas)
 	heldKoopas = koopas;
 	isHolding = true;
 
-	if (heldKoopas->GetState() != KOOPAS_STATE_SHELL)
-		heldKoopas->SetState(KOOPAS_STATE_SHELL);
+	if (heldKoopas->GetType() == KOOPAS_RED)
+	{
+		if (heldKoopas->GetState() != KOOPAS_STATE_SHELL)
+			heldKoopas->SetState(KOOPAS_STATE_SHELL);
+	}
+	else
+	{
+		if (heldKoopas->GetState() != KOOPA_PARATROOPA_STATE_SHELL)
+			heldKoopas->SetState(KOOPA_PARATROOPA_STATE_SHELL);
+	}
 
 	heldKoopas->SetBeingHeld(true);
 
@@ -44,7 +52,14 @@ void CMario::ReleaseKoopas()
 	kick_start = GetTickCount64();
 
 	heldKoopas->SetBeingHeld(false);
-	heldKoopas->SetState(KOOPAS_STATE_SHELL_MOVING);
+	if (heldKoopas->GetType() == KOOPAS_RED)
+	{
+		heldKoopas->SetState(KOOPAS_STATE_SHELL_MOVING);
+	}
+	else
+	{
+		heldKoopas->SetState(KOOPA_PARATROOPA_STATE_MOVING_SHELL);
+	}
 	heldKoopas->SetSpeed(nx * KOOPAS_SHELL_SPEED, 0);
 
 	isHolding = false;
@@ -58,7 +73,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	if (platform)
 	{
 		CMovingPlatform* currentPlatform = dynamic_cast<CMovingPlatform*>(this->platform);
-		if(currentPlatform&&currentPlatform->GetMoveDirection()==PLATFORM_MOVE_DOWN)
+		if(currentPlatform&&currentPlatform->GetMoveDirection() == PLATFORM_MOVE_DOWN)
 		{
 			isOnPlatform = true;
 		}
@@ -479,75 +494,160 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 	Koopas* koopas = (Koopas*)e->obj;
 
 	// Mario jumps on Koopas from above
-	if (e->ny < 0)
+	if (koopas->GetType() == KOOPAS_RED)
 	{
-		if (koopas->GetState() == KOOPAS_STATE_WALKING)
+		if (e->ny < 0)
 		{
-			// Turn normal Koopas into shell
-			koopas->SetState(KOOPAS_STATE_SHELL);
-			vy = -MARIO_JUMP_DEFLECT_SPEED;
-		}
-		else if (koopas->GetState() == KOOPAS_STATE_SHELL)
-		{
-			// If Koopas is already in shell state, kick it
-			float shellDirection;
+			if (koopas->GetState() == KOOPAS_STATE_WALKING)
+			{
+				// Turn normal Koopas into shell
+				koopas->SetState(KOOPAS_STATE_SHELL);
+				vy = -MARIO_JUMP_DEFLECT_SPEED;
+			}
+			else if (koopas->GetState() == KOOPAS_STATE_SHELL)
+			{
+				// If Koopas is already in shell state, kick it
+				float shellDirection;
 
-			// Determine kick direction based on Mario's direction
-			if (nx > 0)
-				shellDirection = 1.0f; // Kick to the right
-			else
-				shellDirection = -1.0f; // Kick to the left
+				// Determine kick direction based on Mario's direction
+				if (nx > 0)
+					shellDirection = 1.0f; // Kick to the right
+				else
+					shellDirection = -1.0f; // Kick to the left
 
-			koopas->SetState(KOOPAS_STATE_SHELL_MOVING);
-			koopas->SetSpeed(shellDirection * KOOPAS_SHELL_SPEED, 0);
-			vy = -MARIO_JUMP_DEFLECT_SPEED;
-			DebugOut(L">>> Mario kicked Koopa shell by jumping on it! >>> \n");
+				koopas->SetState(KOOPAS_STATE_SHELL_MOVING);
+				koopas->SetSpeed(shellDirection * KOOPAS_SHELL_SPEED, 0);
+				vy = -MARIO_JUMP_DEFLECT_SPEED;
+				DebugOut(L">>> Mario kicked Koopa shell by jumping on it! >>> \n");
+			}
+			else if (koopas->GetState() == KOOPAS_STATE_SHELL_MOVING)
+			{
+				// If shell is already moving, stop it
+				koopas->SetState(KOOPAS_STATE_SHELL);
+				koopas->SetSpeed(0, 0);
+				vy = -MARIO_JUMP_DEFLECT_SPEED;
+				DebugOut(L">>> Mario stopped moving Koopa shell! >>> \n");
+			}
 		}
-		else if (koopas->GetState() == KOOPAS_STATE_SHELL_MOVING)
+		else if (e->nx != 0) // Side collision
 		{
-			// If shell is already moving, stop it
-			koopas->SetState(KOOPAS_STATE_SHELL);
-			koopas->SetSpeed(0, 0);
-			vy = -MARIO_JUMP_DEFLECT_SPEED;
-			DebugOut(L">>> Mario stopped moving Koopa shell! >>> \n");
+			// Check if we can hold the Koopa shell (only when running with A pressed)
+			if (koopas->GetState() == KOOPAS_STATE_SHELL &&
+				(abs(vx) >= MARIO_WALKING_SPEED) &&
+				CGame::GetInstance()->IsKeyDown(DIK_A) &&
+				!isHolding)
+			{
+				HoldKoopas(koopas);
+				DebugOut(L">>> Mario picked up Koopa shell! >>> \n");
+			}
+			else if (koopas->GetState() == KOOPAS_STATE_SHELL)
+			{
+				isKicking = true;
+				kick_start = GetTickCount64();
+
+				int shellDirection = (e->nx > 0) ? -1 : 1; // Determine direction based on collision
+				koopas->SetState(KOOPAS_STATE_SHELL_MOVING);
+				koopas->SetSpeed(shellDirection * KOOPAS_SHELL_SPEED, 0);
+				DebugOut(L">>> Mario kicked Koopa shell from the side! >>> \n");
+			}
+			else // hit by Koopas
+			{
+				if (untouchable == 0)
+				{
+					if (koopas->GetState() != KOOPAS_STATE_SHELL)
+					{
+						if (level > MARIO_LEVEL_SMALL)
+						{
+							LevelDown();
+							StartUntouchable();
+						}
+						else
+						{
+							DebugOut(L">>> Mario DIE >>> \n");
+							SetState(MARIO_STATE_DIE);
+						}
+					}
+				}
+			}
 		}
 	}
-	else if (e->nx != 0) // Side collision
+	else if (koopas->GetType() == KOOPAS_GREEN || koopas->GetType() == KOOPAS_GREEN_NO_WINGS)
 	{
-		// Check if we can hold the Koopa shell (only when running with A pressed)
-		if (koopas->GetState() == KOOPAS_STATE_SHELL &&
-			(abs(vx) >= MARIO_WALKING_SPEED) &&
-			CGame::GetInstance()->IsKeyDown(DIK_A) &&
-			!isHolding)
+		if (e->ny < 0)
 		{
-			HoldKoopas(koopas);
-			DebugOut(L">>> Mario picked up Koopa shell! >>> \n");
-		}
-		else if (koopas->GetState() == KOOPAS_STATE_SHELL)
-		{
-			isKicking = true;
-			kick_start = GetTickCount64();
-
-			int shellDirection = (e->nx > 0) ? -1 : 1; // Determine direction based on collision
-			koopas->SetState(KOOPAS_STATE_SHELL_MOVING);
-			koopas->SetSpeed(shellDirection * KOOPAS_SHELL_SPEED, 0);
-			DebugOut(L">>> Mario kicked Koopa shell from the side! >>> \n");
-		}
-		else // hit by Koopas
-		{
-			if (untouchable == 0)
+			if (koopas->GetState() == KOOPA_PARATROOPA_STATE_WALKING_WINGS || koopas->GetState() == KOOPA_PARATROOPA_STATE_JUMPING_WINGS)
 			{
-				if (koopas->GetState() != KOOPAS_STATE_SHELL)
+				koopas->SetState(KOOPA_PARATROOPA_STATE_WALKING);
+				vy = -MARIO_JUMP_DEFLECT_SPEED;
+			}
+			else if (koopas->GetState() == KOOPA_PARATROOPA_STATE_WALKING)
+			{
+				// Turn normal Koopas into shell
+				koopas->SetState(KOOPA_PARATROOPA_STATE_SHELL);
+				vy = -MARIO_JUMP_DEFLECT_SPEED;
+			}
+			else if (koopas->GetState() == KOOPA_PARATROOPA_STATE_SHELL)
+			{
+				// If Koopas is already in shell state, kick it
+				float shellDirection;
+
+				// Determine kick direction based on Mario's direction
+				if (nx > 0)
+					shellDirection = 1.0f; // Kick to the right
+				else
+					shellDirection = -1.0f; // Kick to the left
+
+				koopas->SetState(KOOPA_PARATROOPA_STATE_MOVING_SHELL);
+				koopas->SetSpeed(shellDirection * KOOPAS_SHELL_SPEED, 0);
+				vy = -MARIO_JUMP_DEFLECT_SPEED;
+				DebugOut(L">>> Mario kicked Koopa shell by jumping on it! >>> \n");
+			}
+			else if (koopas->GetState() == KOOPA_PARATROOPA_STATE_MOVING_SHELL)
+			{
+				// If shell is already moving, stop it
+				koopas->SetState(KOOPA_PARATROOPA_STATE_SHELL);
+				koopas->SetSpeed(0, 0);
+				vy = -MARIO_JUMP_DEFLECT_SPEED;
+				DebugOut(L">>> Mario stopped moving Koopa shell! >>> \n");
+			}
+		}
+		else if (e->nx != 0) // Side collision
+		{
+			// Check if we can hold the Koopa shell (only when running with A pressed)
+			if (koopas->GetState() == KOOPA_PARATROOPA_STATE_SHELL &&
+				(abs(vx) >= MARIO_WALKING_SPEED) &&
+				CGame::GetInstance()->IsKeyDown(DIK_A) &&
+				!isHolding)
+			{
+				HoldKoopas(koopas);
+				DebugOut(L">>> Mario picked up Koopa shell! >>> \n");
+			}
+			else if (koopas->GetState() == KOOPA_PARATROOPA_STATE_SHELL)
+			{
+				isKicking = true;
+				kick_start = GetTickCount64();
+
+				int shellDirection = (e->nx > 0) ? -1 : 1; // Determine direction based on collision
+				koopas->SetState(KOOPA_PARATROOPA_STATE_MOVING_SHELL);
+				koopas->SetSpeed(shellDirection * KOOPAS_SHELL_SPEED, 0);
+				DebugOut(L">>> Mario kicked Koopa shell from the side! >>> \n");
+			}
+			else // hit by Koopas
+			{
+				if (untouchable == 0)
 				{
-					if (level > MARIO_LEVEL_SMALL)
+					if (koopas->GetState() != KOOPA_PARATROOPA_STATE_SHELL)
 					{
-						LevelDown();
-						StartUntouchable();
-					}
-					else
-					{
-						DebugOut(L">>> Mario DIE >>> \n");
-						SetState(MARIO_STATE_DIE);
+						if (level > MARIO_LEVEL_SMALL)
+						{
+							LevelDown();
+							StartUntouchable();
+						}
+						else
+						{
+							DebugOut(L">>> Mario DIE >>> \n");
+							SetState(MARIO_STATE_DIE);
+						}
 					}
 				}
 			}
@@ -1036,7 +1136,7 @@ void CMario::UpdateHeldKoopas()
 	if (!isHolding || heldKoopas == NULL)
 		return;
 
-	if (heldKoopas->GetState()== KOOPAS_STATE_WALKING)
+	if (heldKoopas->GetState()== KOOPAS_STATE_WALKING || heldKoopas->GetState() == KOOPA_PARATROOPA_STATE_WALKING)
 	{
 		heldKoopas->SetBeingHeld(false);
 

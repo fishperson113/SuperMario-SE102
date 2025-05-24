@@ -68,18 +68,32 @@ void CMario::ReleaseKoopas()
 	DebugOut(L">>> Mario released Koopa shell! >>> \n");
 }
 
-void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
+void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 
-	if (!isOnPlatform) {
+	bool wasPreviouslyOnPlatform = isOnPlatform;
+	CPlatform* previousPlatform = platform;
+
+	if (!isOnPlatform || (platform && dynamic_cast<CMovingPlatform*>(platform) &&
+		dynamic_cast<CMovingPlatform*>(platform)->GetMoveDirection() != PLATFORM_MOVE_DOWN)) {
 		platform = nullptr;
 	}
-	if (dynamic_cast<CMovingPlatform*> (platform))
+
+	if (platform && dynamic_cast<CMovingPlatform*>(platform))
 	{
-		CMovingPlatform* currentPlatform = dynamic_cast<CMovingPlatform*>(this->platform);
-		if(currentPlatform&&currentPlatform->GetMoveDirection() == PLATFORM_MOVE_DOWN)
+		CMovingPlatform* movingPlatform = dynamic_cast<CMovingPlatform*>(platform);
+
+		if (movingPlatform->GetMoveDirection() == PLATFORM_MOVE_DOWN)
 		{
+
 			isOnPlatform = true;
+
+			float platformVx, platformVy;
+			movingPlatform->GetSpeed(platformVx, platformVy);
+
+			if (platformVy > 0) {
+				vy = platformVy;
+			}
 		}
 	}
 	// Update velocity based on acceleration
@@ -112,7 +126,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 
 void CMario::OnNoCollision(DWORD dt)
 {
-	isOnPlatform = false;
+	if (!(platform && dynamic_cast<CMovingPlatform*>(platform) &&
+		dynamic_cast<CMovingPlatform*>(platform)->GetMoveDirection() == PLATFORM_MOVE_DOWN)) {
+		isOnPlatform = false;
+	}
 	x += vx * dt;
 	y += vy * dt;
 }
@@ -125,15 +142,22 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		if (e->ny < 0)
 		{
 			isOnPlatform = true;
+
 			if (dynamic_cast<CPlatform*>(e->obj) && !dynamic_cast<CPipe*>(e->obj))
 			{
-				platform = dynamic_cast<CPlatform*>(e->obj);
+				CPlatform* collidedPlatform = dynamic_cast<CPlatform*>(e->obj);
 
-				CMovingPlatform* movingPlatform = dynamic_cast<CMovingPlatform*>(platform);
-				if (movingPlatform)
-				{
+				if (!(platform && dynamic_cast<CMovingPlatform*>(platform) &&
+					dynamic_cast<CMovingPlatform*>(platform)->GetMoveDirection() == PLATFORM_MOVE_DOWN)) {
+					platform = collidedPlatform;
+				}
+
+				if (CMovingPlatform* movingPlatform = dynamic_cast<CMovingPlatform*>(platform)) {
 					movingPlatform->SetMarioTouched(true);
-					movingPlatform->SetMoveDirection(PLATFORM_MOVE_DOWN);
+
+					if (platform == collidedPlatform) {
+						movingPlatform->SetMoveDirection(PLATFORM_MOVE_DOWN);
+					}
 				}
 			}
 		}
@@ -1349,8 +1373,8 @@ void CMario::SetState(int state)
 			else
 				vy = -MARIO_JUMP_SPEED_Y;
 
-			isOnPlatform = false;
 		}
+		isOnPlatform = false;
 		break;
 	case MARIO_STATE_FLY:
 		isFlying = true;

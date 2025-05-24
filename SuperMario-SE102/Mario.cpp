@@ -1050,7 +1050,6 @@ void CMario::StartSpinAttack()
 	{
 		isSpinning = true;
 		spin_start = GetTickCount64();
-		// Activate the spin hitbox if it exists
 		if (spinHitbox) {
 			spinHitbox->Activate();
 		}

@@ -6,6 +6,13 @@
 #define HITBOX_LIFESPAN 500
 class HitBox :  public CGameObject
 {
+    void OnCollisionWithGoomba(LPCOLLISIONEVENT e);
+    void OnCollisionWithParaGoomba(LPCOLLISIONEVENT e);
+    void OnCollisionWithKoopas(LPCOLLISIONEVENT e);
+    void OnCollisionWithKoopaParatroopa(LPCOLLISIONEVENT e);
+    void OnCollisionWithPiranhaPlant(LPCOLLISIONEVENT e);
+    void OnCollisionWithBullet(LPCOLLISIONEVENT e);
+    void OnCollisionWithBrick(LPCOLLISIONEVENT e);
 protected:
     ULONGLONG activate_start;
     CGameObject* owner;  // The owner of this hitbox (Mario)
@@ -20,7 +27,7 @@ public:
     void Activate();
     bool IsActive() { return isActive; }
 
-    int IsCollidable() { return isActive; }
+    int IsCollidable() { return 1; }
     int IsBlocking() { return 0; }
 
     virtual void OnCollisionWith(LPCOLLISIONEVENT e);

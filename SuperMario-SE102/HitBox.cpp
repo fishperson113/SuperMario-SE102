@@ -34,9 +34,77 @@ void HitBox::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
         isActive = false;
     }
 }
+void HitBox::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
+{
+    CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
+    if (goomba->GetState() != GOOMBA_STATE_DIE)
+        goomba->SetState(GOOMBA_STATE_DIE);
+}
 
+void HitBox::OnCollisionWithParaGoomba(LPCOLLISIONEVENT e)
+{
+    CParaGoomba* paraGoomba = dynamic_cast<CParaGoomba*>(e->obj);
+    if (paraGoomba->GetState() != PARAGOOMBA_STATE_DIE)
+        paraGoomba->SetState(PARAGOOMBA_STATE_DIE);
+}
+
+void HitBox::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
+{
+    Koopas* koopas = dynamic_cast<Koopas*>(e->obj);
+    if (koopas->GetState() != KOOPAS_STATE_SHELL)
+    {
+        koopas->SetState(KOOPAS_STATE_SHELL);
+    }
+    else if (koopas->GetState() == KOOPAS_STATE_SHELL)
+    {
+        // Direction is based on Mario's direction
+        //float shellDirection = owner->GetDirection() > 0 ? 1.0f : -1.0f;
+        /*koopas->SetState(KOOPAS_STATE_SHELL_MOVING);
+        koopas->SetSpeed(shellDirection * KOOPAS_SHELL_SPEED, 0);*/
+        DebugOut(L">>> Mario's hitbox kicked Koopa shell! >>> \n");
+    }
+    else if (koopas->GetState() == KOOPAS_STATE_SHELL_MOVING)
+    {
+        // Reverse the shell's direction
+        float vx, vy;
+        koopas->GetSpeed(vx, vy);
+        koopas->SetSpeed(-vx, vy);
+        DebugOut(L">>> Mario's hitbox reversed Koopa shell direction! >>> \n");
+    }
+}
+
+void HitBox::OnCollisionWithKoopaParatroopa(LPCOLLISIONEVENT e)
+{
+    CKoopaParatroopa* koopaParatroopa = dynamic_cast<CKoopaParatroopa*>(e->obj);
+    if (koopaParatroopa->GetState() == KOOPA_PARATROOPA_STATE_WALKING_WINGS ||
+        koopaParatroopa->GetState() == KOOPA_PARATROOPA_STATE_JUMPING_WINGS)
+        koopaParatroopa->SetState(KOOPA_PARATROOPA_STATE_WALKING);
+    else if (koopaParatroopa->GetState() == KOOPA_PARATROOPA_STATE_WALKING)
+        koopaParatroopa->SetState(KOOPA_PARATROOPA_STATE_SHELL);
+}
+
+void HitBox::OnCollisionWithPiranhaPlant(LPCOLLISIONEVENT e)
+{
+    CPiranhaPlant* plant = dynamic_cast<CPiranhaPlant*>(e->obj);
+    plant->Delete();
+}
+
+void HitBox::OnCollisionWithBullet(LPCOLLISIONEVENT e)
+{
+    CBullet* bullet = dynamic_cast<CBullet*>(e->obj);
+    bullet->Delete();
+}
+
+void HitBox::OnCollisionWithBrick(LPCOLLISIONEVENT e)
+{
+    // Only break bricks that are breakable
+    CBrick* brick = dynamic_cast<CBrick*>(e->obj);
+    /*if (brick->IsBreakable())
+        brick->Break();*/
+}
 void HitBox::Render()
 {
+    if (!isActive) return;
     RenderBoundingBox();
 }
 
@@ -57,68 +125,19 @@ void HitBox::Activate()
 void HitBox::OnCollisionWith(LPCOLLISIONEVENT e)
 {
     if (!isActive) return;
-
     // Handle collision with enemies
     if (dynamic_cast<CGoomba*>(e->obj))
-    {
-        CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
-        if (goomba->GetState() != GOOMBA_STATE_DIE)
-            goomba->SetState(GOOMBA_STATE_DIE);
-    }
+        OnCollisionWithGoomba(e);
     else if (dynamic_cast<CParaGoomba*>(e->obj))
-    {
-        CParaGoomba* paraGoomba = dynamic_cast<CParaGoomba*>(e->obj);
-        if (paraGoomba->GetState() != PARAGOOMBA_STATE_DIE)
-            paraGoomba->SetState(PARAGOOMBA_STATE_DIE);
-    }
+        OnCollisionWithParaGoomba(e);
     else if (dynamic_cast<Koopas*>(e->obj))
-    {
-        Koopas* koopas = dynamic_cast<Koopas*>(e->obj);
-        if (koopas->GetState() != KOOPAS_STATE_SHELL)
-        {
-            koopas->SetState(KOOPAS_STATE_SHELL);
-        }
-        else if (koopas->GetState() == KOOPAS_STATE_SHELL)
-        {
-            // Direction is based on Mario's direction
-            //float shellDirection = owner->GetDirection() > 0 ? 1.0f : -1.0f;
-            /*koopas->SetState(KOOPAS_STATE_SHELL_MOVING);
-            koopas->SetSpeed(shellDirection * KOOPAS_SHELL_SPEED, 0);*/
-            DebugOut(L">>> Mario's hitbox kicked Koopa shell! >>> \n");
-        }
-        else if (koopas->GetState() == KOOPAS_STATE_SHELL_MOVING)
-        {
-            // Reverse the shell's direction
-            float vx, vy;
-            koopas->GetSpeed(vx, vy);
-            koopas->SetSpeed(-vx, vy);
-            DebugOut(L">>> Mario's hitbox reversed Koopa shell direction! >>> \n");
-        }
-    }
+        OnCollisionWithKoopas(e);
     else if (dynamic_cast<CKoopaParatroopa*>(e->obj))
-    {
-        CKoopaParatroopa* koopaParatroopa = dynamic_cast<CKoopaParatroopa*>(e->obj);
-        if (koopaParatroopa->GetState() == KOOPA_PARATROOPA_STATE_WALKING_WINGS ||
-            koopaParatroopa->GetState() == KOOPA_PARATROOPA_STATE_JUMPING_WINGS)
-            koopaParatroopa->SetState(KOOPA_PARATROOPA_STATE_WALKING);
-        else if (koopaParatroopa->GetState() == KOOPA_PARATROOPA_STATE_WALKING)
-            koopaParatroopa->SetState(KOOPA_PARATROOPA_STATE_SHELL);
-    }
+        OnCollisionWithKoopaParatroopa(e);
     else if (dynamic_cast<CPiranhaPlant*>(e->obj))
-    {
-        CPiranhaPlant* plant = dynamic_cast<CPiranhaPlant*>(e->obj);
-        plant->Delete();
-    }
+        OnCollisionWithPiranhaPlant(e);
     else if (dynamic_cast<CBullet*>(e->obj))
-    {
-        CBullet* bullet = dynamic_cast<CBullet*>(e->obj);
-        bullet->Delete();
-    }
+        OnCollisionWithBullet(e);
     else if (dynamic_cast<CBrick*>(e->obj))
-    {
-        // Only break bricks that are breakable
-        CBrick* brick = dynamic_cast<CBrick*>(e->obj);
-        /*if (brick->IsBreakable())
-            brick->Break();*/
-    }
+        OnCollisionWithBrick(e);
 }

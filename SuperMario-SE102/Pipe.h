@@ -1,6 +1,15 @@
 #pragma once
 #include "GameObject.h"
+#define PIPE_TYPE_STANDARD         0  // Standard pipe
+#define PIPE_TYPE_SHORT            1  // Short pipe for moving up
+#define PIPE_TYPE_LONG             2  // Long pipe for moving down
+#define PIPE_TYPE_WITH_FLOWER      3  // Pipe with flower enemy
+#define PIPE_TYPE_WITH_STRIPES     4  // Pipe with striped decoration
 
+#define DOWN_PIPE_POSITION_X       135
+#define DOWN_PIPE_POSITION_Y       412
+#define UP_PIPE_POSITION_X         2304
+#define UP_PIPE_POSITION_Y         310
 enum class PipeDirection
 {
 	UP,
@@ -16,17 +25,19 @@ protected:
 	float cellWidth;
 	float cellHeight;
 	int spriteIdBegin, spriteIdMiddle, spriteIdEnd;
+	int pipeType;
 
-	PipeDirection entryDirection;    // Direction Mario enters this pipe
-	PipeDirection exitDirection;    // Direction Mario enters/exits
-	bool isEntrance;            // Is this an entrance pipe
-	bool isExit;                // Is this an exit pipe
-	float targetX, targetY;     // Target coordinates when Mario enters
+	PipeDirection entryDirection; 
+	PipeDirection exitDirection;  
+	bool isEntrance;           
+	bool isExit;               
+	float targetX, targetY;    
 
 public:
 	CPipe(float x, float y,
 		float cell_width, float cell_height, int length,
-		int sprite_id_begin, int sprite_id_middle, int sprite_id_end) :CGameObject(x, y)
+		int sprite_id_begin, int sprite_id_middle, int sprite_id_end,
+		int pipe_type = PIPE_TYPE_STANDARD) :CGameObject(x, y)
 	{
 		this->length = length;
 		this->cellWidth = cell_width;
@@ -34,6 +45,7 @@ public:
 		this->spriteIdBegin = sprite_id_begin;
 		this->spriteIdMiddle = sprite_id_middle;
 		this->spriteIdEnd = sprite_id_end;
+		this->pipeType = pipe_type;
 
 		this->entryDirection = PipeDirection::DOWN;
 		this->exitDirection = PipeDirection::UP;
@@ -60,6 +72,8 @@ public:
 	PipeDirection GetExitDirection() const { return exitDirection; }
 	void GetEntryPosition(float& x, float& y) const;
 	void GetExitPosition(float& x, float& y) const;
+	int GetPipeType() const { return pipeType; }
+	void SetPipeType(int type) { pipeType = type; }
 };
 
 typedef CPipe* LPPIPE;

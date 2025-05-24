@@ -5,7 +5,7 @@
 
 #include "Textures.h"
 #include "Game.h"
-
+#include"debug.h"
 void CPipe::Render()
 {
 	if (this->length <= 0) return;
@@ -22,7 +22,7 @@ void CPipe::Render()
 	if (length > 1)
 		s->Get(this->spriteIdEnd)->Draw(x, yy);
 
-	//RenderBoundingBox();
+	RenderBoundingBox();
 }
 
 void CPipe::GetBoundingBox(float& l, float& t, float& r, float& b)
@@ -59,19 +59,37 @@ void CPipe::RenderBoundingBox()
 
 int CPipe::IsDirectionColliable(float nx, float ny)
 {
-	if (nx == 0 && ny == -1) return 1;
-	if (nx != 0) return 1;
-	return 0;
+	return 1;
 }
 
 void CPipe::SetAsEntrance(float targetX, float targetY, PipeDirection entryDir, PipeDirection exitDir)
 {
-	this->isEntrance = true;
-	this->isExit = false;
-	this->targetX = targetX;
-	this->targetY = targetY;
-	this->entryDirection = entryDir;
-	this->exitDirection = exitDir;
+	// Validate entry direction is within enum range
+    int entryDirValue = static_cast<int>(entryDir);
+    if (entryDirValue < 0 || entryDirValue > 3)
+    {
+        DebugOut(L"[ERROR] Invalid pipe entry direction: %d\n", entryDirValue);
+        return;
+    }
+    
+    // Validate exit direction is within enum range
+    int exitDirValue = static_cast<int>(exitDir);
+    if (exitDirValue < 0 || exitDirValue > 3)
+    {
+        DebugOut(L"[ERROR] Invalid pipe exit direction: %d\n", exitDirValue);
+        return;
+    }
+    
+    this->isEntrance = true;
+    this->isExit = false;
+    this->targetX = targetX;
+    this->targetY = targetY;
+    this->entryDirection = entryDir;
+    this->exitDirection = exitDir;
+    
+    DebugOut(L"[INFO] Pipe set as entrance: Target (%f, %f), Entry direction: %d, Exit direction: %d\n",
+        targetX, targetY, static_cast<int>(entryDir), static_cast<int>(exitDir));
+
 }
 
 void CPipe::SetAsExit()

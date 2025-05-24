@@ -233,7 +233,6 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 
 	case OBJECT_TYPE_PIPE:
 	{
-
 		float cell_width = (float)atof(tokens[3].c_str());
 		float cell_height = (float)atof(tokens[4].c_str());
 		int length = atoi(tokens[5].c_str());
@@ -241,25 +240,33 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		int sprite_middle = atoi(tokens[7].c_str());
 		int sprite_end = atoi(tokens[8].c_str());
 
+		// Add pipe type parameter (default to standard)
+		int pipeType = PIPE_TYPE_STANDARD;
+		if (tokens.size() >= 10)
+		{
+			pipeType = atoi(tokens[9].c_str());
+		}
+
 		CPipe* pipe = new CPipe(
 			x, y,
 			cell_width, cell_height, length,
-			sprite_begin, sprite_middle, sprite_end
+			sprite_begin, sprite_middle, sprite_end,
+			pipeType
 		);
 
 		// Check if it's a teleport pipe
-		if (tokens.size() >= 12)
+		if (tokens.size() >= 13)
 		{
 			// Entry Direction: 0=UP, 1=DOWN, 2=LEFT, 3=RIGHT
-			int entryDirection = atoi(tokens[9].c_str());
-			float target_x = (float)atof(tokens[10].c_str());
-			float target_y = (float)atof(tokens[11].c_str());
+			int entryDirection = atoi(tokens[10].c_str());
+			float target_x = (float)atof(tokens[11].c_str());
+			float target_y = (float)atof(tokens[12].c_str());
 
 			// Default exit direction (if not specified) is UP
 			int exitDirection = 0; // UP
-			if (tokens.size() >= 13)
+			if (tokens.size() >= 14)
 			{
-				exitDirection = atoi(tokens[12].c_str());
+				exitDirection = atoi(tokens[13].c_str());
 			}
 
 			PipeDirection entryDir, exitDir;
@@ -286,10 +293,10 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 
 			pipe->SetAsEntrance(target_x, target_y, entryDir, exitDir);
 			DebugOut(L"[INFO] Teleport Pipe created with target (%f, %f), entry dir %d, exit dir %d\n",
-				target_x, target_y, entryDirection, exitDirection);
+				target_x, target_y, pipe->GetEntryDirection(), pipe->GetExitDirection());
 		}
 		// Check if it's an exit pipe
-		else if (tokens.size() >= 10 && atoi(tokens[9].c_str()) == 1)
+		else if (tokens.size() >= 11 && atoi(tokens[10].c_str()) == 1)
 		{
 			pipe->SetAsExit();
 			DebugOut(L"[INFO] Exit Pipe created\n");

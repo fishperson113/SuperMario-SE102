@@ -4,7 +4,7 @@
 #include <typeinfo>
 #include "Platform.h"
 #include "Goomba.h"
-
+#include"Pipe.h"
 ObjectManager::ObjectManager() : player(nullptr)
 {
 }

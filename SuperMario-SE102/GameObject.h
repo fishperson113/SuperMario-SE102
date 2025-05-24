@@ -30,6 +30,7 @@ protected:
 	HitBox* spinHitbox;
 	bool isDeleted; 
 	bool isActive;
+	vector<LPGAMEOBJECT>* coObjects;
 
 public: 
 	void SetPosition(float x, float y) { this->x = x, this->y = y; }
@@ -71,7 +72,7 @@ public:
 
 	//Is this object moving ?
 	virtual int IsDynamic() { return 0; }
-
+	void SetCoObjects(vector<LPGAMEOBJECT>* coObjects) { this->coObjects = coObjects; };
 	// Does this object collide with other object at certain direction ( like ColorBox )
 	virtual int IsDirectionColliable(float nx, float ny) { return 1; }
 	void SetHitbox(HitBox* hitBox) { spinHitbox = hitBox; };

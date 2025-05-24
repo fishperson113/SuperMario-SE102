@@ -1078,32 +1078,6 @@ void CMario::HandleEnemyCollisionsInGodMode(LPCOLLISIONEVENT e)
 			return;
 		}
 	}
-	// Handle Koopas collisions
-	else if (Koopas* koopas = dynamic_cast<Koopas*>(e->obj))
-	{
-		if (koopas->GetState() != KOOPAS_STATE_SHELL)
-		{
-			koopas->SetState(KOOPAS_STATE_SHELL);
-			return;
-		}
-		else if (koopas->GetState() == KOOPAS_STATE_SHELL)
-		{
-			float shellDirection = (nx > 0) ? 1.0f : -1.0f;
-			koopas->SetState(KOOPAS_STATE_SHELL_MOVING);
-			koopas->SetSpeed(shellDirection * KOOPAS_SHELL_SPEED, 0);
-			DebugOut(L">>> Mario kicked Koopa shell with spin attack! >>> \n");
-			return;
-		}
-		else if (koopas->GetState() == KOOPAS_STATE_SHELL_MOVING)
-		{
-			// If shell is already moving, reverse its direction
-			float vx, vy;
-			koopas->GetSpeed(vx, vy);
-			koopas->SetSpeed(-vx, vy);
-			DebugOut(L">>> Mario reversed Koopa shell direction with spin attack! >>> \n");
-			return;
-		}
-	}
 	// Handle PiranhaPlant collisions
 	else if (CPiranhaPlant* plant = dynamic_cast<CPiranhaPlant*>(e->obj))
 	{
@@ -1474,8 +1448,7 @@ void CMario::SetState(int state)
 
 bool CMario::IsGodMode()
 {
-	return (isHolding && heldKoopas && !heldKoopas->IsAboutToWakeUp()) ||
-		(level == MARIO_LEVEL_TAIL && isSpinning);
+	return (isHolding && heldKoopas && !heldKoopas->IsAboutToWakeUp());
 }
 
 

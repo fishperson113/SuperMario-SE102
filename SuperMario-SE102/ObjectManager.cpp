@@ -97,7 +97,9 @@ void ObjectManager::ProcessCollisions(DWORD dt)
         }
 
         if (!coObjects.empty())
+        {
             collision->Process(obj, dt, &coObjects);
+        }
     }
 }
 

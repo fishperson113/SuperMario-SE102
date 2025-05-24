@@ -1,6 +1,6 @@
 ﻿#include "Collision.h"
 #include "GameObject.h"
-
+#include"Utils.h"
 #include "debug.h"
 
 #define BLOCK_PUSH_FACTOR 0.01f
@@ -16,11 +16,6 @@ CCollision* CCollision::GetInstance()
 {
 	if (__instance == NULL) __instance = new CCollision();
 	return __instance;
-}
-bool IsOverlap(float l1, float t1, float r1, float b1,
-	float l2, float t2, float r2, float b2)
-{
-	return !(r1 < l2 || r2 < l1 || b1 < t2 || b2 < t1);
 }
 /*
 	SweptAABB 

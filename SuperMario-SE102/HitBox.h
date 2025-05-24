@@ -3,7 +3,7 @@
 
 #define HITBOX_WIDTH 24
 #define HITBOX_HEIGHT 16
-#define HITBOX_LIFESPAN 500
+#define HITBOX_LIFESPAN 400
 class HitBox :  public CGameObject
 {
     void OnCollisionWithGoomba(LPCOLLISIONEVENT e);
@@ -16,7 +16,7 @@ class HitBox :  public CGameObject
 protected:
     ULONGLONG activate_start;
     CGameObject* owner;  // The owner of this hitbox (Mario)
-    bool isActive;
+    bool isActivate;
 
 public:
     HitBox(CGameObject* owner);
@@ -25,11 +25,13 @@ public:
     virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 
     void Activate();
-    bool IsActive() { return isActive; }
+    bool IsActivate() { return isActivate; }
 
     int IsCollidable() { return 1; }
     int IsBlocking() { return 0; }
 
     virtual void OnCollisionWith(LPCOLLISIONEVENT e);
+    void OnNoCollision(DWORD dt);
+    void CheckOverlaps(vector<LPGAMEOBJECT>* coObjects);
 };
 

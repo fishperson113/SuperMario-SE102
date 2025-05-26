@@ -1,21 +1,23 @@
 # list of object assets to load in this scene
 [ASSETS]
-mario.txt
-brick.txt
-coin.txt
-goomba.txt
-cloud.txt
-pipe.txt
-jumpinggoomba.txt
-portal.txt
-mushroom.txt
-koopas.txt
-piranhaplant.txt
-paragoomba.txt
-background_item.txt
-platform.txt
-bullet.txt
-Hud.txt
+assets\mario.txt
+assets\brick.txt
+assets\coin.txt
+assets\goomba.txt
+assets\cloud.txt
+assets\pipe.txt
+assets\jumpinggoomba.txt
+assets\portal.txt
+assets\mushroom.txt
+assets\koopas.txt
+assets\piranhaplant.txt
+assets\paragoomba.txt
+assets\background_item.txt
+assets\platform.txt
+assets\bullet.txt
+assets\Hud.txt
+assets\boomerangBro.txt
+assets\boomerang.txt
 #
 [OBJECTS]
 # type	x	y	extra_settings per object type
@@ -45,8 +47,9 @@ Hud.txt
 4	160	80
 4	180	80
 
-6	200	84	31	15	3	52001	51001	51001	2	1	300	124	1
-6	300	124	31	15	3	52001	51001	51001	2	1
+20	150	10
+#6	200	84	31	15	3	52001	51001	51001	2	1	300	124	1
+#6	300	124	31	15	3	52001	51001	51001	2	1
 
 
 #Platform

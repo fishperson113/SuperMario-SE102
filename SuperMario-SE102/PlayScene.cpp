@@ -29,6 +29,8 @@
 #include "CMovingPlatform.h"
 #include "KoopaParatroopa.h"
 #include "HitBox.h"
+#include "BoomerangBro.h"
+#include "Boomerang.h"
 using namespace std;
 
 CPlayScene::CPlayScene(int id, LPCWSTR filePath):
@@ -88,7 +90,14 @@ CGameObject* CPlayScene::CreateEnemy(int enemyType, float x, float y)
 		obj = new CKoopaParatroopa(x, y);
 		DebugOut(L"[INFO] Koopa Paratroopa object has been created!\n");
 		break;
-
+	case OBJECT_TYPE_BOOMERANG_BRO:
+	{
+		CBoomerangBro* boomerangBro = new CBoomerangBro(x, y);
+		objectManager.Add(boomerangBro->GetBoomerang());
+		obj = boomerangBro;
+		DebugOut(L"[INFO] Boomerang Bro object has been created!\n");
+		break;
+	}
 		// Add other enemy types as needed
 	default:
 		DebugOut(L"[WARNING] Unknown enemy type: %d\n", enemyType);
@@ -202,6 +211,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 	case OBJECT_TYPE_PARAGOOMBA:
 	case OBJECT_TYPE_FIRETRAP:
 	case OBJECT_TYPE_KOOPA_PARATROOPA:
+	case OBJECT_TYPE_BOOMERANG_BRO:
 		obj = CreateEnemy(object_type, x, y);
 		break;
 	case OBJECT_TYPE_BRICK:

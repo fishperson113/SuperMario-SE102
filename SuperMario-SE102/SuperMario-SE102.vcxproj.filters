@@ -138,6 +138,18 @@
     <ClCompile Include="KoopaParatroopa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="HitBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HUD.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BoomerangBro.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Boomerang.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h">
@@ -267,6 +279,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="KoopaParatroopa.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HitBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HUD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BoomerangBro.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Boomerang.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

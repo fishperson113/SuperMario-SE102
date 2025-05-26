@@ -6,11 +6,11 @@ height	240
 #id	type	file
 # type: 0: intro, 1: play scene 
 [SCENES]
-0	intro.txt
-1	scene01.txt
-2	scene02.txt
-5	scene0005.txt
-10	scene03.txt
+0	scenes\intro.txt
+1	scenes\scene01.txt
+2	scenes\scene02.txt
+5	scenes\scene0005.txt
+10	scenes\scene03.txt
 
 # id	file 
 [TEXTURES]
@@ -20,6 +20,7 @@ height	240
 20	textures\misc_transparent.png
 30	textures\background.png
 40	textures\background_item.png
+50	textures\enemies_sprites.png
 100	textures\Hud.png
 110	textures\Hud_2.png
 120	textures\Hud_Start & Hud_End.png

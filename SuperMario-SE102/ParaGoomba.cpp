@@ -113,6 +113,7 @@ void CParaGoomba::SetState(int state)
 		vx = 0;
 		vy = 0;
 		ay = 0;
+		isDeleted = true;
 		break;
 	case PARAGOOMBA_STATE_WALKING:
 		vx = -PARAGOOMBA_WALKING_SPEED;

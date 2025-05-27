@@ -216,6 +216,8 @@ class CMario : public CGameObject
 	PipeDirection teleport_exit_direction;
 	PipeDirection current_pipe_direction;
 
+	bool isUnderground = false;
+
 	void UpdateHeldKoopasPosition();
 	void OnCollisionWithGoomba(LPCOLLISIONEVENT e);
 	void OnCollisionWithCoin(LPCOLLISIONEVENT e);
@@ -353,4 +355,7 @@ public:
 
 	int GetCoin() { return coin; }
 	int GetPoints() { return points; }
+
+	void SetIsUnderground(bool underground) { isUnderground = underground; }
+	bool GetIsUnderground() { return isUnderground; }
 };

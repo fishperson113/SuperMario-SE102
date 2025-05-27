@@ -9,7 +9,8 @@ private:
         FOLLOW_PLAYER,     
         PUSH_FORWARD,      
         THRESHOLD_BASED,
-		FREE_MOVE
+		FREE_MOVE,
+        FREEZE_MODE
     };
 
     CameraMoveMode mode;
@@ -34,6 +35,9 @@ private:
 
     int screenWidth;
     int screenHeight;
+
+    float offSetX = 48;
+	float offSetY = 16;
     // Reference to the game and player
     CGame* game;
     LPGAMEOBJECT player;
@@ -77,6 +81,7 @@ public:
     void SwitchToPushMode() { mode = PUSH_FORWARD; }
     void SwitchToThresholdMode() { mode = THRESHOLD_BASED; }
     void SwitchToFreeMove() { mode = FREE_MOVE; }
+	void SwitchToFreezeMode() { mode = FREEZE_MODE; }
 
     bool IsInFreeMove() const { return mode == FREE_MOVE; }
 };

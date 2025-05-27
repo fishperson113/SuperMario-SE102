@@ -57,6 +57,7 @@ public:
 	bool IsGameOver() const { return isGameOver; }
 	void TriggerGameOver();
 	void Reload();
+	CameraController* GetCameraController() { return cameraController; }
 
 };
 

@@ -381,7 +381,14 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 	}
 	case OBJECT_TYPE_COINBRICK:
 	{
-		obj = new CCoinBrick(x, y);
+		int breakCount = 1;
+
+		if (tokens.size() >= 4)
+		{
+			breakCount = atoi(tokens[3].c_str());
+		}
+
+		obj = new CCoinBrick(x, y, false, breakCount);
 
 		DebugOut(L"[INFO] CoinBrick object has been created!\n");
 		break;

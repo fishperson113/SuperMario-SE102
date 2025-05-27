@@ -20,7 +20,8 @@
 #include "Bullet.h"
 #include "CMovingPlatform.h"
 #include "KoopaParatroopa.h"
-#include"HitBox.h"
+#include "HitBox.h"
+
 void CMario::HoldKoopas(Koopas* koopas)
 {
 	if (isHolding) return; 
@@ -70,6 +71,7 @@ void CMario::ReleaseKoopas()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	//DebugOut(L">>> Mario position %f, %f! >>> \n", this->x, this->y);
 
 	bool wasPreviouslyOnPlatform = isOnPlatform;
 	CPlatform* previousPlatform = platform;
@@ -122,6 +124,25 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	// Handle gliding state
 	if(!isFlying)
 		UpdateGlidingState();
+
+	CPlayScene* currentScene = dynamic_cast<CPlayScene*>(CGame::GetInstance()->GetCurrentScene());
+
+	if (this->y >= 340)
+	{
+		if (currentScene && currentScene->GetCameraController())
+		{
+			// Set the camera to FREEZE_MODE
+			currentScene->GetCameraController()->SwitchToFreezeMode();
+		}
+		this->SetIsUnderground(true);
+	}
+	if (this->y <= 134 && this->isUnderground == true)
+	{
+		if (currentScene && currentScene->GetCameraController())
+		{
+			currentScene->GetCameraController()->SwitchToThresholdMode();
+		}
+	}
 }
 
 void CMario::OnNoCollision(DWORD dt)
@@ -274,10 +295,17 @@ void CMario::OnCollisionWithCoinBrick(LPCOLLISIONEVENT e)
 
 	if (e->ny > 0)	//collision from below
 	{
-		if (coinBrick->GetState() == BRICK_STATE_HIT) return; // already hit
-		coinBrick->SpawnCoin();
-		coinBrick->SetState(BRICK_STATE_HIT);
-		coin++;
+		if (coinBrick->GetBreakCount() != 0)
+		{
+			if (coinBrick->GetState() == BRICK_STATE_HIT) return; // already hit
+			coinBrick->SpawnCoin();
+			coinBrick->SetBreakCOunt(coinBrick->GetBreakCount() - 1);
+			if (coinBrick->GetBreakCount() == 0)
+			{
+				coinBrick->SetState(BRICK_STATE_HIT);
+			}
+			coin++;
+		}
 	}
 }
 
@@ -650,6 +678,35 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 							DebugOut(L">>> Mario DIE >>> \n");
 							SetState(MARIO_STATE_DIE);
 						}
+					}
+				}
+			}
+		}
+	}
+	else if (koopas->GetState() == KOOPAS_STATE_FLOATING)
+	{
+		if (e->ny < 0)
+		{
+			koopas->SetState(KOOPAS_STATE_WALKING);
+			vy = -MARIO_JUMP_DEFLECT_SPEED;
+			//koopas->ay = KOOPAS_GRAVITY;
+			DebugOut(L">>> Mario jumped on floating Koopa! >>> \n");
+		}
+		else // hit by Koopas
+		{
+			if (untouchable == 0)
+			{
+				if (koopas->GetState() != KOOPA_PARATROOPA_STATE_SHELL)
+				{
+					if (level > MARIO_LEVEL_SMALL)
+					{
+						LevelDown();
+						StartUntouchable();
+					}
+					else
+					{
+						DebugOut(L">>> Mario DIE >>> \n");
+						SetState(MARIO_STATE_DIE);
 					}
 				}
 			}

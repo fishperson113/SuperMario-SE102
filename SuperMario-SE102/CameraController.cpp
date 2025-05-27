@@ -122,6 +122,16 @@ void CameraController::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
             y = max(topBoundary, y - (absoluteTopThreshold - playerY));
         }
         break;
+    case FREEZE_MODE:
+        if (this->offSetX == 48)
+        {
+            x += this->offSetX;
+            this->offSetX = 0;
+
+            y += this->offSetY;
+            this->offSetY = 0;
+        }
+        break;
     }
 
     game->SetCamPos(x, y);

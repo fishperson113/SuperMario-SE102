@@ -13,12 +13,17 @@
 
 class CCoinBrick : public CGameObject
 {
+private:
+	float isBreakable = false;
+	int breakCount = 1;
 public:
-	CCoinBrick(float x, float y) : CGameObject(x, y) {}
+	CCoinBrick(float x, float y, float isBreakable = false, int breakCount = 0) : CGameObject(x, y), isBreakable(isBreakable), breakCount(breakCount) {}
 	virtual void Render();
 	virtual void Update(DWORD dt) {}
 	virtual void GetBoundingBox(float& l, float& t, float& r, float& b);
 	virtual void SetState(int state);
 	void SpawnCoin();
+	int GetBreakCount() { return breakCount; }
+	void SetBreakCOunt(int count) { breakCount = count; }
 };
 

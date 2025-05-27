@@ -68,11 +68,28 @@ void Koopas::GetBoundingBox(float& left, float& top, float& right, float& bottom
 			bottom = top + KOOPAS_BBOX_HEIGHT_SHELL;
 		}
 	}
+	else if (this->type == KOOPAS_RED_WINGS)
+	{
+		left = x - KOOPA_PARATROOPA_WINGS_BBOX_WIDTH / 2;
+		top = y - KOOPA_PARATROOPA_WINGS_BBOX_HEIGHT / 2;
+		right = left + KOOPA_PARATROOPA_WINGS_BBOX_WIDTH;
+		bottom = top + KOOPA_PARATROOPA_WINGS_BBOX_HEIGHT;
+	}
 }
 
 void Koopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	if (!isBeingHeld)  
+	if (this->state == KOOPAS_STATE_FLOATING)
+	{
+		vx = 0;
+		floatTime += dt * 0.001f; // Convert milliseconds to seconds
+
+		// Calculate the new Y position using a sine wave
+		float amplitude = 16.0f; // Amplitude of the floating (16 pixels)
+		float frequency = 2.0f;  // Frequency of the floating (2 cycles per second)
+		y = initialY + amplitude * sin(floatTime * 2 * 3.14159f * frequency);
+	}
+	else if (!isBeingHeld)  
 	{
 		vy += ay * dt;
 		vx += ax * dt;
@@ -156,6 +173,7 @@ void Koopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 void Koopas::Render()
 {
 	int aniId = ID_ANI_KOOPAS_WALKING_RIGHT;
+	//DebugOut(L"[INFO] Koopas object type = %d!\n", this->type);
 	if (this->type == KOOPAS_RED)
 	{
 		if (state == KOOPAS_STATE_WALKING)
@@ -211,6 +229,12 @@ void Koopas::Render()
 			aniId = ID_ANI_KOOPA_PARATROOPA_DIE;
 		}
 	}
+	else if (this->type == KOOPAS_RED_WINGS)
+	{
+		aniId = ID_ANI_RED_WALKING_WINGS_LEFT;
+		if (state == KOOPAS_STATE_WALKING)
+			aniId = ID_ANI_KOOPAS_WALKING_LEFT;
+	}
 	
 	CAnimations::GetInstance()->Get(aniId)->Render(x, y);
 	RenderBoundingBox();
@@ -218,11 +242,13 @@ void Koopas::Render()
 
 void Koopas::OnNoCollision(DWORD dt)
 {
-	if (!isBeingHeld)  
+	if (!isBeingHeld && this->type != KOOPAS_RED_WINGS)  
 	{
 		x += vx * dt;
 		y += vy * dt;
 	}
+	if (this->type == KOOPAS_RED_WINGS && this->state == KOOPAS_STATE_WALKING)
+		y += vy * dt;
 }
 
 void Koopas::OnCollisionWith(LPCOLLISIONEVENT e)
@@ -318,6 +344,7 @@ Koopas::Koopas(float x, float y, int type) :CGameObject(x, y)
 	die_start = -1;
 	shell_start = 0;
 	isBeingHeld = false;
+	DebugOut(L"[INFO] Koopas object type = %d!\n", this->type);
 	if (this->type == KOOPAS_RED)
 	{
 		fallSensor = new FallSensor(x, y, this);
@@ -327,10 +354,17 @@ Koopas::Koopas(float x, float y, int type) :CGameObject(x, y)
 	{
 		SetState(KOOPA_PARATROOPA_STATE_WALKING);
 	}
-	else if (this->type = KOOPAS_GREEN_NO_WINGS)
+	else if (this->type == KOOPAS_GREEN_NO_WINGS)
 	{
 		SetState(KOOPA_PARATROOPA_STATE_WALKING_WINGS);
 	}
+	else if (this->type == KOOPAS_RED_WINGS)
+	{
+		SetState(KOOPAS_STATE_FLOATING);
+		this->initialY = y;
+		this->floatTime = 0.0f;
+	}
+	DebugOut(L"[INFO] Koopas object type = %d!\n", this->type);
 	ResetSensors();
 }
 
@@ -408,6 +442,9 @@ void Koopas::SetState(int state)
 	case KOOPA_PARATROOPA_STATE_JUMPING_WINGS:
 		vy = KOOPA_PARATROOPA_JUMP_SPEED;
 		jump_start = GetTickCount64();
+		break;
+	case KOOPAS_STATE_FLOATING:
+		walk_start = GetTickCount64();
 		break;
 	}
 }

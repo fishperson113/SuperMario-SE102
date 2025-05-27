@@ -20,7 +20,7 @@ height	240
 20	textures\misc_transparent.png
 30	textures\background.png
 40	textures\background_item.png
-50	textures\enemies_sprites.png
+50	textures\enemies_sprites_trans.png
 100	textures\Hud.png
 110	textures\Hud_2.png
 120	textures\Hud_Start & Hud_End.png

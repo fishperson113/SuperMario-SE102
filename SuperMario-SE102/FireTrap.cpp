@@ -1,6 +1,6 @@
 #include "FireTrap.h"
 
-CFireTrap::CFireTrap(float x, float y) : CGameObject(x, y)
+CFireTrap::CFireTrap(float x, float y, int type) : CGameObject(x, y)
 {
 	piranhaPlant = new CPiranhaPlant(x, y + 10);
 
@@ -16,6 +16,8 @@ CFireTrap::CFireTrap(float x, float y) : CGameObject(x, y)
 	this->spawnTime = GetTickCount64();
 
 	this->state = FIRETRAP_STATE_APPEARING;
+
+    this->type = type;
 }
 
 void CFireTrap::Render()
@@ -43,10 +45,13 @@ void CFireTrap::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
         isHiding = true;
 
     bool isLeft = false, isRight = false;
-    if (playerX < 340)
+    if (playerX < 320)
         isLeft = true;
-    if (playerX > 400)
+    if (playerX > 420)
 		isRight = true;
+
+    //DebugOut(L"[INFO] Fire Trap object is hiding = %d!\n", isHiding);
+    //DebugOut(L"[INFO] Fire Trap object state = %d!\n", this->state);
 
 	ULONGLONG currentTime = GetTickCount64();
     if (currentTime - this->spawnTime > SHOOTING_TIME)
@@ -54,24 +59,56 @@ void CFireTrap::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
         switch (state)
         {
         case FIRETRAP_STATE_APPEARING:
+        if (isHiding == true) break;
         if (isHiding == false)
         {
-            this->piranhaPlant->SetAnimationId(ID_ANI_PIRANHA_LONG_LEFT);
-            if (this->offset > OFFSET)
+            if (this->type == TYPE_RED_FIRE_TRAP)
             {
-                this->offset -= 0.5f;
-                this->piranhaPlant->SetPosition(this->x, this->y + this->offset);
+                this->piranhaPlant->SetAnimationId(ID_ANI_PIRANHA_LONG_LEFT);
+                if (this->offset > OFFSET)
+                {
+                    this->offset -= 0.5f;
+                    this->piranhaPlant->SetPosition(this->x, this->y + this->offset);
+                }
+                else
+                {
+                    state = FIRETRAP_STATE_SHOOTING;
+                    this->hasFired = false;
+                }
             }
-            else
+            else if (this->type == TYPE_GREEN_FIRE_TRAP)
             {
-                state = FIRETRAP_STATE_SHOOTING;
-                this->hasFired = false; 
+                this->piranhaPlant->SetAnimationId(ID_ANI_PIRANHA_GREEN_LONG_LEFT);
+                if (this->offset > OFFSET + 4)
+                {
+                    this->offset -= 0.5f;
+                    this->piranhaPlant->SetPosition(this->x, this->y + this->offset);
+                }
+                else
+                {
+                    state = FIRETRAP_STATE_SHOOTING;
+                    this->hasFired = false;
+                }
             }
+			else if (this->type == TYPE_GREEN_PIRANHA_PLANT)
+			{
+				this->piranhaPlant->SetAnimationId(ID_ANI_PIRANHA_GREEN_ABOVE);
+				if (this->offset > OFFSET + 4)
+				{
+					this->offset -= 0.5f;
+					this->piranhaPlant->SetPosition(this->x, this->y + this->offset);
+				}
+				else
+				{
+					state = FIRETRAP_STATE_SHOOTING;
+					this->hasFired = false;
+				}
+			}
             break;
         }
 
         case FIRETRAP_STATE_SHOOTING:
-            if (!this->hasFired)
+            if (!this->hasFired && this->type != TYPE_GREEN_PIRANHA_PLANT)
             {
                 this->piranhaPlant->ShootBullet();
                 this->hasFired = true;
@@ -79,38 +116,85 @@ void CFireTrap::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
             if (isRight)
             {
-                this->piranhaPlant->SetAnimationId(ID_ANI_PIRANHA_CHANGE_DIRECTION);
+                if (this->type == TYPE_RED_FIRE_TRAP)
+                    this->piranhaPlant->SetAnimationId(ID_ANI_PIRANHA_CHANGE_DIRECTION);
+                else if (this->type == TYPE_GREEN_FIRE_TRAP)
+                    this->piranhaPlant->SetAnimationId(ID_ANI_PIRANHA_GREEN_LONG_RIGHT);
             }
 
-            if (currentTime - spawnTime > HIDING_TIME)
+			if (this->type == TYPE_RED_FIRE_TRAP || this->type == TYPE_GREEN_FIRE_TRAP)
             {
-                state = FIRETRAP_STATE_HIDING;
+                if (currentTime - spawnTime > HIDING_TIME)
+                {
+                    state = FIRETRAP_STATE_HIDING;
+                }
+            }
+            else
+            {
+                if (currentTime - spawnTime > HIDING_TIME)
+                {
+                    state = FIRETRAP_STATE_HIDING;
+                }
             }
             break;
 
         case FIRETRAP_STATE_HIDING:
-            if (this->offset2 < -OFFSET - 1)
+        {
+            if (this->type == TYPE_RED_FIRE_TRAP)
             {
-                this->offset2 += 0.5f;
-                this->piranhaPlant->SetPosition(this->x, this->y + this->offset2);
+                if (this->offset2 < -OFFSET - 1)
+                {
+                    this->offset2 += 0.5f;
+                    this->piranhaPlant->SetPosition(this->x, this->y + this->offset2);
+                }
+                else
+                {
+                    state = FIRETRAP_STATE_HIDDEN;
+                    this->piranhaPlant->SetActive(false);
+                }
             }
             else
             {
-                state = FIRETRAP_STATE_HIDDEN;
-                this->piranhaPlant->SetActive(false);
+                if (this->offset2 < -OFFSET - 1 - 8)
+                {
+                    this->offset2 += 0.5f;
+                    this->piranhaPlant->SetPosition(this->x, this->y + this->offset2);
+                }
+                else
+                {
+                    state = FIRETRAP_STATE_HIDDEN;
+                    this->piranhaPlant->SetActive(false);
+                }
             }
             break;
-
+        }
         case FIRETRAP_STATE_HIDDEN:
-            if (currentTime - spawnTime > HIDING_TIME + 2000) 
+        {
+            if (isHiding == true) break;
+            if (this->type == TYPE_RED_FIRE_TRAP || this->type == TYPE_GREEN_FIRE_TRAP)
             {
-                state = FIRETRAP_STATE_APPEARING;
-                this->offset = 0.0f;  
-                this->offset2 = 0.0f;
-                this->piranhaPlant->SetActive(true);
-                this->spawnTime = currentTime; 
+                if (currentTime - spawnTime > HIDING_TIME + 2000)
+                {
+                    state = FIRETRAP_STATE_APPEARING;
+                    this->offset = 0.0f;
+                    this->offset2 = 0.0f;
+                    this->piranhaPlant->SetActive(true);
+                    this->spawnTime = currentTime;
+                }
+            }
+            else
+            {
+                if (currentTime - spawnTime > HIDING_TIME - 5000)
+                {
+                    state = FIRETRAP_STATE_APPEARING;
+                    this->offset = 0.0f;
+                    this->offset2 = 0.0f;
+                    this->piranhaPlant->SetActive(true);
+                    this->spawnTime = currentTime;
+                }
             }
             break;
+        }
         default:
             break;
         }

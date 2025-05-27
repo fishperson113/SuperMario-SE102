@@ -27,6 +27,7 @@
 #define KOOPAS_RED 0
 #define KOOPAS_GREEN 1
 #define KOOPAS_GREEN_NO_WINGS 2
+#define KOOPAS_RED_WINGS 3
 
 #define KOOPA_PARATROOPA_GRAVITY 0.002f
 #define KOOPA_PARATROOPA_WALKING_SPEED 0.03f
@@ -48,6 +49,8 @@
 #define KOOPA_PARATROOPA_STATE_SHELL_FEET 351
 #define KOOPA_PARATROOPA_STATE_MOVING_SHELL 401
 
+#define KOOPAS_STATE_FLOATING 402
+
 #define KOOPA_PARATROOPA_DIE_TIMEOUT 500
 #define KOOPA_PARATROOPA_SHELL_FEET_TIMEOUT 4000
 #define KOOPA_PARATROOPA_SHELL_TIMEOUT 5000
@@ -60,6 +63,9 @@
 #define ID_ANI_KOOPA_PARATROOPA_WALKING_RIGHT 4988
 #define ID_ANI_KOOPA_PARATROOPA_DIE 4987
 
+#define ID_ANI_RED_WALKING_WINGS_LEFT 4986
+
+
 class Koopas :public CGameObject
 {
 private:
@@ -67,6 +73,8 @@ private:
 	bool isBeingHeld;
 	int type = 0;
 	int lastDirection = 0; // 0: left, 1: right
+	float initialY;
+	float floatTime;
 protected:
 	float ax;
 	float ay;

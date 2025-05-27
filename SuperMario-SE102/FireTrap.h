@@ -6,7 +6,6 @@
 #include "Bullet.h"
 #include "PiranhaPlant.h"
 
-#define SHOOTING_TIME 4000
 #define CHANGE_DIRECTION_TIME 8000
 #define HIDING_TIME 10000
 #define OFFSET -23

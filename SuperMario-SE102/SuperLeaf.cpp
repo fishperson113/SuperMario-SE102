@@ -8,6 +8,23 @@ void CSuperLeaf::GetBoundingBox(float& left, float& top, float& right, float& bo
 	bottom = top + SUPERLEAF_BBOX_HEIGHT;
 }
 
+void CSuperLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+{
+	vy += LEAF_GRAVITY * dt;
+	startTime = GetTickCount64();
+	if (GetTickCount64() - startTime > 500)
+	{
+		vx += 0.001f * dt;
+	}
+	else
+	{
+		vx -= 0.001f * dt;
+		startTime = GetTickCount64();
+	}
+	CGameObject::Update(dt, coObjects);
+
+}
+
 void CSuperLeaf::Render()
 {
 	int aniId = ID_ANI_SUPERLEAF;

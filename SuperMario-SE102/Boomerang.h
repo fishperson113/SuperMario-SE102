@@ -44,6 +44,7 @@ protected:
 
 public:
     CBoomerang(float x, float y, CGameObject* owner = NULL);
+    virtual ~CBoomerang();
     virtual void SetState(int state);
     void SetDirection(int dir);
     void StartChangeState();

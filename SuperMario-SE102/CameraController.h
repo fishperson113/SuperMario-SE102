@@ -77,7 +77,6 @@ public:
     void SwitchToPushMode() { mode = PUSH_FORWARD; }
     void SwitchToThresholdMode() { mode = THRESHOLD_BASED; }
     void SwitchToFreeMove() { mode = FREE_MOVE; }
-
     bool IsInFreeMove() const { return mode == FREE_MOVE; }
 };
 enum FreeCameraDirection {

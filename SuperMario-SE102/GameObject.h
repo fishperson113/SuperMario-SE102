@@ -76,7 +76,7 @@ public:
 	// Does this object collide with other object at certain direction ( like ColorBox )
 	virtual int IsDirectionColliable(float nx, float ny) { return 1; }
 	void SetHitbox(HitBox* hitBox) { spinHitbox = hitBox; };
-	~CGameObject();
+	virtual ~CGameObject();
 
 	static bool IsDeleted(const LPGAMEOBJECT &o) { return o->isDeleted; }
 };

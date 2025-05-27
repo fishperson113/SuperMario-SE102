@@ -20,6 +20,13 @@ CBoomerang::CBoomerang(float x, float y, CGameObject* owner) : CGameObject(x, y)
     SetState(BOOMERANG_STATE_INACTIVE);
 }
 
+CBoomerang::~CBoomerang()
+{
+    owner = nullptr; 
+
+    DebugOut(L"[INFO] Boomerang destroyed\n");
+}
+
 void CBoomerang::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
     left = x - BOOMERANG_BBOX_WIDTH / 2;

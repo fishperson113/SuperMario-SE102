@@ -16,7 +16,7 @@ ObjectManager::~ObjectManager()
 
 void ObjectManager::Add(LPGAMEOBJECT object)
 {
-    if (object == nullptr)
+    if (!object || std::find(objects.begin(), objects.end(), object) != objects.end())
         return;
 
     objects.push_back(object);
@@ -43,13 +43,22 @@ void ObjectManager::Remove(LPGAMEOBJECT object)
         objects.erase(it);
     }
 }
-
 void ObjectManager::Clear()
 {
+    std::unordered_set<void*> seen;
     for (auto obj : objects)
     {
-        if (obj)
+        if (obj == nullptr || !IsValidPointer(obj)) {
+            DebugOut(L"[ERROR] Invalid pointer detected: %p\n", obj);
+            continue;
+        }
+        if (seen.count(obj)) {
+            DebugOut(L"[ERROR] Duplicate delete attempt on address: %p\n", obj);
+        }
+        else {
+            seen.insert(obj);
             delete obj;
+        }
     }
     objects.clear();
     player = nullptr;
@@ -105,14 +114,17 @@ void ObjectManager::ProcessCollisions(DWORD dt)
 
 void ObjectManager::PurgeDeletedObjects()
 {
+    std::vector<LPGAMEOBJECT> toDelete;
+
     for (auto& obj : objects)
     {
-        if (obj && obj->IsDeleted()) // Fixed: Check if deleted
-        {
-            delete obj;
-            obj = nullptr;
-        }
+        if (obj && IsValidPointer(obj) && obj->IsDeleted())
+            toDelete.push_back(obj);
     }
+
+    // Delete them
+    for (auto& obj : toDelete)
+        delete obj;
 
     objects.erase(
         std::remove_if(objects.begin(), objects.end(),
@@ -129,4 +141,14 @@ std::vector<LPGAMEOBJECT> ObjectManager::GetCollidableObjects() const
             coObjects.push_back(obj);
     }
     return coObjects;
+}
+bool ObjectManager::IsValidPointer(const LPGAMEOBJECT& obj) const
+{
+    try {
+        volatile auto test = obj->IsDeleted();
+        return true;
+    }
+    catch (...) {
+        return false;
+    }
 }

@@ -23,6 +23,22 @@
 #include"HitBox.h"
 #include"Boomerang.h"
 #include"BoomerangBro.h"
+#include "Card.h"
+CMario::~CMario()
+{
+	if (heldKoopas != NULL)
+	{
+		heldKoopas->SetBeingHeld(false);
+		heldKoopas = NULL;
+		isHolding = false;
+		DebugOut(L">>> Mario released held Koopas in destructor! >>> \n");
+	}
+	if (platform != nullptr && dynamic_cast<CMovingPlatform*>(platform)) {
+		dynamic_cast<CMovingPlatform*>(platform)->SetMarioTouched(false);
+	}
+	spinHitbox=nullptr;
+	DebugOut(L">>> Mario destroyed! >>> \n");
+}
 void CMario::HoldKoopas(Koopas* koopas)
 {
 	if (isHolding) return; 
@@ -212,6 +228,8 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithBoomerang(e);
 	else if (dynamic_cast<CBoomerangBro*>(e->obj))
 		OnCollisionWithBoomerangBro(e);
+	else if (dynamic_cast<Card*>(e->obj))
+		OnCollisionWithCard(e);
 }
 
 void CMario::OnCollisionExit(LPGAMEOBJECT obj)
@@ -564,6 +582,26 @@ void CMario::OnCollisionWithBoomerangBro(LPCOLLISIONEVENT e)
 				}
 			}
 		}
+	}
+}
+
+void CMario::OnCollisionWithCard(LPCOLLISIONEVENT e)
+{
+	Card* card = dynamic_cast<Card*>(e->obj);
+
+	card->SetState(CARD_STATE_BE_COLLECTED);
+
+	switch (card->GetType())
+	{
+	case CARD_STATE_MUSHROOM:
+		points += 1350;
+		break;
+	case CARD_STATE_STAR:
+		points += 1450;
+		break;
+	case CARD_STATE_FLOWER:
+		points += 1500;
+		break;
 	}
 }
 
@@ -1178,6 +1216,16 @@ void CMario::UpdatePowerMeter(DWORD dt)
 
 		if (powerMeter > MARIO_PMETER_MAX)
 			powerMeter = MARIO_PMETER_MAX;
+	}
+	else if (isOnPlatform && abs(vx) < 0.01f && !isSitting && state == MARIO_STATE_IDLE)
+	{
+		powerMeter -= (MARIO_PMETER_DECAY_RATE * 0.5f) * dt;
+
+		if (powerMeter < 0)
+			powerMeter = 0;
+
+		if (powerMeter > 0 && powerMeter < 0.1f)
+			DebugOut(L">>> Mario's power meter almost depleted while idle >>> \n");
 	}
 	else
 	{

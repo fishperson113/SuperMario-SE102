@@ -95,7 +95,6 @@ void CGoomba::SetState(int state)
 			vx = 0;
 			vy = 0;
 			ay = 0; 
-			isDeleted = true;
 			break;
 		case GOOMBA_STATE_WALKING: 
 			vx = -GOOMBA_WALKING_SPEED;

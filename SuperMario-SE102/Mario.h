@@ -235,6 +235,7 @@ class CMario : public CGameObject
 	void OnCollisionWithKoopaParatroopa(LPCOLLISIONEVENT e);
 	void OnCollisionWithBoomerang(LPCOLLISIONEVENT e); 
 	void OnCollisionWithBoomerangBro(LPCOLLISIONEVENT e);
+	void OnCollisionWithCard(LPCOLLISIONEVENT e);
 
 	int GetAniIdBig();
 	int GetAniIdSmall();
@@ -316,6 +317,7 @@ public:
 		teleport_exit_start = 0;
 		current_pipe_direction = PipeDirection::UP;
 	}
+	virtual ~CMario();
 
 	void HoldKoopas(Koopas* koopas);
 	void ReleaseKoopas();

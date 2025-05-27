@@ -4,7 +4,7 @@
 #include "Mario.h"
 #include "PlayScene.h"
 #include "debug.h"
-
+#include "Card.h"
 HUD* HUD::__HudInstance = NULL;
 bool HUD::isStarting = false;
 bool HUD::initStart = false;
@@ -76,11 +76,26 @@ void HUD::Render()
 }
 void HUD::UpdateCard()
 {
+    LPPLAYSCENE scene = (LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene();
+    if (!scene) return;
+
+    CMario* mario = (CMario*)scene->GetPlayer();
+    if (!mario) return;
+
+    if (!initCard)
+    {
+        initCard = true;
+    }
 }
 
 int HUD::Get3Card()
 {
-	return 0;
+    if (Card::HasCollectedAllCards())
+    {
+        return 7;
+    }
+
+    return Card::GetLastCollectedType();
 }
 
 void HUD::RenderHP()
@@ -201,6 +216,48 @@ void HUD::RenderSpeedBar()
 
 void HUD::RenderCard()
 {
+    CSprites* sprites = CSprites::GetInstance();
+    if (!sprites) return;
+
+    // Position for displaying cards in the HUD
+    float cardX = x + 64.0f;
+    float cardY = y ;
+    float cardSpacing = 30.0f; // Space between cards
+
+    // Get the collected cards
+    auto listCards = Card::GetCollectedCards();
+    int totalCards = Card::GetTotalCollectedCards();
+
+    int cardsToDisplay = min(totalCards, 3);
+
+    for (int i = 0; i < cardsToDisplay; i++)
+    {
+        int cardIndex = totalCards - 1 - i;
+        auto card = listCards[cardIndex];
+
+        // Determine sprite ID based on card type
+        int spriteID = 0;
+        if (card->GetType() == CARD_STATE_MUSHROOM)
+        {
+            spriteID = 90200; // Mushroom card sprite ID
+        }
+        else if (card->GetType() == CARD_STATE_STAR)
+        {
+            spriteID = 90201; // Star card sprite ID
+        }
+        else if (card->GetType() == CARD_STATE_FLOWER)
+        {
+            spriteID = 90202; // Flower card sprite ID
+        }
+
+        float posX = cardX + i * cardSpacing;
+
+        // Draw the card
+        if (spriteID != 0)
+        {
+            sprites->Get(spriteID)->Draw(posX, cardY, 1.2, 1.2);
+        }
+    }
 }
 
 void HUD::RenderHudStart()

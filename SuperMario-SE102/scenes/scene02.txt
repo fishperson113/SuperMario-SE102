@@ -1,9 +1,24 @@
 # list of object assets to load in this scene
 [ASSETS]
-mario.txt
-coin.txt
-cloud.txt
-brick.txt
+assets\mario.txt
+assets\brick.txt
+assets\coin.txt
+assets\goomba.txt
+assets\cloud.txt
+assets\pipe.txt
+assets\jumpinggoomba.txt
+assets\portal.txt
+assets\mushroom.txt
+assets\koopas.txt
+assets\piranhaplant.txt
+assets\paragoomba.txt
+assets\background_item.txt
+assets\platform.txt
+assets\bullet.txt
+assets\Hud.txt
+assets\boomerangBro.txt
+assets\boomerang.txt
+assets\card.txt
 #
 [OBJECTS]
 # type	x	y	extra_settings per object type

@@ -18,6 +18,7 @@ assets\bullet.txt
 assets\Hud.txt
 assets\boomerangBro.txt
 assets\boomerang.txt
+assets\card.txt
 #
 [OBJECTS]
 # type	x	y	extra_settings per object type
@@ -47,7 +48,7 @@ assets\boomerang.txt
 4	160	80
 4	180	80
 
-20	300	10
+#20	300	10
 #6	200	84	31	15	3	52001	51001	51001	2	1	300	124	1
 #6	300	124	31	15	3	52001	51001	51001	2	1
 
@@ -56,3 +57,4 @@ assets\boomerang.txt
 5 	100	180	16	15	32	51000	52000	53000
 5	140	140	16	15	26	51000	52000	53000
 
+50	150	50	200	140	2

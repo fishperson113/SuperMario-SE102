@@ -31,6 +31,7 @@
 #include "HitBox.h"
 #include "BoomerangBro.h"
 #include "Boomerang.h"
+#include "Card.h"
 using namespace std;
 
 CPlayScene::CPlayScene(int id, LPCWSTR filePath):
@@ -50,7 +51,6 @@ CPlayScene::~CPlayScene()
 {
 	if (cameraController != NULL)
 	{
-		delete cameraController;
 		cameraController = NULL;
 	}
 }
@@ -589,6 +589,12 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		DebugOut(L"[INFO] Moving Platform object has been created! Active: %d\n", !isCheckpointControlled);
 		break;
 	}
+	case OBJECT_TYPE_CARD:
+	{
+		obj = new Card(x, y);
+		DebugOut(L"[INFO] Card object has been created at (%f, %f)!\n", x, y);
+		break;
+	}
 
 	default:
 		DebugOut(L"[ERROR] Invalid object type: %d\n", object_type);
@@ -670,7 +676,6 @@ void CPlayScene::Load()
 			case SCENE_SECTION_OBJECTS: _ParseSection_OBJECTS(line,f); break;
 		}
 	}
-
 	f.close();
 	DebugOut(L"[INFO] Done loading scene  %s\n", sceneFilePath);
 }
@@ -739,7 +744,6 @@ void CPlayScene::Unload()
 {
 	if (cameraController != NULL)
 	{
-		delete cameraController;
 		cameraController = NULL;
 	}
 	objectManager.Clear();

@@ -94,7 +94,7 @@ void CameraController::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
     case PUSH_FORWARD:
         // Move camera forward constantly
         x += pushSpeed * dt;
-
+        y = screenHeight / 2-80;
         break;
 
     case THRESHOLD_BASED:

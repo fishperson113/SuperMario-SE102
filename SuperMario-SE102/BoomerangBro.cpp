@@ -22,6 +22,10 @@ CBoomerangBro::CBoomerangBro(float x, float y) :CGameObject(x, y)
 
 CBoomerangBro::~CBoomerangBro()
 {
+    if (boomerang)
+    {
+        boomerang = nullptr;
+    }
 }
 
 void CBoomerangBro::ThrowBoomerang()

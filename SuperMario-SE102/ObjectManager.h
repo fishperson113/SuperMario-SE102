@@ -25,7 +25,7 @@ public:
     LPGAMEOBJECT GetPlayer() const { return player; }
     const std::vector<LPGAMEOBJECT>& GetObjects() const { return objects; }
     std::vector<LPGAMEOBJECT> GetCollidableObjects() const;
-
+	bool IsValidPointer(const LPGAMEOBJECT& o) const;
     bool IsGameObjectDeleted(const LPGAMEOBJECT& o) const;
     size_t Size() const { return objects.size(); }
 private:

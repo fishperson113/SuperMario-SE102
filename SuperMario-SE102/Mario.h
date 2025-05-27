@@ -235,6 +235,8 @@ class CMario : public CGameObject
 	void OnCollisionWithBullet(LPCOLLISIONEVENT e);
 	void OnCollisionWithPipe(LPCOLLISIONEVENT e);
 	void OnCollisionWithKoopaParatroopa(LPCOLLISIONEVENT e);
+	void OnCollisionWithBoomerang(LPCOLLISIONEVENT e); 
+	void OnCollisionWithBoomerangBro(LPCOLLISIONEVENT e);
 
 	int GetAniIdBig();
 	int GetAniIdSmall();
@@ -318,9 +320,7 @@ public:
 	}
 
 	void HoldKoopas(Koopas* koopas);
-	void HoldKoopaParatroopa(CKoopaParatroopa* koopaParatroopa);
 	void ReleaseKoopas();
-	void ReleaseKoopaParatroopa();
 	bool IsHolding() { return isHolding; }
 	bool IsSpinning() { return isSpinning; }
 	bool IsGliding() { return isGliding; }

@@ -9,7 +9,7 @@
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
-
+#define BOOMERANG_STATE_RETURNING 2
 CBoomerang::CBoomerang(float x, float y, CGameObject* owner) : CGameObject(x, y)
 {
     this->owner = owner;
@@ -40,14 +40,9 @@ void CBoomerang::OnCollisionWith(LPCOLLISIONEVENT e)
 
 void CBoomerang::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-    // If not active, don't update
-    if (!IsActive()) return;
-
-    // Update position based on velocity
     x += vx * dt;
     y += vy * dt;
 
-    // State transition based on timer
     if (state_start != 0)
         state_start += dt;
 
@@ -105,7 +100,6 @@ void CBoomerang::Render()
     }
 
     CAnimations::GetInstance()->Get(aniId)->Render(x, y);
-    //RenderBoundingBox();
 }
 
 void CBoomerang::SetState(int state)

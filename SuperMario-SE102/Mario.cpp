@@ -22,6 +22,9 @@
 #include "KoopaParatroopa.h"
 #include "HitBox.h"
 
+#include"HitBox.h"
+#include"Boomerang.h"
+#include"BoomerangBro.h"
 void CMario::HoldKoopas(Koopas* koopas)
 {
 	if (isHolding) return; 
@@ -227,6 +230,10 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithPipe(e);
 	else if (dynamic_cast<CKoopaParatroopa*>(e->obj))
 		OnCollisionWithKoopaParatroopa(e);
+	else if (dynamic_cast<CBoomerang*>(e->obj))
+		OnCollisionWithBoomerang(e);
+	else if (dynamic_cast<CBoomerangBro*>(e->obj))
+		OnCollisionWithBoomerangBro(e);
 }
 
 void CMario::OnCollisionExit(LPGAMEOBJECT obj)
@@ -511,6 +518,77 @@ void CMario::OnCollisionWithKoopaParatroopa(LPCOLLISIONEVENT e)
 				else
 				{
 					DebugOut(L">>> Mario DIE >>> \n");
+					SetState(MARIO_STATE_DIE);
+				}
+			}
+		}
+	}
+}
+
+void CMario::OnCollisionWithBoomerang(LPCOLLISIONEVENT e)
+{
+	CBoomerang* boomerang = dynamic_cast<CBoomerang*>(e->obj);
+
+	if (!boomerang) return;
+
+	if (boomerang->IsActive() && untouchable == 0)
+	{
+		if (IsGodMode()) return;
+
+		if (level == MARIO_LEVEL_TAIL && isSpinning)
+		{
+			boomerang->SetActive(false);
+			DebugOut(L">>> Mario deflected a boomerang with his tail! >>> \n");
+			return;
+		}
+
+		if (level > MARIO_LEVEL_SMALL)
+		{
+			LevelDown();
+			StartUntouchable();
+			DebugOut(L">>> Mario was hit by a boomerang! >>> \n");
+		}
+		else
+		{
+			DebugOut(L">>> Mario DIE from boomerang! >>> \n");
+			SetState(MARIO_STATE_DIE);
+		}
+	}
+}
+
+void CMario::OnCollisionWithBoomerangBro(LPCOLLISIONEVENT e)
+{
+	CBoomerangBro* boomerangBro = dynamic_cast<CBoomerangBro*>(e->obj);
+
+	if (e->ny < 0)
+	{
+		if (boomerangBro->GetState() != BOOMERANG_BRO_STATE_DIE_TOP &&
+			boomerangBro->GetState() != BOOMERANG_BRO_STATE_DIE_BOTTOM)
+		{
+			boomerangBro->SetState(BOOMERANG_BRO_STATE_DIE_TOP);
+			vy = -MARIO_JUMP_DEFLECT_SPEED;
+			DebugOut(L">>> Mario killed a BoomerangBro by jumping on it! >>> \n");
+		}
+	}
+	else // hit by BoomerangBro from side
+	{
+		if (untouchable == 0)
+		{
+			if (boomerangBro->GetState() != BOOMERANG_BRO_STATE_DIE_TOP &&
+				boomerangBro->GetState() != BOOMERANG_BRO_STATE_DIE_BOTTOM)
+			{
+				if (IsGodMode()) return;
+
+				// Otherwise, take damage
+				if (level > MARIO_LEVEL_SMALL)
+				{
+					LevelDown();
+					StartUntouchable();
+					DebugOut(L">>> Mario was hit by a BoomerangBro! >>> \n");
+				}
+				else
+				{
+					DebugOut(L">>> Mario DIE from BoomerangBro! >>> \n");
 					SetState(MARIO_STATE_DIE);
 				}
 			}

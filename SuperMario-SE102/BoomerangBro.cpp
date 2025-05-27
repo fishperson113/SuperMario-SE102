@@ -90,10 +90,30 @@ void CBoomerangBro::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
     vy += ay * dt;
     vx += ax * dt;
 
+    // Check if the BoomerangBro is dead
     if ((state == BOOMERANG_BRO_STATE_DIE_TOP || state == BOOMERANG_BRO_STATE_DIE_BOTTOM) && GetTickCount64() - die_start > BOOMERANG_BRO_DIE_TIMEOUT)
     {
         isDeleted = true;
         return;
+    }
+
+    CMario* mario = NULL;
+    CPlayScene* scene = dynamic_cast<CPlayScene*>(CGame::GetInstance()->GetCurrentScene());
+    if (scene)
+    {
+        mario = dynamic_cast<CMario*>(scene->GetPlayer());
+    }
+
+    // Update direction to face Mario
+    if (mario)
+    {
+        float mario_x, mario_y;
+        mario->GetPosition(mario_x, mario_y);
+
+        if (mario_x > x)
+            direction = 1;  // Mario is to the right, face right
+        else
+            direction = -1; // Mario is to the left, face left
     }
 
     // Check if boomerang has completed its path
@@ -104,9 +124,18 @@ void CBoomerangBro::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
     }
 
     // State transitions
-    if (state == BOOMERANG_BRO_STATE_WALKING && GetTickCount64() - walk_start > 2000)
+    if (state == BOOMERANG_BRO_STATE_WALKING)
     {
-        SetState(BOOMERANG_BRO_STATE_IDLE);
+        if (GetTickCount64() - walk_start > 2000)
+        {
+            vx = -vx;
+            walk_start = GetTickCount64();
+        }
+
+        if (GetTickCount64() - walk_start > 1000 && hasBoomerang && GetTickCount64() - throw_cooldown > BOOMERANG_BRO_THROW_COOLDOWN)
+        {
+            SetState(BOOMERANG_BRO_STATE_IDLE);
+        }
     }
     else if (state == BOOMERANG_BRO_STATE_IDLE && hasBoomerang && GetTickCount64() - throw_cooldown > BOOMERANG_BRO_THROW_COOLDOWN)
     {
@@ -117,6 +146,7 @@ void CBoomerangBro::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
         ThrowBoomerang();
         SetState(BOOMERANG_BRO_STATE_WALKING);
     }
+
 }
 
 void CBoomerangBro::Render()

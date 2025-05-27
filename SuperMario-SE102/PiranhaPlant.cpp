@@ -15,10 +15,21 @@ void CPiranhaPlant::Render()
 
 void CPiranhaPlant::GetBoundingBox(float& l, float& t, float& r, float& b)
 {
-	l = x - PIRANHA_PLANT_BBOX_WIDTH / 2;
-	t = y - PIRANHA_PLANT_BBOX_HEIGHT / 2;
-	r = l + PIRANHA_PLANT_BBOX_WIDTH;
-	b = t + PIRANHA_PLANT_BBOX_HEIGHT;
+	if (this->type == 0)
+	{
+		l = x - PIRANHA_PLANT_BBOX_WIDTH / 2;
+		t = y - PIRANHA_PLANT_BBOX_HEIGHT / 2;
+		r = l + PIRANHA_PLANT_BBOX_WIDTH;
+		b = t + PIRANHA_PLANT_BBOX_HEIGHT;
+	}
+	else
+	{
+		l = x - GREEN_FIRE_TRAP_BBOX_WIDTH / 2;
+		t = y - GREEN_FIRE_TRAP_BBOX_HEIGHT / 2;
+		r = l + GREEN_FIRE_TRAP_BBOX_WIDTH;
+		b = t + GREEN_FIRE_TRAP_BBOX_HEIGHT;
+
+	}
 }
 
 int CPiranhaPlant::IsDirectionColliable(float nx, float ny)

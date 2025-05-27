@@ -81,11 +81,6 @@ CGameObject* CPlayScene::CreateEnemy(int enemyType, float x, float y)
 		DebugOut(L"[INFO] Creating ParaGoomba at (%f, %f)\n", x, y);
 		break;
 
-	case OBJECT_TYPE_FIRETRAP:
-		obj = new CFireTrap(x, y);
-		DebugOut(L"[INFO] Fire Trap object has been created!\n");
-		break;
-
 	case OBJECT_TYPE_KOOPA_PARATROOPA:
 		obj = new CKoopaParatroopa(x, y);
 		DebugOut(L"[INFO] Koopa Paratroopa object has been created!\n");
@@ -209,11 +204,17 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 	}
 	case OBJECT_TYPE_GOOMBA:
 	case OBJECT_TYPE_PARAGOOMBA:
-	case OBJECT_TYPE_FIRETRAP:
 	case OBJECT_TYPE_KOOPA_PARATROOPA:
 	case OBJECT_TYPE_BOOMERANG_BRO:
 		obj = CreateEnemy(object_type, x, y);
 		break;
+	case OBJECT_TYPE_FIRETRAP:
+	{
+		int type = atoi(tokens[3].c_str());
+		obj = new CFireTrap(x, y, type);
+		DebugOut(L"[INFO] Fire Trap object has been created!\n");
+		break;
+	}
 	case OBJECT_TYPE_BRICK:
 	{
 		int brickNumber = 1; 

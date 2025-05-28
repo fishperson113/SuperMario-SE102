@@ -18,7 +18,7 @@ assets\bullet.txt
 assets\koopaparatroopa.txt
 assets\Hud.txt
 assets\card.txt
-
+assets\score.txt
 #
 [OBJECTS]
 # type	x	y	extra_settings per object type
@@ -266,4 +266,4 @@ assets\card.txt
 #17	0	0	1
 
 #Portal 
-50	150	110	316	140	5
+#50	150	110	316	140	5

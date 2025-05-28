@@ -144,6 +144,8 @@
     <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="Card.cpp" />
     <ClCompile Include="CBackgroundObject.cpp" />
+    <ClCompile Include="CEffect.cpp" />
+    <ClCompile Include="CEffectScore.cpp" />
     <ClCompile Include="Checkpoint.cpp" />
     <ClCompile Include="CMovingPlatform.cpp" />
     <ClCompile Include="Coin.cpp" />
@@ -193,6 +195,8 @@
     <ClInclude Include="CameraController.h" />
     <ClInclude Include="Card.h" />
     <ClInclude Include="CBackgroundObject.h" />
+    <ClInclude Include="CEffect.h" />
+    <ClInclude Include="CEffectScore.h" />
     <ClInclude Include="Checkpoint.h" />
     <ClInclude Include="CMovingPlatform.h" />
     <ClInclude Include="Coin.h" />

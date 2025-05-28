@@ -26,6 +26,8 @@
 #include"Boomerang.h"
 #include"BoomerangBro.h"
 #include "Card.h"
+#include"CEffect.h"
+#include "CEffectScore.h"
 CMario::~CMario()
 {
 	if (heldKoopas != NULL)
@@ -278,6 +280,18 @@ void CMario::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
 		if (goomba->GetState() != GOOMBA_STATE_DIE)
 		{
 			goomba->SetState(GOOMBA_STATE_DIE);
+			float goombaX, goombaY;
+			goomba->GetPosition(goombaX, goombaY);
+			CEffectScore* scoreEffect = new CEffectScore(goombaX, goombaY, SCORE_100);
+
+			// Add the score effect to the scene
+			CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+			if (scene) {
+				scene->GetObjectManager()->Add(scoreEffect);
+			}
+
+			// Add points to Mario's score
+			points += 100;
 			vy = -MARIO_JUMP_DEFLECT_SPEED;
 		}
 	}
@@ -336,6 +350,17 @@ void CMario::OnCollisionWithCoinBrick(LPCOLLISIONEVENT e)
 
 void CMario::OnCollisionWithMushroom(LPCOLLISIONEVENT e)
 {
+	float mushroomX, mushroomY;
+	e->obj->GetPosition(mushroomX, mushroomY);
+	CEffectScore* levelUpEffect = new CEffectScore(mushroomX, mushroomY, SCORE_LEVEL_UP);
+
+	CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+	if (scene) {
+		scene->GetObjectManager()->Add(levelUpEffect);
+	}
+
+	// Add points to Mario's score
+	points += 1000;
 	e->obj->Delete();
 	this->SetLevel(MARIO_LEVEL_BIG);
 }
@@ -411,6 +436,17 @@ void CMario::OnCollisionWithPiranhaPlant(LPCOLLISIONEVENT e)
 
 void CMario::OnCollisionWithSuperLeaf(LPCOLLISIONEVENT e)
 {
+	float leafX, leafY;
+	e->obj->GetPosition(leafX, leafY);
+	CEffectScore* levelUpEffect = new CEffectScore(leafX, leafY, SCORE_LEVEL_UP);
+
+	CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+	if (scene) {
+		scene->GetObjectManager()->Add(levelUpEffect);
+	}
+
+	// Add points to Mario's score
+	points += 1000;
 	e->obj->Delete();
 	if (level == MARIO_LEVEL_SMALL)
 	{

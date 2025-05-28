@@ -279,6 +279,8 @@ void Koopas::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithMushroomBrick(e);
 	else if (dynamic_cast<CSuperLeafBrick*>(e->obj))
 		OnCollisionWithLeafBrick(e);
+	else if (dynamic_cast<CBrick*>(e->obj))
+		OnCollisionWithBrick(e);
 }
 
 void Koopas::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
@@ -332,6 +334,19 @@ void Koopas::OnCollisionWithLeafBrick(LPCOLLISIONEVENT e)
 		leafBrick->SpawnSuperLeaf();
 		leafBrick->SetState(BRICK_STATE_HIT);
 		DebugOut(L">>> Koopa shell hit Leaf Brick! >>> \n");
+	}
+}
+
+void Koopas::OnCollisionWithBrick(LPCOLLISIONEVENT e)
+{
+	CBrick* brick = dynamic_cast<CBrick*>(e->obj);
+
+	if (e->nx != 0)	//collision from left and right
+	{
+		if (brick->IsBreakable())
+		{
+			brick->Break();
+		}
 	}
 }
 

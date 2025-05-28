@@ -38,6 +38,7 @@ void HitBox::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
     CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
     if (goomba->GetState() != GOOMBA_STATE_DIE)
         goomba->SetState(GOOMBA_STATE_DIE);
+    DebugOut(L">>> Hitbox hit Goomba! >>> \n");
 }
 
 void HitBox::OnCollisionWithParaGoomba(LPCOLLISIONEVENT e)
@@ -171,8 +172,8 @@ void HitBox::OnCollisionWithBrick(LPCOLLISIONEVENT e)
 {
     // Only break bricks that are breakable
     CBrick* brick = dynamic_cast<CBrick*>(e->obj);
-    /*if (brick->IsBreakable())
-        brick->Break();*/
+    if (brick->IsBreakable())
+        brick->Break();
 }
 void HitBox::Render()
 {

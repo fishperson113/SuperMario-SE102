@@ -3,12 +3,8 @@
 void CBrick::Render()
 {
 	CAnimations* animations = CAnimations::GetInstance();
-	for (int i = 0; i < brickNumber; i++)
-	{
-		float posX = x + i * offsetX;
-		float posY = y + i * offsetY;
-		animations->Get(this->aniId)->Render(posX,posY);
-	}
+	animations->Get(this->aniId)->Render(x, y);
+	RenderBoundingBox();
 }
 
 void CBrick::GetBoundingBox(float &l, float &t, float &r, float &b)
@@ -28,4 +24,12 @@ int CBrick::IsDirectionColliable(float nx, float ny)
 	}
 	else
 		return 1;
+}
+
+void CBrick::Break()
+{
+	if (this->IsBreakable() == 1)
+	{
+		this->Delete();
+	}
 }

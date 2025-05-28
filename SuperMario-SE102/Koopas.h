@@ -98,6 +98,7 @@ protected:
 	void OnCollisionWithCoinBrick(LPCOLLISIONEVENT e);
 	void OnCollisionWithMushroomBrick(LPCOLLISIONEVENT e);
 	void OnCollisionWithLeafBrick(LPCOLLISIONEVENT e);
+	void OnCollisionWithBrick(LPCOLLISIONEVENT e);
 
 public:
 	Koopas(float x, float y, int type);

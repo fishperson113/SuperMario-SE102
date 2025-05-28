@@ -226,15 +226,16 @@ void HUD::RenderCard()
 
     // Get the collected cards
     auto listCards = Card::GetCollectedCards();
-    int totalCards = Card::GetTotalCollectedCards();
 
-    int cardsToDisplay = min(totalCards, 3);
-
+    int cardsToDisplay = 3;
+    if (listCards.size() < cardsToDisplay)
+    {
+        cardsToDisplay = listCards.size(); // Adjust if fewer cards are collected
+	}
     for (int i = 0; i < cardsToDisplay; i++)
     {
-        int cardIndex = totalCards - 1 - i;
-        auto card = listCards[cardIndex];
-
+        //int cardIndex = listCards.size() - 1 - i;
+        auto card = listCards[i];
         // Determine sprite ID based on card type
         int spriteID = 0;
         if (card->GetType() == CARD_STATE_MUSHROOM)

@@ -25,15 +25,15 @@ void Card::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
     // If card is in static state (displayed in HUD), no need for further updates
     if (state == CARD_STATE_STATIC) return;
 
-    // Delete the card when it goes off the top of the screen after being collected
-    if (y <= 100.0f && state == CARD_STATE_BE_COLLECTED)
+    float screenHeight = CGame::GetInstance()->GetBackBufferHeight();
+    if (y <= -CARD_BBOX_HEIGHT && state == CARD_STATE_BE_COLLECTED)
     {
-        this->Delete();
+		SetState(CARD_STATE_STATIC);
         return;
     }
 
     // Cycle through card types if not collected or static
-    if (state != CARD_STATE_BE_COLLECTED && state != CARD_STATE_STATIC)
+    if (state != CARD_STATE_BE_COLLECTED)
     {
         if (GetTickCount64() - switch_card_start > TIME_SWITCH_CARD)
         {

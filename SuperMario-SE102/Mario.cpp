@@ -668,6 +668,7 @@ void CMario::OnCollisionWithBoomerangBro(LPCOLLISIONEVENT e)
 void CMario::OnCollisionWithCard(LPCOLLISIONEVENT e)
 {
 	Card* card = dynamic_cast<Card*>(e->obj);
+	if (card->GetState() == CARD_STATE_BE_COLLECTED) return; 
 
 	card->SetState(CARD_STATE_BE_COLLECTED);
 

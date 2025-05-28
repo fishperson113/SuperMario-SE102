@@ -159,6 +159,12 @@
     <ClCompile Include="CEffectScore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Switch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SwitchBrick.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h">
@@ -309,6 +315,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CEffectScore.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Switch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SwitchBrick.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

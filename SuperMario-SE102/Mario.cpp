@@ -22,12 +22,15 @@
 #include "KoopaParatroopa.h"
 #include "HitBox.h"
 
-#include"HitBox.h"
-#include"Boomerang.h"
-#include"BoomerangBro.h"
+#include "HitBox.h"
+#include "Boomerang.h"
+#include "BoomerangBro.h"
 #include "Card.h"
-#include"CEffect.h"
+#include "CEffect.h"
 #include "CEffectScore.h"
+#include "Switch.h"	
+#include "SwitchBrick.h"
+
 CMario::~CMario()
 {
 	if (heldKoopas != NULL)
@@ -256,6 +259,10 @@ void CMario::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithBoomerangBro(e);
 	else if (dynamic_cast<Card*>(e->obj))
 		OnCollisionWithCard(e);
+	else if (dynamic_cast<CSwitch*>(e->obj))
+		OnCollisionWithSwitch(e);
+	else if (dynamic_cast<CSwitchBrick*>(e->obj))
+		OnCollisionWithSwitchBrick(e);
 }
 
 void CMario::OnCollisionExit(LPGAMEOBJECT obj)
@@ -685,6 +692,39 @@ void CMario::OnCollisionWithCard(LPCOLLISIONEVENT e)
 	}
 }
 
+void CMario::OnCollisionWithSwitch(LPCOLLISIONEVENT e)
+{
+	CSwitch* switchObj = dynamic_cast<CSwitch*>(e->obj);
+
+	if (switchObj && switchObj->GetState() == SWITCH_STATE_NORMAL)
+	{
+		switchObj->SetState(SWITCH_STATE_HITTED);
+		DebugOut(L">>> Mario hit a switch! >>> \n");
+	}
+	else
+	{
+		DebugOut(L">>> Mario tried to hit a switch that is already activated! >>> \n");
+	}
+}
+
+void CMario::OnCollisionWithSwitchBrick(LPCOLLISIONEVENT e)
+{
+	CSwitchBrick* switchBrick = dynamic_cast<CSwitchBrick*>(e->obj);
+
+	if (e->ny > 0)
+	{
+		if (switchBrick && switchBrick->GetState() != SWITCH_BRICK_STATE_HIT)
+		{
+			switchBrick->SetState(SWITCH_BRICK_STATE_HIT);
+			switchBrick->SpawnSwitch();
+			DebugOut(L">>> Mario hit a switch brick! >>> \n");
+		}
+		else
+		{
+			DebugOut(L">>> Mario tried to hit a switch brick that is already activated! >>> \n");
+		}
+	}
+}
 
 void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 {

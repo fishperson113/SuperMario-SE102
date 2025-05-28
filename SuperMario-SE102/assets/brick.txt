@@ -22,6 +22,7 @@
 20020	492	5	547	148	30
 20021	167	26	182	41	30
 20022	352	739	367	754	30
+20023	205	7	220	22	30	
 # ani_id	sprite1_id	time1	sprite2_id	time2	...
 [ANIMATIONS]
 #Normal Brick
@@ -62,3 +63,5 @@
 10017	20021	1000
 #Underground Pipe Brick
 10018	20022	1000
+#Switch Brick Hit
+10019	20023	1000

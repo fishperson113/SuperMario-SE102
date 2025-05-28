@@ -32,6 +32,9 @@
 #include "BoomerangBro.h"
 #include "Boomerang.h"
 #include "Card.h"
+#include "Switch.h"
+#include "SwitchBrick.h"
+
 using namespace std;
 
 CPlayScene::CPlayScene(int id, LPCWSTR filePath):
@@ -426,6 +429,18 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 	{
 		obj = new CSuperLeafBrick(x, y);
 		DebugOut(L"[INFO] SuperLeafBrick object has been created!\n");
+		break;
+	}
+	case OBJECT_TYPE_SWITCH:
+	{
+		obj = new CSwitch(x, y);
+		DebugOut(L"[INFO] Switch object has been created!\n");
+		break;
+	}
+	case OBJECT_TYPE_SWITCH_BRICK:
+	{
+		obj = new CSwitchBrick(x, y);
+		DebugOut(L"[INFO] Switch Brick object has been created!\n");
 		break;
 	}
 	case OBJECT_TYPE_CAMERA:

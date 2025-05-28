@@ -23,6 +23,7 @@
 20021	167	26	182	41	30
 20022	352	739	367	754	30
 20023	493	119	502	128	20
+20024	205	7	220	22	30
 # ani_id	sprite1_id	time1	sprite2_id	time2	...
 [ANIMATIONS]
 #Normal Brick
@@ -65,3 +66,5 @@
 10018	20022	1000
 #Brick Piece
 10019	20023	1000
+#Switch Brick Hit
+10020	20023	1000

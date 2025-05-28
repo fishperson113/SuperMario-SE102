@@ -223,6 +223,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		int aniId = ID_ANI_BRICK;
 		int bboxWidth = BRICK_BBOX_WIDTH;
 		int bboxHeight = BRICK_BBOX_HEIGHT;
+		bool isBreakable = false;
+		int coinCount = 0;
 		if (tokens.size() >= 6)
 		{
 			aniId = atoi(tokens[3].c_str());
@@ -235,8 +237,13 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 			offsetX = (float)atof(tokens[7].c_str());
 			offsetY = (float)atof(tokens[8].c_str());
 		}
+		if (tokens.size() >= 10)
+		{
+			isBreakable = atoi(tokens[9].c_str()) != 0; // Convert to boolean
+			coinCount = atoi(tokens[10].c_str());
+		}
 
-		obj = new CBrick(x, y, brickNumber, offsetX, offsetY, aniId, bboxWidth, bboxHeight);
+		obj = new CBrick(x, y, brickNumber, offsetX, offsetY, aniId, bboxWidth, bboxHeight, isBreakable, coinCount);
 		DebugOut(L"[INFO] Brick object has been created!\n");
 		break;
 	}

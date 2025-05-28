@@ -17,15 +17,18 @@ class CBrick : public CGameObject {
 	int aniId; // Animation ID
 	int bboxWidth; // Bounding box width
 	int bboxHeight; // Bounding box height
-	float isBreakable = false;
-	int breakCount = 0;
+	bool isBreakable = false;
+	int coinCount = 0;
 public:
-	CBrick(float x, float y, int brickNumber = 1, float offsetX = 0.0f, float offsetY = 0.0f, int aniId = ID_ANI_BRICK, int bboxWidth = BRICK_BBOX_WIDTH, int bboxHeight = BRICK_BBOX_HEIGHT, float isBreakable = false, int breakCount = 0)
-		: CGameObject(x, y), brickNumber(brickNumber), offsetX(offsetX), offsetY(offsetY), aniId(aniId), bboxWidth(bboxWidth), bboxHeight(bboxHeight), isBreakable(isBreakable), breakCount(breakCount){
+	CBrick(float x, float y, int brickNumber = 1, float offsetX = 0.0f, float offsetY = 0.0f, int aniId = ID_ANI_BRICK, int bboxWidth = BRICK_BBOX_WIDTH, int bboxHeight = BRICK_BBOX_HEIGHT, bool isBreakable = false, int coinCount = 0)
+		: CGameObject(x, y), brickNumber(brickNumber), offsetX(offsetX), offsetY(offsetY), aniId(aniId), bboxWidth(bboxWidth), bboxHeight(bboxHeight), isBreakable(isBreakable), coinCount(coinCount){
 	}
 
 	void Render();
 	void Update(DWORD dt) {}
 	void GetBoundingBox(float& l, float& t, float& r, float& b);
 	int IsDirectionColliable(float nx, float ny);
+	int IsBreakable() { return isBreakable; }
+	int IsCollidable() { return isBreakable; }
+	void Break();
 };

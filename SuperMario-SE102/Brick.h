@@ -30,5 +30,6 @@ public:
 	int IsDirectionColliable(float nx, float ny);
 	int IsBreakable() { return isBreakable; }
 	int IsCollidable() { return isBreakable; }
+	void SpawnBreakPiece();
 	void Break();
 };

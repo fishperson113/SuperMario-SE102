@@ -603,6 +603,27 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		DebugOut(L"[INFO] Moving Platform object has been created! Active: %d\n", !isCheckpointControlled);
 		break;
 	}
+	case OOBJECT_TYPE_BREAKABLE_BRICK:
+	{
+		int brickNumber = 1;
+		float offsetX = 0.0f;
+		float offsetY = 0.0f;
+		int aniId = ID_ANI_BRICK;
+		int bboxWidth = BRICK_BBOX_WIDTH;
+		int bboxHeight = BRICK_BBOX_HEIGHT;
+		bool isBreakable = true;
+		int coinCount = 0;
+		if (tokens.size() >= 6)
+		{
+			aniId = atoi(tokens[3].c_str());
+			bboxWidth = atoi(tokens[4].c_str());
+			bboxHeight = atoi(tokens[5].c_str());
+		}
+
+		obj = new CBrick(x, y, brickNumber, offsetX, offsetY, aniId, bboxWidth, bboxHeight, isBreakable, coinCount);
+		DebugOut(L"[INFO] Brick object has been created!\n");
+		break;
+	}
 	case OBJECT_TYPE_CARD:
 	{
 		obj = new Card(x, y);

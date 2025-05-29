@@ -28,6 +28,7 @@ public:
 		this->old_pos = y;
 		this->min_pos = y - 4;
 		this->jump_start = GetTickCount64();
+		this->state = BRICK_STATE_NORMAL;
 	}
 	virtual void Render();
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
@@ -36,6 +37,9 @@ public:
 	void SpawnCoin();
 	void Bounce();
 	void OnNoCollision(DWORD dt);
+	int IsCollidable() { return 1; }
+	virtual void OnCollisionWith(LPCOLLISIONEVENT e);
+	void OnCollisionWithKoopas(LPCOLLISIONEVENT e);
 	int GetBreakCount() { return breakCount; }
 	void SetBreakCOunt(int count) { breakCount = count; }
 };

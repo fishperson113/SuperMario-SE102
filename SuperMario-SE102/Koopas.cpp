@@ -158,6 +158,17 @@ void Koopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		SetState(KOOPA_PARATROOPA_STATE_WALKING_WINGS);
 	}
+	else if ((state == KOOPA_PARATROOPA_STATE_DIE) && (GetTickCount64() - die_start > KOOPA_PARATROOPA_DIE_TIMEOUT))
+	{
+		isDeleted = true;
+		return;
+	}
+
+	if ((state == KOOPAS_STATE_DIE) && (GetTickCount64() - die_start > KOOPA_PARATROOPA_DIE_TIMEOUT))
+	{
+		isDeleted = true;
+		return;
+	}
 
 	if (!isBeingHeld && state == KOOPAS_STATE_WALKING)
 	{
@@ -190,6 +201,10 @@ void Koopas::Render()
 		else if (state == KOOPAS_STATE_SHELL || state == KOOPAS_STATE_SHELL_MOVING)
 		{
 			aniId = ID_ANI_KOOPAS_SHELL;
+		}
+		else if (state == KOOPAS_STATE_DIE)
+		{
+			aniId = ID_ANI_KOOPAS_DIE;
 		}
 	}
 	else if (this->type == KOOPAS_GREEN || this->type == KOOPAS_GREEN_NO_WINGS)
@@ -460,6 +475,12 @@ void Koopas::SetState(int state)
 		break;
 	case KOOPAS_STATE_FLOATING:
 		walk_start = GetTickCount64();
+		break;
+	case KOOPAS_STATE_DIE:
+		die_start = GetTickCount64();
+		vx = 0;
+		vy = 0;
+		ay = 0;
 		break;
 	}
 }

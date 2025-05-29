@@ -177,6 +177,7 @@
 #define MARIO_UNTOUCHABLE_TIME 2500
 
 #define MARIO_STATE_PIPE 920
+#include"HUD.h"
 class Koopas;
 class CPlatform;
 class CMario : public CGameObject
@@ -296,7 +297,7 @@ public:
 		untouchable = 0;
 		untouchable_start = -1;
 		isOnPlatform = false;
-		coin = 10;
+		coin = HUD::GetInstance()->GetLastCoin();
 		heldKoopas = NULL;
 		isHolding = false;
 		isKicking = false;
@@ -318,7 +319,7 @@ public:
 		teleport_target_y = 0;
 		teleport_exit_direction = PipeDirection::UP;
 		pipe_offset = 0.0f;
-		points = 0;
+		points = HUD::GetInstance()->GetLastScore();
 		teleport_exit_start = 0;
 		current_pipe_direction = PipeDirection::UP;
 	}

@@ -29,7 +29,8 @@ class HUD
     bool isUndrawInitialized;
     bool isAffect;  
     bool initCard; 
-
+    int lastCoin=0;
+    int lastScore=0;
 public:
     static bool isStarting;
     static bool initStart;
@@ -54,4 +55,8 @@ public:
     void RenderPauseText();
 
     void SetInitCard(bool para) { this->initCard = para; }
+	int GetLastCoin() { return this->lastCoin; }
+	void SetLastCoin(int coin) { this->lastCoin = coin; }
+	int GetLastScore() { return this->lastScore; }
+	void SetLastPoints(int score) { this->lastScore = score; }
 };

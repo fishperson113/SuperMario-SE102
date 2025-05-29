@@ -347,6 +347,9 @@ void CMario::OnCollisionWithCoin(LPCOLLISIONEVENT e)
 void CMario::OnCollisionWithPortal(LPCOLLISIONEVENT e)
 {
 	CPortal* p = (CPortal*)e->obj;
+	auto hud = HUD::GetInstance();
+	hud->SetLastCoin(coin);
+	hud->SetLastPoints(points);
 	CGame::GetInstance()->InitiateSwitchScene(p->GetSceneId());
 }
 

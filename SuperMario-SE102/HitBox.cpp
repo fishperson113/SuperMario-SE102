@@ -1,13 +1,16 @@
 #include "HitBox.h"
 #include "Mario.h"
-#include"ParaGoomba.h"
-#include"Goomba.h"
-#include"Koopas.h"
-#include"KoopaParatroopa.h"
-#include"Bullet.h"
-#include"Brick.h"
-#include"PiranhaPlant.h"
-#include"Utils.h"
+#include "ParaGoomba.h"
+#include "Goomba.h"
+#include "Koopas.h"
+#include "KoopaParatroopa.h"
+#include "Bullet.h"
+#include "Brick.h"
+#include "PiranhaPlant.h"
+#include "Utils.h"
+#include "CEffect.h"
+#include "CEffectScore.h"
+
 HitBox::HitBox(CGameObject* owner):CGameObject(x,y)
 {
     this->owner = owner;

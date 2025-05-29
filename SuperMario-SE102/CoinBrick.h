@@ -10,19 +10,32 @@
 #define BRICK_BBOX_WIDTH 16
 #define BRICK_BBOX_HEIGHT 16
 #define BRICK_STATE_HIT 100
+#define BRICK_STATE_HITTING 101
+#define BRICK_STATE_NORMAL 102
+#define GOLD_BRICK_BOUNCING_SPEED 0.05f
+#define GOLD_BRICK_GRAVITY	0.05f
 
 class CCoinBrick : public CGameObject
 {
 private:
 	float isBreakable = false;
 	int breakCount = 1;
+	int initialY = y;
+	float old_pos, min_pos;
+	ULONGLONG jump_start;
 public:
-	CCoinBrick(float x, float y, float isBreakable = false, int breakCount = 0) : CGameObject(x, y), isBreakable(isBreakable), breakCount(breakCount) {}
+	CCoinBrick(float x, float y, float isBreakable = false, int breakCount = 1) : CGameObject(x, y), isBreakable(isBreakable), breakCount(breakCount) {
+		this->old_pos = y;
+		this->min_pos = y - 4;
+		this->jump_start = GetTickCount64();
+	}
 	virtual void Render();
-	virtual void Update(DWORD dt) {}
+	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	virtual void GetBoundingBox(float& l, float& t, float& r, float& b);
 	virtual void SetState(int state);
 	void SpawnCoin();
+	void Bounce();
+	void OnNoCollision(DWORD dt);
 	int GetBreakCount() { return breakCount; }
 	void SetBreakCOunt(int count) { breakCount = count; }
 };

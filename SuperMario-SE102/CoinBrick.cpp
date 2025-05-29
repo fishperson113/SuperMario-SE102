@@ -13,6 +13,26 @@ void CCoinBrick::Render()
 	}
 }
 
+void CCoinBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+{
+	if (this->breakCount == 0)
+		this->SetState(BRICK_STATE_HIT);
+	if (this->state == BRICK_STATE_HITTING)
+	{
+		if (this->y != this->min_pos)
+			this->y += 4;
+	}
+	if (GetTickCount64() - this->jump_start > 100)
+	{
+		this->y = old_pos;
+		if (this->state != BRICK_STATE_HIT)
+		{
+			this->SetState(BRICK_STATE_NORMAL);
+		}
+		jump_start = GetTickCount64();
+	}
+}
+
 void CCoinBrick::GetBoundingBox(float& l, float& t, float& r, float& b)
 {
 	l = x - BRICK_BBOX_WIDTH / 2;
@@ -34,4 +54,18 @@ void CCoinBrick::SpawnCoin()
 	CPlayScene* currentScene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
 
 	currentScene->GetObjectManager()->Add(coin);
+}
+
+void CCoinBrick::Bounce()
+{
+	jump_start = GetTickCount64();
+	if (this->breakCount != 0 && this->state != BRICK_STATE_HIT)
+	{
+		this->y -= 4;
+	}
+}
+
+void CCoinBrick::OnNoCollision(DWORD dt)
+{
+	y += vy * dt;
 }

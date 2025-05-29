@@ -618,7 +618,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		DebugOut(L"[INFO] Moving Platform object has been created! Active: %d\n", !isCheckpointControlled);
 		break;
 	}
-	case OOBJECT_TYPE_BREAKABLE_BRICK:
+	case OBJECT_TYPE_BREAKABLE_BRICK:
 	{
 		int brickNumber = 1;
 		float offsetX = 0.0f;
@@ -750,6 +750,7 @@ void CPlayScene::Update(DWORD dt)
 	{
 		cameraController = new CameraController(player, CGame::GetInstance());
 		cameraController->SwitchToThresholdMode(); // Default mode
+		//cameraController->SwitchToFreeMove();
 		objectManager.Add(cameraController);
 		DebugOut(L"[INFO] Default camera controller created\n");
 	}

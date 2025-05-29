@@ -4,6 +4,7 @@
 #include "Animation.h"
 #include "Animations.h"
 #include "debug.h"
+#include "Switch.h"
 
 #define ID_ANI_BRICK 10000
 #define BRICK_WIDTH 16
@@ -19,6 +20,7 @@ class CBrick : public CGameObject {
 	int bboxHeight; // Bounding box height
 	bool isBreakable = false;
 	int coinCount = 0;
+	CSwitch* sw = NULL;
 public:
 	CBrick(float x, float y, int brickNumber = 1, float offsetX = 0.0f, float offsetY = 0.0f, int aniId = ID_ANI_BRICK, int bboxWidth = BRICK_BBOX_WIDTH, int bboxHeight = BRICK_BBOX_HEIGHT, bool isBreakable = false, int coinCount = 0)
 		: CGameObject(x, y), brickNumber(brickNumber), offsetX(offsetX), offsetY(offsetY), aniId(aniId), bboxWidth(bboxWidth), bboxHeight(bboxHeight), isBreakable(isBreakable), coinCount(coinCount){

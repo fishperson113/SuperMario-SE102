@@ -27,6 +27,7 @@ public:
 	int IsDirectionColliable(float nx, float ny);
 	void ShootBullet();
 	int IsBlocking() { return 0; }
+	int IsCollidable() { return 1; }
 	void SetAnimationId(int aniId) { this->aniId = aniId; }
 protected:
 	ULONGLONG spawnTime;

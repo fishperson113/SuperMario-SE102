@@ -95,7 +95,7 @@ void CMario::ReleaseKoopas()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	//DebugOut(L">>> Mario position %f, %f! >>> \n", this->x, this->y);
+	DebugOut(L">>> Mario position %f, %f! >>> \n", this->x, this->y);
 
 	bool wasPreviouslyOnPlatform = isOnPlatform;
 	CPlatform* previousPlatform = platform;
@@ -360,11 +360,10 @@ void CMario::OnCollisionWithCoinBrick(LPCOLLISIONEVENT e)
 		{
 			if (coinBrick->GetState() == BRICK_STATE_HIT) return; // already hit
 			coinBrick->SpawnCoin();
+			coinBrick->SetState(BRICK_STATE_HITTING);
+			coinBrick->Bounce();
 			coinBrick->SetBreakCOunt(coinBrick->GetBreakCount() - 1);
-			if (coinBrick->GetBreakCount() == 0)
-			{
-				coinBrick->SetState(BRICK_STATE_HIT);
-			}
+
 			coin++;
 		}
 	}
@@ -384,7 +383,10 @@ void CMario::OnCollisionWithMushroom(LPCOLLISIONEVENT e)
 	// Add points to Mario's score
 	points += 1000;
 	e->obj->Delete();
-	this->SetLevel(MARIO_LEVEL_BIG);
+	if (this->GetLevel() == MARIO_LEVEL_SMALL)
+		this->SetLevel(MARIO_LEVEL_BIG);
+	else if (this->GetLevel() == MARIO_LEVEL_BIG)
+		this->SetLevel(MARIO_LEVEL_TAIL);		
 }
 
 void CMario::OnCollisionWithMushroomBrick(LPCOLLISIONEVENT e)

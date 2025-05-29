@@ -1,4 +1,5 @@
 #include "CoinBrick.h"
+#include "Koopas.h"
 
 void CCoinBrick::Render()
 {
@@ -68,4 +69,42 @@ void CCoinBrick::Bounce()
 void CCoinBrick::OnNoCollision(DWORD dt)
 {
 	y += vy * dt;
+}
+
+void CCoinBrick::OnCollisionWith(LPCOLLISIONEVENT e)
+{
+	if (e->obj->IsBlocking())
+	{
+		if (e->ny != 0)
+		{
+			vy = 0;
+		}
+		else if (e->nx != 0)
+		{
+			vx = -vx;
+		}
+	}
+
+	if (dynamic_cast<Koopas*>(e->obj))
+		OnCollisionWithKoopas(e);
+
+}
+
+void CCoinBrick::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
+{
+	Koopas* koopas = (Koopas*)e->obj;
+
+	if (e->ny > 0) // Collision from below
+	{
+		if (this->state == BRICK_STATE_HITTING)
+		{
+			float x, y;
+			koopas->GetPosition(x, y);
+			koopas->SetPosition(x, y + 8);
+			if (koopas->GetState() == KOOPAS_STATE_WALKING)
+				koopas->SetState(KOOPAS_STATE_SHELL);
+			else if (koopas->GetState() == KOOPAS_STATE_SHELL)
+				koopas->SetState(KOOPAS_STATE_DIE);
+		}
+	}
 }

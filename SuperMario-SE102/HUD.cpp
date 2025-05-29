@@ -105,7 +105,7 @@ void HUD::RenderHP()
 
     if (!mario) return;
 
-    sprites->Get(ID_LETTER_M)->Draw(x - 106.0f, y + 5.0f, 1.2, 1.2);
+    sprites->Get(ID_LETTER_M)->Draw(x - 128.0f, y + 5.0f, 1.2, 1.2);
 
     int lives = 3;
 

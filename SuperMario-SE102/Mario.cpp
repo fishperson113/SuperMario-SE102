@@ -328,6 +328,12 @@ void CMario::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
 void CMario::OnCollisionWithBrick(LPCOLLISIONEVENT e)
 {
 	CBrick* brick = dynamic_cast<CBrick*>(e->obj);
+	if (brick->IsCoin())
+	{
+		e->obj->Delete();
+		coin++;
+		return;
+	}
 
 	if (e->ny > 0)	//collision from below
 	{
@@ -705,6 +711,7 @@ void CMario::OnCollisionWithSwitch(LPCOLLISIONEVENT e)
 	if (switchObj && switchObj->GetState() == SWITCH_STATE_NORMAL)
 	{
 		switchObj->SetState(SWITCH_STATE_HITTED);
+		isHitSwitch = true;
 		DebugOut(L">>> Mario hit a switch! >>> \n");
 	}
 	else

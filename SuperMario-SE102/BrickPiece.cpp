@@ -3,6 +3,11 @@
 
 void BrickPiece::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	if(GetTickCount64() - start_time > BRICK_PIECE_LIFE_TIME)
+	{
+		isDeleted = true;
+		return;
+	}
 	vy += ay * dt;
 }
 

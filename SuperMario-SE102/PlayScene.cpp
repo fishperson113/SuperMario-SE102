@@ -635,8 +635,31 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 			bboxHeight = atoi(tokens[5].c_str());
 		}
 
-		obj = new CBrick(x, y, brickNumber, offsetX, offsetY, aniId, bboxWidth, bboxHeight, isBreakable, coinCount);
+		CBrick* brick = new CBrick(x, y, brickNumber, offsetX, offsetY, aniId, bboxWidth, bboxHeight, isBreakable, coinCount);
+		obj = brick;
 		DebugOut(L"[INFO] Brick object has been created!\n");
+		break;
+	}
+	case OBJECT_TYPE_BREAKABLE_BRICK_TURN_COIN:
+	{
+		int brickNumber = 1;
+		float offsetX = 0.0f;
+		float offsetY = 0.0f;
+		int aniId = ID_ANI_BRICK;
+		int bboxWidth = BRICK_BBOX_WIDTH;
+		int bboxHeight = BRICK_BBOX_HEIGHT;
+		bool isBreakable = true;
+		int coinCount = 0;
+		if (tokens.size() >= 6)
+		{
+			aniId = atoi(tokens[3].c_str());
+			bboxWidth = atoi(tokens[4].c_str());
+			bboxHeight = atoi(tokens[5].c_str());
+		}
+
+		CBrick* brick = new CBrick(x, y, brickNumber, offsetX, offsetY, aniId, bboxWidth, bboxHeight, isBreakable, coinCount);
+		brick->SetAbleToChangeToCoin(true);
+		obj = brick;
 		break;
 	}
 	case OBJECT_TYPE_CARD:

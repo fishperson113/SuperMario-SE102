@@ -1,10 +1,18 @@
 #include "Brick.h"
 #include "PlayScene.h"
 #include "BrickPiece.h"
+#include"Coin.h"
 void CBrick::Render()
 {
 	CAnimations* animations = CAnimations::GetInstance();
-	animations->Get(this->aniId)->Render(x, y);
+	if (isCoin)
+	{
+		animations->Get(ID_ANI_COIN)->Render(x, y);
+	}
+	else
+	{
+		animations->Get(this->aniId)->Render(x, y);
+	}
 }
 
 void CBrick::GetBoundingBox(float &l, float &t, float &r, float &b)
@@ -55,5 +63,27 @@ void CBrick::Break()
 	{
 		this->SpawnBreakPiece();
 		this->Delete();
+	}
+}
+
+void CBrick::TurnToCoin()
+{
+	isCoin = true;
+}
+
+void CBrick::TurnBackToBrick()
+{
+}
+void CBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+{
+	if (ableToChangeToCoin && !isCoin)
+	{
+		CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		CMario* mario = (CMario*)scene->GetPlayer();
+
+		if (mario && mario->GetIsHitSwitch())
+		{
+			TurnToCoin();
+		}
 	}
 }

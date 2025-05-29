@@ -218,6 +218,7 @@ class CMario : public CGameObject
 	PipeDirection current_pipe_direction;
 
 	bool isUnderground = false;
+	bool isHitSwitch = false;
 
 	void UpdateHeldKoopasPosition();
 	void OnCollisionWithGoomba(LPCOLLISIONEVENT e);
@@ -364,4 +365,5 @@ public:
 
 	void SetIsUnderground(bool underground) { isUnderground = underground; }
 	bool GetIsUnderground() { return isUnderground; }
+	bool GetIsHitSwitch() { return isHitSwitch; }
 };

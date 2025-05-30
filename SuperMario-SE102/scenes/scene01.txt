@@ -202,7 +202,7 @@ assets\switch.txt
 4	2176	244
 
 #MARIO
-0	1952	10	#Beginning spawn
+0	0	10	#Beginning spawn
 #0	2264	-120	#Underground spawn
 
 #Platform
@@ -269,10 +269,10 @@ assets\switch.txt
 2	864	128
 10	976	128
 16	1104	10	16	500	4
-19	1323	60
-19	1355	60
-19	1387	60
-3	1472	148	2
+29	1323	60
+29	1355	60
+29	1387	60
+19	1472	148
 3	2096	116	0
 
 23	160	500

@@ -1,5 +1,6 @@
 #include "Mushroom.h"
-
+#include "PlayScene.h"
+#include "Mario.h"
 void CMushroom::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
 	left = x - MUSHROOM_BBOX_WIDTH / 2;

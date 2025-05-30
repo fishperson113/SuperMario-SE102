@@ -221,7 +221,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		{
 			DebugOut(L"[ERROR] MARIO object was created before!\n");
 			return;
-		}
+		}else
 		{  // Add a new scope with curly braces
 			obj = new CMario(x, y);
 			player = (CMario*)obj;

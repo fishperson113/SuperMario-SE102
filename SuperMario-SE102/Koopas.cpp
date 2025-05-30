@@ -201,18 +201,18 @@ void Koopas::Render()
 		else if (state == KOOPAS_STATE_SHELL || state == KOOPAS_STATE_SHELL_MOVING)
 		{
 			if (preState == KOOPAS_STATE_UPSIDE_DOWN)
-				aniId = ID_ANI_KOOPAS_DIE;
+				aniId = ID_ANI_KOOPAS_UPSIDE_DOWN;
 			else
 				aniId = ID_ANI_KOOPAS_SHELL;
 		}
 		else if (state == KOOPAS_STATE_UPSIDE_DOWN)
 		{
-			aniId = ID_ANI_KOOPAS_DIE;
+			aniId = ID_ANI_KOOPAS_UPSIDE_DOWN;
 		}
 		else if (state == KOOPAS_STATE_DIE)
 		{
 			if (preState == KOOPAS_STATE_UPSIDE_DOWN)
-				aniId = ID_ANI_KOOPAS_DIE;
+				aniId = ID_ANI_KOOPAS_UPSIDE_DOWN;
 			else if (preState == KOOPAS_STATE_SHELL)
 				aniId = ID_ANI_KOOPAS_SHELL;
 		}
@@ -261,7 +261,7 @@ void Koopas::Render()
 			aniId = ID_ANI_KOOPAS_WALKING_LEFT;
 		else if (state == KOOPAS_STATE_UPSIDE_DOWN)
 		{
-			aniId = ID_ANI_KOOPAS_DIE;
+			aniId = ID_ANI_KOOPAS_UPSIDE_DOWN;
 		}
 	}
 	

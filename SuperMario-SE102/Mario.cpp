@@ -95,8 +95,6 @@ void CMario::ReleaseKoopas()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	DebugOut(L">>> Mario position %f, %f! >>> \n", this->x, this->y);
-
 	bool wasPreviouslyOnPlatform = isOnPlatform;
 	CPlatform* previousPlatform = platform;
 
@@ -809,7 +807,7 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 			{
 				if (untouchable == 0)
 				{
-					if (koopas->GetState() != KOOPAS_STATE_SHELL)
+					if (koopas->GetState() != KOOPAS_STATE_SHELL && koopas->GetState() != KOOPAS_STATE_UPSIDE_DOWN)
 					{
 						if (level > MARIO_LEVEL_SMALL)
 						{

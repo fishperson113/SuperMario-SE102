@@ -8,3 +8,4 @@
 41005	1	207	88	310	30	#mega big transparent bush
 41006	281	367	414	438	30	#big long bush
 41007	558	16	657	151	30	#mega big bush
+41008	4	4	319	287	60	#1.4 item card back ground

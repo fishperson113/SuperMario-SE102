@@ -10,6 +10,7 @@
 #include "Utils.h"
 #include "CEffect.h"
 #include "CEffectScore.h"
+#include "SwitchBrick.h"
 
 HitBox::HitBox(CGameObject* owner):CGameObject(x,y)
 {
@@ -178,6 +179,20 @@ void HitBox::OnCollisionWithBrick(LPCOLLISIONEVENT e)
     if (brick->IsBreakable())
         brick->Break();
 }
+void HitBox::OnCollisionWithSwitchBrick(LPCOLLISIONEVENT e)
+{
+	CSwitchBrick* switchBrick = dynamic_cast<CSwitchBrick*>(e->obj);
+    if (switchBrick && switchBrick->GetState() != SWITCH_BRICK_STATE_HIT)
+    {
+        switchBrick->SetState(SWITCH_BRICK_STATE_HIT);
+        switchBrick->SpawnSwitch();
+        DebugOut(L">>> Mario hit a switch brick! >>> \n");
+    }
+    else
+    {
+        DebugOut(L">>> Mario tried to hit a switch brick that is already activated! >>> \n");
+    }
+}
 void HitBox::Render()
 {
     //if (!isActivate) return;
@@ -263,4 +278,6 @@ void HitBox::OnCollisionWith(LPCOLLISIONEVENT e)
         OnCollisionWithBullet(e);
     else if (dynamic_cast<CBrick*>(e->obj))
         OnCollisionWithBrick(e);
+	else if (dynamic_cast<CSwitchBrick*>(e->obj))
+		OnCollisionWithSwitchBrick(e);
 }

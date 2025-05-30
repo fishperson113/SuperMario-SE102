@@ -116,6 +116,24 @@ CGameObject* CPlayScene::CreateEnemy(int enemyType, float x, float y)
 		DebugOut(L"[INFO] Boomerang Bro object has been created!\n");
 		break;
 	}
+	case OBJECT_TYPE_RED_FIRETRAP:
+	{
+		obj = new CFireTrap(x, y, 0);
+		DebugOut(L"[INFO] Fire Trap object has been created!\n");
+		break;
+	}
+	case OBJECT_TYPE_GREEN_PIRANHA:
+	{
+		obj = new CFireTrap(x, y, 2);
+		DebugOut(L"[INFO] Fire Trap object has been created!\n");
+		break;
+	}
+	case OBJECT_TYPE_GREEN_FIRETRAP:
+	{
+		obj = new CFireTrap(x, y, 1);
+		DebugOut(L"[INFO] Fire Trap object has been created!\n");
+		break;
+	}
 		// Add other enemy types as needed
 	default:
 		DebugOut(L"[WARNING] Unknown enemy type: %d\n", enemyType);
@@ -224,15 +242,11 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 	case OBJECT_TYPE_PARAGOOMBA:
 	case OBJECT_TYPE_KOOPA_PARATROOPA:
 	case OBJECT_TYPE_BOOMERANG_BRO:
+	case OBJECT_TYPE_RED_FIRETRAP:
+	case OBJECT_TYPE_GREEN_FIRETRAP:
+	case OBJECT_TYPE_GREEN_PIRANHA:
 		obj = CreateEnemy(object_type, x, y);
 		break;
-	case OBJECT_TYPE_FIRETRAP:
-	{
-		int type = atoi(tokens[3].c_str());
-		obj = new CFireTrap(x, y, type);
-		DebugOut(L"[INFO] Fire Trap object has been created!\n");
-		break;
-	}
 	case OBJECT_TYPE_BRICK:
 	{
 		int brickNumber = 1; 
@@ -456,6 +470,13 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 	{
 		obj = new CSwitchBrick(x, y);
 		DebugOut(L"[INFO] Switch Brick object has been created!\n");
+		break;
+	}
+	case OBJECT_TYPE_FIRETRAP:
+	{
+		int type = atoi(tokens[3].c_str());
+		obj = new CFireTrap(x, y, type);
+		DebugOut(L"[INFO] Fire Trap object has been created!\n");
 		break;
 	}
 	case OBJECT_TYPE_CAMERA:
@@ -797,6 +818,7 @@ void CPlayScene::Update(DWORD dt)
 	{
 		CGame* game = CGame::GetInstance();
 
+		cameraController->SetFreeCameraDirection(FREE_CAM_LEFT, game->IsKeyDown(DIK_LEFT));
 		cameraController->SetFreeCameraDirection(FREE_CAM_LEFT, game->IsKeyDown(DIK_LEFT));
 		cameraController->SetFreeCameraDirection(FREE_CAM_RIGHT, game->IsKeyDown(DIK_RIGHT));
 		cameraController->SetFreeCameraDirection(FREE_CAM_UP, game->IsKeyDown(DIK_UP));

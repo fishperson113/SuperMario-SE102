@@ -8,10 +8,16 @@ CFireTrap::CFireTrap(float x, float y, int type) : CGameObject(x, y)
 
 	currentScene->GetObjectManager()->Add(piranhaPlant);
 
-	pipe = new CPipe(x, y, 31, 15, 3, 52001, 51001, 51001);
+    if (type == 2)
+    {
+        pipe = new CPipe(x, y, 31, 15, 2, 52001, 51001, 51001);
+    }
+    else 
+    {
+        pipe = new CPipe(x, y, 31, 15, 3, 52001, 51001, 51001);
+    }
 
 	currentScene->GetObjectManager()->Add(pipe);
-
 
 	this->spawnTime = GetTickCount64();
 
@@ -110,8 +116,11 @@ void CFireTrap::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
         case FIRETRAP_STATE_SHOOTING:
             if (!this->hasFired && this->type != TYPE_GREEN_PIRANHA_PLANT)
             {
-                this->piranhaPlant->ShootBullet();
-                this->hasFired = true;
+                if (piranhaPlant)
+                {
+                    this->piranhaPlant->ShootBullet();
+                    this->hasFired = true;
+                }
             }
 
             if (isRight)

@@ -11,16 +11,11 @@ void CSuperLeaf::GetBoundingBox(float& left, float& top, float& right, float& bo
 void CSuperLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	vy += LEAF_GRAVITY * dt;
-	startTime = GetTickCount64();
-	if (GetTickCount64() - startTime > 500)
-	{
-		vx += 0.001f * dt;
-	}
-	else
-	{
-		vx -= 0.001f * dt;
-		startTime = GetTickCount64();
-	}
+	
+	float time = (float)(GetTickCount64() % 1000) / 1000.0f; // Normalize time to [0, 1]
+	originX = x; // Store the original x position
+	x = originX + oscillationRange * sin(time * 2 * 3.14159f); // S
+
 	CGameObject::Update(dt, coObjects);
 
 }

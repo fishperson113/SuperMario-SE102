@@ -203,6 +203,7 @@ assets\switch.txt
 
 #MARIO
 0	0	10	#Beginning spawn
+11	32	164	1
 #0	2264	-120	#Underground spawn
 
 #Platform

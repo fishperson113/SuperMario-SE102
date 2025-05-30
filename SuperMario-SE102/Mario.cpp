@@ -95,7 +95,7 @@ void CMario::ReleaseKoopas()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	//DebugOut(L">>> Mario position %f, %f! >>> \n", this->x, this->y);
+	DebugOut(L">>> Mario position %f, %f! >>> \n", this->x, this->y);
 
 	bool wasPreviouslyOnPlatform = isOnPlatform;
 	CPlatform* previousPlatform = platform;
@@ -151,7 +151,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	CPlayScene* currentScene = dynamic_cast<CPlayScene*>(CGame::GetInstance()->GetCurrentScene());
 
-	if (this->y >= 340)
+	if (this->y >= 320)
 	{
 		if (currentScene && currentScene->GetCameraController())
 		{

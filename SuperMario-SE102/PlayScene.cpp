@@ -636,7 +636,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		}
 
 		// Default speed value
-		float moveSpeed = 0.05f;
+		float moveSpeed = 0.03f;
 
 		// Set custom speed if provided (optional parameter)
 		if (tokens.size() >= 10)

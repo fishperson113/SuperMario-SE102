@@ -85,8 +85,8 @@ void Koopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		floatTime += dt * 0.001f; // Convert milliseconds to seconds
 
 		// Calculate the new Y position using a sine wave
-		float amplitude = 16.0f; // Amplitude of the floating (16 pixels)
-		float frequency = 2.0f;  // Frequency of the floating (2 cycles per second)
+		float amplitude = 64.0f; // Amplitude of the floating (16 pixels)
+		float frequency = 0.4f;  // Frequency of the floating (2 cycles per second)
 		y = initialY + amplitude * sin(floatTime * 2 * 3.14159f * frequency);
 	}
 	else if (!isBeingHeld)  

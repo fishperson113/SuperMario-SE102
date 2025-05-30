@@ -203,7 +203,6 @@ assets\switch.txt
 
 #MARIO
 0	0	10	#Beginning spawn
-11	32	164	1
 #0	2264	-120	#Underground spawn
 
 #Platform
@@ -228,7 +227,6 @@ assets\switch.txt
 #Coin Brick
 7	176	116
 3	186	500
-
 
 7	192	116
 7	240	68

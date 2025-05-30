@@ -24,7 +24,7 @@ CameraController::CameraController(LPGAMEOBJECT player, CGame* game) : CGameObje
     pushSpeed = 0.02f;
     freeMovementSpeed = 0.2f;
     freeCameraDirection = 0;
-    stopPointX = 100.0f;
+    stopPointX = 1500.0f;
     hasStopPoint = true;
     // Get initial screen dimensions
     screenWidth = game->GetBackBufferWidth();

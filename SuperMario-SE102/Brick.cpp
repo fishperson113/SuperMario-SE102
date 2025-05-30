@@ -66,14 +66,14 @@ void CBrick::Break()
 	
 	this->SpawnBreakPiece();
 
-	if(ableToChangeToCoin&&!isCoin)
+	if (!ableToChangeToCoin)
+	{
+		this->Delete();
+	}
+	else if(!isCoin)
 	{
 		justTurnedToCoin = true;
 		TurnToCoin();
-	}
-	else
-	{
-		this->Delete();
 	}
 
 }

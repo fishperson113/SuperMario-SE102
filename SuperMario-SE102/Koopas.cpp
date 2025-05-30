@@ -379,7 +379,7 @@ Koopas::Koopas(float x, float y, int type) :CGameObject(x, y)
 	if (this->type == KOOPAS_RED)
 	{
 		fallSensor = new FallSensor(x, y, this);
-		SetState(KOOPAS_STATE_SHELL);
+		SetState(KOOPAS_STATE_WALKING);
 	}
 	else if (this->type == KOOPAS_GREEN)
 	{

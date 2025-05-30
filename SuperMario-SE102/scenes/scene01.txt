@@ -202,7 +202,7 @@ assets\switch.txt
 4	2176	244
 
 #MARIO
-0	2600	10	#Beginning spawn
+0	1952	10	#Beginning spawn
 #0	2264	-120	#Underground spawn
 
 #Platform
@@ -242,8 +242,8 @@ assets\switch.txt
 #9	20	10
 
 #Mushroom Brick
-11	256	68
-11	1462	-108
+11	256	68	0
+11	1462	-108	0
 
 #Fall Pitch
 13	-100	220	2000	10

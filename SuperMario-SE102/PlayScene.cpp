@@ -441,7 +441,9 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 	}
 	case OBJECT_TYPE_MUSHROOMBRICK:
 	{
-		obj = new CMushroomBrick(x, y);
+		int isHitted = atoi(tokens[3].c_str());
+
+		obj = new CMushroomBrick(x, y, isHitted);
 
 		DebugOut(L"[INFO] MushroomBrick object has been created!\n");
 		break;
@@ -682,7 +684,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		int brickNumber = 1;
 		float offsetX = 0.0f;
 		float offsetY = 0.0f;
-		int aniId = ID_ANI_BRICK;
+		int aniId = 10015;
 		int bboxWidth = BRICK_BBOX_WIDTH;
 		int bboxHeight = BRICK_BBOX_HEIGHT;
 		bool isBreakable = true;

@@ -28,7 +28,7 @@ void CMushroomBrick::SetState(int state)
 
 void CMushroomBrick::SpawnMushroom()
 {
-	CMushroom* mushroom = new CMushroom(x, y - BRICK_BBOX_HEIGHT);
+	CMushroom* mushroom = new CMushroom(x, y - 32);
 	mushroom->SetState(MUSHROOM_STATE_WALKING);
 
 	CPlayScene* currentScene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();

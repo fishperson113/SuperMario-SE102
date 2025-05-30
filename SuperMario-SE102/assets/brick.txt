@@ -27,6 +27,9 @@
 20025	550	556	709	635	10	#big green ground
 20026	486	594	533	625	10	#small green ground
 20027	557	663	696	694	10	#big striped brick
+20028	221	338	236	353	30	#begin moving platform
+20029	245	338	260	353	30	#middle
+20030	269	338	284	353	30	#end
 # ani_id	sprite1_id	time1	sprite2_id	time2	...
 [ANIMATIONS]
 #Normal Brick

@@ -22,6 +22,7 @@ class CBrick : public CGameObject {
 	int coinCount = 0;
 	bool ableToChangeToCoin = false;
 	bool isCoin = false;
+	bool justTurnedToCoin = false;
 public:
 	CBrick(float x, float y, int brickNumber = 1, float offsetX = 0.0f, float offsetY = 0.0f, int aniId = ID_ANI_BRICK, int bboxWidth = BRICK_BBOX_WIDTH, int bboxHeight = BRICK_BBOX_HEIGHT, bool isBreakable = false, int coinCount = 0)
 		: CGameObject(x, y), brickNumber(brickNumber), offsetX(offsetX), offsetY(offsetY), aniId(aniId), bboxWidth(bboxWidth), bboxHeight(bboxHeight), isBreakable(isBreakable), coinCount(coinCount){
@@ -41,4 +42,6 @@ public:
 	void TurnToCoin();
 	void TurnBackToBrick();
 	bool IsCoin() { return isCoin; }
+	bool JustTurnedToCoin() { return justTurnedToCoin; } 
+	void ResetJustTurnedToCoin() { justTurnedToCoin = false; } 
 };

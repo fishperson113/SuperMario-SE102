@@ -24,7 +24,8 @@ void FallSensor::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
         owner->GetPosition(ownerX, ownerY);
 
         float ownerVx = 0;
-        owner->GetSpeed(ownerVx, vy);
+		float ownerVy = 0;
+        owner->GetSpeed(ownerVx, ownerVy);
 
         if (ownerVx > 0) // Koopas moving right
         {

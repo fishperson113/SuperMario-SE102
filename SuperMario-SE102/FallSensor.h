@@ -14,7 +14,7 @@ public:
 
     virtual void Render()
     {
-         //RenderBoundingBox();
+         RenderBoundingBox();
     }
 
     virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);

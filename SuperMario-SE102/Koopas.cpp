@@ -170,10 +170,10 @@ void Koopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		return;
 	}
 
-	if (!isBeingHeld && state == KOOPAS_STATE_WALKING)
+	/*if (!isBeingHeld && state == KOOPAS_STATE_WALKING)
 	{
 		if (fallSensor) fallSensor->Update(dt, coObjects);
-	}
+	}*/
 
 	if (this->vx > 0)
 		this->SetDirection(1);
@@ -374,6 +374,7 @@ Koopas::Koopas(float x, float y, int type) :CGameObject(x, y)
 	die_start = -1;
 	shell_start = 0;
 	isBeingHeld = false;
+	fallSensor = nullptr;
 	DebugOut(L"[INFO] Koopas object type = %d!\n", this->type);
 	if (this->type == KOOPAS_RED)
 	{

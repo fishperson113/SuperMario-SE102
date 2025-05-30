@@ -59,11 +59,23 @@ void CBrick::SpawnBreakPiece()
 
 void CBrick::Break()
 {
-	if (this->IsBreakable() == 1)
+	if (this->IsBreakable() != 1)
 	{
-		this->SpawnBreakPiece();
+		return;
+	}
+	
+	this->SpawnBreakPiece();
+
+	if(ableToChangeToCoin&&!isCoin)
+	{
+		justTurnedToCoin = true;
+		TurnToCoin();
+	}
+	else
+	{
 		this->Delete();
 	}
+
 }
 
 void CBrick::TurnToCoin()

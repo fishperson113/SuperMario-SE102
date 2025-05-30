@@ -334,6 +334,11 @@ void CMario::OnCollisionWithBrick(LPCOLLISIONEVENT e)
 		coin++;
 		return;
 	}
+	if (brick->JustTurnedToCoin())
+	{
+		brick->ResetJustTurnedToCoin();
+		return;
+	}
 
 	if (e->ny > 0)	//collision from below
 	{

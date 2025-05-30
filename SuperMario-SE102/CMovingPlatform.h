@@ -13,7 +13,7 @@ protected:
     float moveSpeed;        
     int moveDirection;         
     bool hasMarioTouched; 
-
+    bool isInView;
 public:
     CMovingPlatform(
         float x, float y,
@@ -33,4 +33,5 @@ public:
     float GetSpeedY();
 	void OnCollisionWith(LPCOLLISIONEVENT e);
 	int GetMoveDirection() { return moveDirection; }
+    bool IsInCameraView();
 };

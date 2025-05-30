@@ -441,7 +441,9 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 	}
 	case OBJECT_TYPE_MUSHROOMBRICK:
 	{
-		obj = new CMushroomBrick(x, y);
+		int isHitted = atoi(tokens[3].c_str());
+
+		obj = new CMushroomBrick(x, y, isHitted);
 
 		DebugOut(L"[INFO] MushroomBrick object has been created!\n");
 		break;

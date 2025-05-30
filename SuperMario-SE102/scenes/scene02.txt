@@ -53,7 +53,7 @@ assets\switch.txt
 1	480	32	10015	16	16
 
 #Mushroom Brick
-11	496	32	#mushroom brick
+11	496	32	0	#mushroom brick
 
 1	512	32	10015	16	16
 
@@ -106,7 +106,7 @@ assets\switch.txt
 1	1072	48	10015	16	16
 
 #Mushroom Brick
-11	1072	32	#green mushroom brick
+11	1072	32	1	#green mushroom brick
 
 1	1104	112	10015	16	16
 1	1120	112	10015	16	16

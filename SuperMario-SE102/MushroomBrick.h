@@ -13,13 +13,17 @@
 
 class CMushroomBrick : public CGameObject
 {
+private:
+	bool isHitted;
 public:
-	CMushroomBrick(float x, float y) : CGameObject(x, y) {}
+	CMushroomBrick(float x, float y, bool isHiited = false) : CGameObject(x, y) {
+		isHitted = isHiited;
+	}
 	virtual void Render();
 	virtual void Update(DWORD dt) {}
 	virtual void GetBoundingBox(float& l, float& t, float& r, float& b);
 	virtual void SetState(int state);
-	int IsCollidable() { return 1; }
+	int IsCollidable() { return isHitted; }
 	void SpawnMushroom();
 };
 

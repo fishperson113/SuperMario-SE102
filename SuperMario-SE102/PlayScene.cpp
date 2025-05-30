@@ -85,9 +85,29 @@ CGameObject* CPlayScene::CreateEnemy(int enemyType, float x, float y)
 		break;
 
 	case OBJECT_TYPE_KOOPA_PARATROOPA:
-		obj = new CKoopaParatroopa(x, y);
+		obj = new Koopas(x, y, 2);
 		DebugOut(L"[INFO] Koopa Paratroopa object has been created!\n");
 		break;
+	case OBJECT_TYPE_KOOPAS:
+	{
+		Koopas* koopas = new Koopas(x, y, 0);
+		objectManager.Add(koopas->GetFallSensor());
+		obj = koopas;
+		DebugOut(L"[INFO] Koopas object has been created!\n");
+		break;
+	}
+	case OBJECT_TYPE_RED_WINGS_KOOPAS:
+	{
+		obj = new Koopas(x, y, 3);
+		DebugOut(L"[INFO] Red Wings Koopas object has been created!\n");
+		break;
+	}
+	case OBJECT_TYPE_KOOPATROOPA:
+	{
+		obj = new Koopas(x, y, 1);
+		DebugOut(L"[INFO] KoopaTroopa object has been created!\n");
+		break;
+	}
 	case OBJECT_TYPE_BOOMERANG_BRO:
 	{
 		CBoomerangBro* boomerangBro = new CBoomerangBro(x, y);
@@ -198,13 +218,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 	//Enemy Spawn Section
 
 	case OBJECT_TYPE_KOOPAS:
-	{
-		int type = atoi(tokens[3].c_str());
-		Koopas* koopas = new Koopas(x, y, type);
-		objectManager.Add(koopas->GetFallSensor());
-		obj = koopas;
-		break;
-	}
+	case OBJECT_TYPE_RED_WINGS_KOOPAS:
+	case OBJECT_TYPE_KOOPATROOPA:
 	case OBJECT_TYPE_GOOMBA:
 	case OBJECT_TYPE_PARAGOOMBA:
 	case OBJECT_TYPE_KOOPA_PARATROOPA:

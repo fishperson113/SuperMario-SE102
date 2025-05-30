@@ -8,7 +8,7 @@ void Koopas::GetBoundingBox(float& left, float& top, float& right, float& bottom
 {
 	if (this->type == KOOPAS_RED)
 	{
-		if (state == KOOPAS_STATE_SHELL || state == KOOPAS_STATE_SHELL_MOVING)
+		if (state == KOOPAS_STATE_SHELL || state == KOOPAS_STATE_SHELL_MOVING || state == KOOPAS_STATE_UPSIDE_DOWN)
 		{
 			left = x - KOOPAS_BBOX_WIDTH / 2;
 			top = y - KOOPAS_BBOX_HEIGHT_SHELL / 2;
@@ -200,11 +200,21 @@ void Koopas::Render()
 		}
 		else if (state == KOOPAS_STATE_SHELL || state == KOOPAS_STATE_SHELL_MOVING)
 		{
-			aniId = ID_ANI_KOOPAS_SHELL;
+			if (preState == KOOPAS_STATE_UPSIDE_DOWN)
+				aniId = ID_ANI_KOOPAS_DIE;
+			else
+				aniId = ID_ANI_KOOPAS_SHELL;
+		}
+		else if (state == KOOPAS_STATE_UPSIDE_DOWN)
+		{
+			aniId = ID_ANI_KOOPAS_DIE;
 		}
 		else if (state == KOOPAS_STATE_DIE)
 		{
-			aniId = ID_ANI_KOOPAS_DIE;
+			if (preState == KOOPAS_STATE_UPSIDE_DOWN)
+				aniId = ID_ANI_KOOPAS_DIE;
+			else if (preState == KOOPAS_STATE_SHELL)
+				aniId = ID_ANI_KOOPAS_SHELL;
 		}
 	}
 	else if (this->type == KOOPAS_GREEN || this->type == KOOPAS_GREEN_NO_WINGS)
@@ -239,7 +249,7 @@ void Koopas::Render()
 				aniId = ID_ANI_KOOPA_PARATROOPA_WALKING_WINGS_LEFT;
 			}
 		}
-		else if (state == KOOPA_PARATROOPA_STATE_DIE)
+		else if (state == KOOPAS_STATE_UPSIDE_DOWN)
 		{
 			aniId = ID_ANI_KOOPA_PARATROOPA_DIE;
 		}
@@ -249,6 +259,10 @@ void Koopas::Render()
 		aniId = ID_ANI_RED_WALKING_WINGS_LEFT;
 		if (state == KOOPAS_STATE_WALKING)
 			aniId = ID_ANI_KOOPAS_WALKING_LEFT;
+		else if (state == KOOPAS_STATE_UPSIDE_DOWN)
+		{
+			aniId = ID_ANI_KOOPAS_DIE;
+		}
 	}
 	
 	CAnimations::GetInstance()->Get(aniId)->Render(x, y);
@@ -312,9 +326,18 @@ void Koopas::OnCollisionWithOtherKoopas(LPCOLLISIONEVENT e)
 {
 	Koopas* otherKoopas = dynamic_cast<Koopas*>(e->obj);
 	if (otherKoopas->GetState() != KOOPAS_STATE_SHELL &&
-		otherKoopas->GetState() != KOOPAS_STATE_SHELL_MOVING)
+		otherKoopas->GetState() != KOOPAS_STATE_SHELL_MOVING &&
+		otherKoopas->GetState() != KOOPA_PARATROOPA_STATE_SHELL &&
+		otherKoopas->GetState() != KOOPA_PARATROOPA_STATE_MOVING_SHELL)
 	{
-		otherKoopas->SetState(KOOPAS_STATE_SHELL);
+		if (otherKoopas->GetType() == KOOPAS_RED || otherKoopas->GetType() == KOOPAS_RED_WINGS)
+		{
+			otherKoopas->SetState(KOOPAS_STATE_SHELL);
+		}
+		else if (otherKoopas->GetType() == KOOPAS_GREEN || otherKoopas->GetType() == KOOPAS_GREEN_NO_WINGS)
+		{
+			otherKoopas->SetState(KOOPA_PARATROOPA_STATE_SHELL);
+		}
 		DebugOut(L">>> Koopa shell hit another Koopa! >>> \n");
 	}
 }
@@ -402,6 +425,7 @@ Koopas::Koopas(float x, float y, int type) :CGameObject(x, y)
 void Koopas::SetState(int state)
 {
 	int previousState = this->state;
+	this->preState = this->state;
 	this->state = state;
 	switch (state)
 	{

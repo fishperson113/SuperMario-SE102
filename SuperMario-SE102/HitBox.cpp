@@ -69,7 +69,7 @@ void HitBox::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
             koopas->SetState(KOOPAS_STATE_SHELL);
             DebugOut(L">>> Hitbox turned Red Koopa into shell! >>> \n");
         }
-        else if (koopas->GetState() == KOOPAS_STATE_SHELL)
+        else if (koopas->GetState() == KOOPAS_STATE_SHELL || koopas->GetState() == KOOPAS_STATE_UPSIDE_DOWN)
         {
             // If Koopas is already in shell state, kick it
             koopas->SetState(KOOPAS_STATE_SHELL_MOVING);

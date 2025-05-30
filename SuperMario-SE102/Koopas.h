@@ -12,6 +12,7 @@
 #define KOOPAS_STATE_SHELL 200
 #define KOOPAS_STATE_SHELL_MOVING 300
 #define KOOPAS_STATE_DIE 400
+#define KOOPAS_STATE_UPSIDE_DOWN 500
 
 #define KOOPAS_BBOX_WIDTH 18
 #define KOOPAS_BBOX_HEIGHT 25
@@ -77,6 +78,7 @@ private:
 	int lastDirection = 0; // 0: left, 1: right
 	float initialY;
 	float floatTime;
+	int preState;
 protected:
 	float ax;
 	float ay;

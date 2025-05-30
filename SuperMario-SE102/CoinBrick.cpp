@@ -100,10 +100,12 @@ void CCoinBrick::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 		{
 			float x, y;
 			koopas->GetPosition(x, y);
-			koopas->SetPosition(x, y + 8);
+			koopas->SetPosition(x, y - 16);
 			if (koopas->GetState() == KOOPAS_STATE_WALKING)
 				koopas->SetState(KOOPAS_STATE_SHELL);
 			else if (koopas->GetState() == KOOPAS_STATE_SHELL)
+				koopas->SetState(KOOPAS_STATE_UPSIDE_DOWN);
+			else if (koopas->GetState() == KOOPAS_STATE_UPSIDE_DOWN)
 				koopas->SetState(KOOPAS_STATE_DIE);
 		}
 	}

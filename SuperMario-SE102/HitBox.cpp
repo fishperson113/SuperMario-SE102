@@ -231,7 +231,7 @@ void HitBox::OnCollisionWithMushroomBrick(LPCOLLISIONEVENT e)
 void HitBox::Render()
 {
     //if (!isActivate) return;
-    RenderBoundingBox();
+    //RenderBoundingBox();
 }
 
 void HitBox::GetBoundingBox(float& left, float& top, float& right, float& bottom)

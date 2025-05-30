@@ -889,8 +889,55 @@ void CPlayScene::TriggerGameOver()
 
 void CPlayScene::Reload()
 {
+	DebugOut(L"[INFO] Reloading scene %d\n", id);
+
+	// Save important information before unloading
 	int currentSceneId = this->id;
-	CGame::GetInstance()->InitiateSwitchScene(currentSceneId);
+	LPCWSTR currentFilePath = this->sceneFilePath;
+
+	// Reset game state
+	isPaused = false;
+	isGameOver = false;
+	timeLimit = DEFAULT_TIME_LIMIT;
+	lastTick = GetTickCount64();
+
+	// Reset HUD stats
+	HUD* hud = HUD::GetInstance();
+	if (hud)
+	{
+		// Reset coin counter
+		hud->SetLastCoin(0);
+
+		// Reset score/points
+		hud->SetLastPoints(0);
+
+		// Reset card collection
+		//Card::ResetCollectedCards();
+		//Card::ResetLastCollectedType();
+
+		// Reset other HUD states
+		hud->SetInitCard(false);
+
+		// Reset HUD drawing flags
+		HUD::isStarting = false;
+		HUD::initStart = false;
+		HUD::isAllowToRenderHudStart = false;
+	}
+	Clear();
+
+	Unload();
+
+	CSprites::GetInstance()->Clear();
+	CAnimations::GetInstance()->Clear();
+
+	key_handler = new CSampleKeyHandler(this);
+	
+	player = NULL;
+	cameraController = NULL;
+
+	Load();
+
+	DebugOut(L"[INFO] Scene %d reloaded successfully!\n", id);
 
 }
 

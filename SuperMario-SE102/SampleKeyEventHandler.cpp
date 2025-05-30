@@ -11,7 +11,12 @@ void CSampleKeyHandler::OnKeyDown(int KeyCode)
 	LPPLAYSCENE scene = (LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene();
 	CMario* mario = (CMario *)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
 	if (!mario) return;
-
+	if (KeyCode == DIK_R)
+	{
+		scene->Reload();
+		DebugOut(L"[INFO] Game reloaded\n");
+		return;
+	}
 	// Handle pause key (P)
 	if (KeyCode == DIK_P)
 	{
@@ -57,9 +62,9 @@ void CSampleKeyHandler::OnKeyDown(int KeyCode)
 	if (mario->GetLevel() == MARIO_LEVEL_TAIL)
 		mario->SetState(MARIO_STATE_SPIN_ATTACK);
 		break;
-	case DIK_R: // reset
-		scene->Reload();
-		break;
+	//case DIK_R: // reset
+	//	scene->Reload();
+	//	break;
 	}
 }
 

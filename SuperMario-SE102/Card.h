@@ -55,5 +55,7 @@ public:
     static void AddCollectedCard(LPCARD card);
     static bool HasCollectedAllCards();
     static const std::vector<LPCARD>& GetCollectedCards() { return collectedCards; }
+    static void ResetLastCollectedType() { lastCollectedType = 0; }
+    static void ResetCollectedCards() { collectedCards.clear(); }
     void OnNoCollision(DWORD dt);
 };

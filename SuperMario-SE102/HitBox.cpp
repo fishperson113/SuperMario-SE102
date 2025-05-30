@@ -21,6 +21,7 @@ HitBox::HitBox(CGameObject* owner):CGameObject(x,y)
 
 void HitBox::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	if (!isActivate) return;
 
     if (GetTickCount64() - activate_start > HITBOX_LIFESPAN)
     {

@@ -974,6 +974,7 @@ void CPlayScene::Reload()
 	
 	player = NULL;
 	cameraController = NULL;
+	CGame::GetInstance()->SetCamPos(0, 0);
 
 	Load();
 

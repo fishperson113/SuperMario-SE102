@@ -3,7 +3,7 @@
 #define SUPERLEAF_BBOX_WIDTH 16
 #define SUPERLEAF_BBOX_HEIGHT 14
 #define ID_ANI_SUPERLEAF 90001
-#define LEAF_GRAVITY 0.0001f
+#define LEAF_GRAVITY 0.00001f
 
 class CSuperLeaf : public CGameObject
 {

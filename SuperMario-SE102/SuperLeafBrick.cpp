@@ -32,7 +32,7 @@ void CSuperLeafBrick::SetState(int state)
 
 void CSuperLeafBrick::SpawnSuperLeaf()
 {
-	CSuperLeaf* superLeaf = new CSuperLeaf(x, y - 16);
+	CSuperLeaf* superLeaf = new CSuperLeaf(x, y - 64);
 
 	CPlayScene* currentScene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
 

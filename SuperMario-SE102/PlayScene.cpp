@@ -946,10 +946,10 @@ void CPlayScene::Reload()
 	if (hud)
 	{
 		// Reset coin counter
-		hud->SetLastCoin(0);
+		//hud->SetLastCoin(0);
 
 		// Reset score/points
-		hud->SetLastPoints(0);
+		//hud->SetLastPoints(0);
 
 		// Reset card collection
 		//Card::ResetCollectedCards();

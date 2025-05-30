@@ -21,7 +21,7 @@ CameraController::CameraController(LPGAMEOBJECT player, CGame* game) : CGameObje
     topThreshold = 0.3f;
     bottomThreshold = 0.7f;
 
-    pushSpeed = 0.02f;
+    pushSpeed = 0.03f;
     freeMovementSpeed = 0.2f;
     freeCameraDirection = 0;
     stopPointX = 1500.0f;

@@ -40,7 +40,7 @@ void Checkpoint::SpawnObjects()
 
 void Checkpoint::Render()
 {
-	RenderBoundingBox();
+	//RenderBoundingBox();
 }
 
 void Checkpoint::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)

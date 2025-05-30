@@ -5,7 +5,7 @@
 #define BRICK_PIECE_GRAVITY	0.001f
 
 #define ID_ANI_BRICK_PIECE	10019
-#define BRICK_PIECE_LIFE_TIME	2000 // 1 second
+#define BRICK_PIECE_LIFE_TIME	10000 // 1 second
 class BrickPiece : public CGameObject
 {
 	float ay;

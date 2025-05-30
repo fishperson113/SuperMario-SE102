@@ -221,7 +221,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		{
 			DebugOut(L"[ERROR] MARIO object was created before!\n");
 			return;
-		}
+		}else
 		{  // Add a new scope with curly braces
 			obj = new CMario(x, y);
 			player = (CMario*)obj;
@@ -441,7 +441,9 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 	}
 	case OBJECT_TYPE_MUSHROOMBRICK:
 	{
-		obj = new CMushroomBrick(x, y);
+		int isHitted = atoi(tokens[3].c_str());
+
+		obj = new CMushroomBrick(x, y, isHitted);
 
 		DebugOut(L"[INFO] MushroomBrick object has been created!\n");
 		break;
@@ -634,7 +636,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		}
 
 		// Default speed value
-		float moveSpeed = 0.05f;
+		float moveSpeed = 0.03f;
 
 		// Set custom speed if provided (optional parameter)
 		if (tokens.size() >= 10)
@@ -682,7 +684,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		int brickNumber = 1;
 		float offsetX = 0.0f;
 		float offsetY = 0.0f;
-		int aniId = ID_ANI_BRICK;
+		int aniId = 10015;
 		int bboxWidth = BRICK_BBOX_WIDTH;
 		int bboxHeight = BRICK_BBOX_HEIGHT;
 		bool isBreakable = true;
@@ -944,10 +946,10 @@ void CPlayScene::Reload()
 	if (hud)
 	{
 		// Reset coin counter
-		hud->SetLastCoin(0);
+		//hud->SetLastCoin(0);
 
 		// Reset score/points
-		hud->SetLastPoints(0);
+		//hud->SetLastPoints(0);
 
 		// Reset card collection
 		//Card::ResetCollectedCards();
@@ -972,6 +974,7 @@ void CPlayScene::Reload()
 	
 	player = NULL;
 	cameraController = NULL;
+	CGame::GetInstance()->SetCamPos(0, 0);
 
 	Load();
 

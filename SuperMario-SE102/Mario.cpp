@@ -95,7 +95,7 @@ void CMario::ReleaseKoopas()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	//DebugOut(L">>> Mario position %f, %f! >>> \n", this->x, this->y);
+	DebugOut(L">>> Mario position %f, %f! >>> \n", this->x, this->y);
 
 	bool wasPreviouslyOnPlatform = isOnPlatform;
 	CPlatform* previousPlatform = platform;
@@ -151,7 +151,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	CPlayScene* currentScene = dynamic_cast<CPlayScene*>(CGame::GetInstance()->GetCurrentScene());
 
-	if (this->y >= 340)
+	if (this->y >= 320)
 	{
 		if (currentScene && currentScene->GetCameraController())
 		{
@@ -345,6 +345,7 @@ void CMario::OnCollisionWithBrick(LPCOLLISIONEVENT e)
 		if (brick->IsBreakable())
 		{
 			brick->Break();
+			points += 10;
 		}
 	}
 }
@@ -353,6 +354,7 @@ void CMario::OnCollisionWithCoin(LPCOLLISIONEVENT e)
 {
 	e->obj->Delete();
 	coin++;
+	points += 50;
 }
 
 void CMario::OnCollisionWithPortal(LPCOLLISIONEVENT e)
@@ -379,6 +381,7 @@ void CMario::OnCollisionWithCoinBrick(LPCOLLISIONEVENT e)
 			coinBrick->SetBreakCOunt(coinBrick->GetBreakCount() - 1);
 
 			coin++;
+			points += 10;
 		}
 	}
 }
@@ -427,9 +430,37 @@ void CMario::OnCollisionWithParaGoomba(LPCOLLISIONEVENT e)
 	if (e->ny < 0)
 	{
 		if (paraGoomba->GetState() == PARAGOOMBA_STATE_WALKING || paraGoomba->GetState() == PARAGOOMBA_STATE_JUMPING)
+		{
+			float goombaX, goombaY;
+			paraGoomba->GetPosition(goombaX, goombaY);
+			CEffectScore* scoreEffect = new CEffectScore(goombaX, goombaY, SCORE_400);
+
+			// Add the score effect to the scene
+			CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+			if (scene) {
+				scene->GetObjectManager()->Add(scoreEffect);
+			}
+
+			// Add points to Mario's score
+			points += 400;
 			paraGoomba->SetState(PARAGOOMBA_STATE_WALKING2);
+		}
 		else if (paraGoomba->GetState() == PARAGOOMBA_STATE_WALKING2)
+		{
+			float goombaX, goombaY;
+			paraGoomba->GetPosition(goombaX, goombaY);
+			CEffectScore* scoreEffect = new CEffectScore(goombaX, goombaY, SCORE_800);
+
+			// Add the score effect to the scene
+			CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+			if (scene) {
+				scene->GetObjectManager()->Add(scoreEffect);
+			}
+
+			// Add points to Mario's score
+			points += 800;
 			paraGoomba->SetState(PARAGOOMBA_STATE_DIE);
+		}
 		vy = -MARIO_JUMP_DEFLECT_SPEED;
 	}
 	else // hit by Goomba
@@ -657,6 +688,18 @@ void CMario::OnCollisionWithBoomerangBro(LPCOLLISIONEVENT e)
 		if (boomerangBro->GetState() != BOOMERANG_BRO_STATE_DIE_TOP &&
 			boomerangBro->GetState() != BOOMERANG_BRO_STATE_DIE_BOTTOM)
 		{
+			float broX, broY;
+			boomerangBro->GetPosition(broX, broY);
+			CEffectScore* scoreEffect = new CEffectScore(broX, broY, SCORE_400);
+
+			// Add the score effect to the scene
+			CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+			if (scene) {
+				scene->GetObjectManager()->Add(scoreEffect);
+			}
+
+			// Add points to Mario's score
+			points += 400;
 			boomerangBro->SetState(BOOMERANG_BRO_STATE_DIE_TOP);
 			vy = -MARIO_JUMP_DEFLECT_SPEED;
 			DebugOut(L">>> Mario killed a BoomerangBro by jumping on it! >>> \n");
@@ -755,12 +798,40 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 		{
 			if (koopas->GetState() == KOOPAS_STATE_WALKING)
 			{
+				// Create score effect
+				float koopasX, koopasY;
+				koopas->GetPosition(koopasX, koopasY);
+				CEffectScore* scoreEffect = new CEffectScore(koopasX, koopasY, SCORE_100);
+
+				// Add the score effect to the scene
+				CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+				if (scene) {
+					scene->GetObjectManager()->Add(scoreEffect);
+				}
+
+				// Add points to Mario's score
+				points += 100;
+
 				// Turn normal Koopas into shell
 				koopas->SetState(KOOPAS_STATE_SHELL);
 				vy = -MARIO_JUMP_DEFLECT_SPEED;
 			}
 			else if (koopas->GetState() == KOOPAS_STATE_SHELL)
 			{
+				// Create score effect (more points for kicking a shell)
+				float koopasX, koopasY;
+				koopas->GetPosition(koopasX, koopasY);
+				CEffectScore* scoreEffect = new CEffectScore(koopasX, koopasY, SCORE_200);
+
+				// Add the score effect to the scene
+				CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+				if (scene) {
+					scene->GetObjectManager()->Add(scoreEffect);
+				}
+
+				// Add points to Mario's score
+				points += 200;
+
 				// If Koopas is already in shell state, kick it
 				float shellDirection;
 
@@ -777,6 +848,20 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 			}
 			else if (koopas->GetState() == KOOPAS_STATE_SHELL_MOVING)
 			{
+				// Create score effect
+				float koopasX, koopasY;
+				koopas->GetPosition(koopasX, koopasY);
+				CEffectScore* scoreEffect = new CEffectScore(koopasX, koopasY, SCORE_100);
+
+				// Add the score effect to the scene
+				CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+				if (scene) {
+					scene->GetObjectManager()->Add(scoreEffect);
+				}
+
+				// Add points to Mario's score
+				points += 100;
+
 				// If shell is already moving, stop it
 				koopas->SetState(KOOPAS_STATE_SHELL);
 				koopas->SetSpeed(0, 0);
@@ -797,6 +882,20 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 			}
 			else if (koopas->GetState() == KOOPAS_STATE_SHELL)
 			{
+				// Create score effect for kicking
+				float koopasX, koopasY;
+				koopas->GetPosition(koopasX, koopasY);
+				CEffectScore* scoreEffect = new CEffectScore(koopasX, koopasY, SCORE_400);
+
+				// Add the score effect to the scene
+				CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+				if (scene) {
+					scene->GetObjectManager()->Add(scoreEffect);
+				}
+
+				// Add points to Mario's score
+				points += 400;
+
 				isKicking = true;
 				kick_start = GetTickCount64();
 
@@ -832,17 +931,59 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 		{
 			if (koopas->GetState() == KOOPA_PARATROOPA_STATE_WALKING_WINGS || koopas->GetState() == KOOPA_PARATROOPA_STATE_JUMPING_WINGS)
 			{
+				// Create score effect - more points for winged koopas
+				float koopasX, koopasY;
+				koopas->GetPosition(koopasX, koopasY);
+				CEffectScore* scoreEffect = new CEffectScore(koopasX, koopasY, SCORE_400);
+
+				// Add the score effect to the scene
+				CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+				if (scene) {
+					scene->GetObjectManager()->Add(scoreEffect);
+				}
+
+				// Add points to Mario's score
+				points += 400;
+
 				koopas->SetState(KOOPA_PARATROOPA_STATE_WALKING);
 				vy = -MARIO_JUMP_DEFLECT_SPEED;
 			}
 			else if (koopas->GetState() == KOOPA_PARATROOPA_STATE_WALKING)
 			{
+				// Create score effect
+				float koopasX, koopasY;
+				koopas->GetPosition(koopasX, koopasY);
+				CEffectScore* scoreEffect = new CEffectScore(koopasX, koopasY, SCORE_100);
+
+				// Add the score effect to the scene
+				CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+				if (scene) {
+					scene->GetObjectManager()->Add(scoreEffect);
+				}
+
+				// Add points to Mario's score
+				points += 100;
+
 				// Turn normal Koopas into shell
 				koopas->SetState(KOOPA_PARATROOPA_STATE_SHELL);
 				vy = -MARIO_JUMP_DEFLECT_SPEED;
 			}
 			else if (koopas->GetState() == KOOPA_PARATROOPA_STATE_SHELL)
 			{
+				// Create score effect
+				float koopasX, koopasY;
+				koopas->GetPosition(koopasX, koopasY);
+				CEffectScore* scoreEffect = new CEffectScore(koopasX, koopasY, SCORE_200);
+
+				// Add the score effect to the scene
+				CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+				if (scene) {
+					scene->GetObjectManager()->Add(scoreEffect);
+				}
+
+				// Add points to Mario's score
+				points += 200;
+
 				// If Koopas is already in shell state, kick it
 				float shellDirection;
 
@@ -859,6 +1000,20 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 			}
 			else if (koopas->GetState() == KOOPA_PARATROOPA_STATE_MOVING_SHELL)
 			{
+				// Create score effect
+				float koopasX, koopasY;
+				koopas->GetPosition(koopasX, koopasY);
+				CEffectScore* scoreEffect = new CEffectScore(koopasX, koopasY, SCORE_100);
+
+				// Add the score effect to the scene
+				CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+				if (scene) {
+					scene->GetObjectManager()->Add(scoreEffect);
+				}
+
+				// Add points to Mario's score
+				points += 100;
+
 				// If shell is already moving, stop it
 				koopas->SetState(KOOPA_PARATROOPA_STATE_SHELL);
 				koopas->SetSpeed(0, 0);
@@ -879,6 +1034,20 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 			}
 			else if (koopas->GetState() == KOOPA_PARATROOPA_STATE_SHELL)
 			{
+				// Create score effect for kicking
+				float koopasX, koopasY;
+				koopas->GetPosition(koopasX, koopasY);
+				CEffectScore* scoreEffect = new CEffectScore(koopasX, koopasY, SCORE_400);
+
+				// Add the score effect to the scene
+				CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+				if (scene) {
+					scene->GetObjectManager()->Add(scoreEffect);
+				}
+
+				// Add points to Mario's score
+				points += 400;
+
 				isKicking = true;
 				kick_start = GetTickCount64();
 
@@ -912,6 +1081,20 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 	{
 		if (e->ny < 0)
 		{
+			// Create score effect for floating koopas
+			float koopasX, koopasY;
+			koopas->GetPosition(koopasX, koopasY);
+			CEffectScore* scoreEffect = new CEffectScore(koopasX, koopasY, SCORE_800);
+
+			// Add the score effect to the scene
+			CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+			if (scene) {
+				scene->GetObjectManager()->Add(scoreEffect);
+			}
+
+			// Add points to Mario's score
+			points += 800;
+
 			koopas->SetState(KOOPAS_STATE_WALKING);
 			vy = -MARIO_JUMP_DEFLECT_SPEED;
 			//koopas->ay = KOOPAS_GRAVITY;
@@ -1582,7 +1765,7 @@ void CMario::Render()
 
 	animations->Get(aniId)->Render(x, y);
 
-	RenderBoundingBox();
+	//RenderBoundingBox();
 	
 	DebugOutTitle(L"Coins: %d", coin);
 }

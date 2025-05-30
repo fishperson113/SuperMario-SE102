@@ -3,19 +3,21 @@
 #include "GameObject.h"
 
 class CMario;
+enum CameraMoveMode {
+    FOLLOW_PLAYER,     
+    PUSH_FORWARD,      
+    THRESHOLD_BASED,
+	FREE_MOVE,
+    FREEZE_MODE
+};
 class CameraController : public CGameObject {
 private:
-    enum CameraMoveMode {
-        FOLLOW_PLAYER,     
-        PUSH_FORWARD,      
-        THRESHOLD_BASED,
-		FREE_MOVE,
-        FREEZE_MODE
-    };
 
     CameraMoveMode mode;
 
     float x, y;
+    float stopPointX; 
+    bool hasStopPoint;
 
     // Camera boundaries
     float leftBoundary;
@@ -84,6 +86,8 @@ public:
 	void SwitchToFreezeMode() { mode = FREEZE_MODE; }
 
     bool IsInFreeMove() const { return mode == FREE_MOVE; }
+    void SetStopPoint(float x) { stopPointX = x; hasStopPoint = true; }
+    int GetMode() const { return mode; }
 };
 enum FreeCameraDirection {
     FREE_CAM_NONE = 0,

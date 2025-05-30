@@ -366,4 +366,6 @@ public:
 	void SetIsUnderground(bool underground) { isUnderground = underground; }
 	bool GetIsUnderground() { return isUnderground; }
 	bool GetIsHitSwitch() { return isHitSwitch; }
+	void AddPoints(int p) { points += p; }
+	void AddCoin(int c) { coin += c; }
 };

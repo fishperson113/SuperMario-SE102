@@ -3,7 +3,7 @@
 
 #define HITBOX_WIDTH 16
 #define HITBOX_HEIGHT 16
-#define HITBOX_LIFESPAN 150
+#define HITBOX_LIFESPAN 100
 class HitBox :  public CGameObject
 {
     void OnCollisionWithGoomba(LPCOLLISIONEVENT e);

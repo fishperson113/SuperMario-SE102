@@ -25,9 +25,6 @@ public:
 		x += vx * dt;
 		y += vy * dt;
 	}
-	void OnCollisionWith(LPCOLLISIONEVENT e) override
-	{
-		if (e->obj->IsBlocking()) return;
-	}
+	void OnCollisionWith(LPCOLLISIONEVENT e) override;
 };
 

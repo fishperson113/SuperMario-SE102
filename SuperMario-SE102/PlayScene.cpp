@@ -684,7 +684,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		int brickNumber = 1;
 		float offsetX = 0.0f;
 		float offsetY = 0.0f;
-		int aniId = ID_ANI_BRICK;
+		int aniId = 10015;
 		int bboxWidth = BRICK_BBOX_WIDTH;
 		int bboxHeight = BRICK_BBOX_HEIGHT;
 		bool isBreakable = true;

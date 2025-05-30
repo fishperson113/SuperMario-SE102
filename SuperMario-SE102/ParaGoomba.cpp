@@ -41,6 +41,7 @@ void CParaGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (state == PARAGOOMBA_STATE_WALKING && GetTickCount64() - jump_start > 500) // Walk duration
 	{
 		SetState(PARAGOOMBA_STATE_JUMPING);
+		jump_start = GetTickCount64();
 	}
 }
 
@@ -115,10 +116,10 @@ void CParaGoomba::SetState(int state)
 		break;
 	case PARAGOOMBA_STATE_WALKING:
 		vx = -PARAGOOMBA_WALKING_SPEED;
+		jump_start = GetTickCount64();
 		break;
 	case PARAGOOMBA_STATE_JUMPING:
 		vy = PARAGOOMBA_JUMP_SPEED;
-		jump_start = GetTickCount64();
 		break;
 	case PARAGOOMBA_STATE_WALKING2:
 		vx = -PARAGOOMBA_WALKING_SPEED;

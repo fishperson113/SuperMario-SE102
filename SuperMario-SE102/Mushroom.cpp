@@ -1,4 +1,7 @@
 #include "Mushroom.h"
+#include "Mario.h"
+#include "Game.h"
+#include "PlayScene.h"
 
 void CMushroom::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
@@ -11,9 +14,7 @@ void CMushroom::GetBoundingBox(float& left, float& top, float& right, float& bot
 void CMushroom::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	vy += ay * dt;
-	vx += ax * dt;
 
-	CGameObject::Update(dt, coObjects);
 }
 
 void CMushroom::Render()
@@ -55,10 +56,20 @@ void CMushroom::SetState(int state)
 {
 	CGameObject::SetState(state);
 
+	CMario* mario = NULL;
+	CPlayScene* scene = dynamic_cast<CPlayScene*>(CGame::GetInstance()->GetCurrentScene());
+	if (scene)
+	{
+		mario = dynamic_cast<CMario*>(scene->GetPlayer());
+	}
+	int direction = mario->GetDirection();
+
 	switch (state)
 	{
 	case MUSHROOM_STATE_WALKING:
-		vx = MUSHROOM_WALKING_SPEED; // Set initial horizontal velocity
+
+		vx = -MUSHROOM_WALKING_SPEED * direction; 
+		// Set initial horizontal velocity
 		break;
 	}
 }

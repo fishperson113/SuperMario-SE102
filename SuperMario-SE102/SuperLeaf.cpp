@@ -1,4 +1,5 @@
 #include "SuperLeaf.h"
+#include "Mario.h"
 
 void CSuperLeaf::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
@@ -24,4 +25,21 @@ void CSuperLeaf::Render()
 {
 	int aniId = ID_ANI_SUPERLEAF;
 	CAnimations::GetInstance()->Get(aniId)->Render(x, y);
+}
+
+void CSuperLeaf::OnCollisionWith(LPCOLLISIONEVENT e)
+{
+	if (e->obj->IsBlocking()) return;
+
+	if (dynamic_cast<CMario*>(e->obj))
+	{
+		CMario* mario = dynamic_cast<CMario*>(e->obj);
+		if (mario->GetLevel() == MARIO_LEVEL_SMALL)
+		{
+			mario->SetLevel(MARIO_LEVEL_BIG);
+		}
+		else {
+			mario->SetLevel(MARIO_LEVEL_TAIL);
+		}
+	}
 }

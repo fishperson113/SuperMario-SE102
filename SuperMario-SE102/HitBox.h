@@ -1,7 +1,7 @@
 #pragma once
 #include "GameObject.h"
 
-#define HITBOX_WIDTH 24
+#define HITBOX_WIDTH 16
 #define HITBOX_HEIGHT 16
 #define HITBOX_LIFESPAN 150
 class HitBox :  public CGameObject

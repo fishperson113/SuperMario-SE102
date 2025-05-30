@@ -250,12 +250,13 @@ void HitBox::Activate()
 void HitBox::OnNoCollision(DWORD dt)
 {
     float mario_x, mario_y;
-    CMario* mario = dynamic_cast<CMario*>(owner);    
+    CMario* mario = dynamic_cast<CMario*>(owner);
     mario->GetPosition(mario_x, mario_y);
 
     float offsetX = mario->GetDirection() > 0 ? HITBOX_WIDTH / 2 : -HITBOX_WIDTH / 2;
+    float offsetY = (mario->GetLevel() == MARIO_LEVEL_SMALL) ? 0 : 5;
     x = mario_x + offsetX;
-    y = mario_y;
+    y = mario_y + offsetY;
 }
 void HitBox::CheckOverlaps(vector<LPGAMEOBJECT>* coObjects)
 {

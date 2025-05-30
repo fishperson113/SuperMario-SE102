@@ -16,6 +16,8 @@ private:
     CameraMoveMode mode;
 
     float x, y;
+    float stopPointX; 
+    bool hasStopPoint;
 
     // Camera boundaries
     float leftBoundary;
@@ -84,6 +86,7 @@ public:
 	void SwitchToFreezeMode() { mode = FREEZE_MODE; }
 
     bool IsInFreeMove() const { return mode == FREE_MOVE; }
+    void SetStopPoint(float x) { stopPointX = x; hasStopPoint = true; }
 };
 enum FreeCameraDirection {
     FREE_CAM_NONE = 0,

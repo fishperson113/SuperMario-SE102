@@ -3,6 +3,9 @@
 #include "CoinBrick.h"
 #include "MushroomBrick.h"
 #include "SuperLeafBrick.h"
+#include "Mario.h"
+#include "PlayScene.h"
+#include "CEffectScore.h"
 
 void Koopas::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
@@ -266,7 +269,7 @@ void Koopas::Render()
 	}
 	
 	CAnimations::GetInstance()->Get(aniId)->Render(x, y);
-	RenderBoundingBox();
+	//RenderBoundingBox();
 }
 
 void Koopas::OnNoCollision(DWORD dt)
@@ -317,8 +320,25 @@ void Koopas::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
 	CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 	if (goomba->GetState() != GOOMBA_STATE_DIE)
 	{
+		// Create score effect
+		float goombaX, goombaY;
+		goomba->GetPosition(goombaX, goombaY);
+		CEffectScore* scoreEffect = new CEffectScore(goombaX, goombaY, SCORE_200);
+
+		// Add the score effect to the scene
+		CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		if (scene) {
+			scene->GetObjectManager()->Add(scoreEffect);
+
+			// Update Mario's points
+			CMario* mario = dynamic_cast<CMario*>(scene->GetPlayer());
+			if (mario) {
+				mario->AddPoints(200);
+			}
+		}
+
 		goomba->SetState(GOOMBA_STATE_DIE);
-		DebugOut(L">>> Koopa shell killed Goomba! >>> \n");
+		DebugOut(L">>> Koopa shell killed Goomba! +200 points >>> \n");
 	}
 }
 
@@ -330,6 +350,23 @@ void Koopas::OnCollisionWithOtherKoopas(LPCOLLISIONEVENT e)
 		otherKoopas->GetState() != KOOPA_PARATROOPA_STATE_SHELL &&
 		otherKoopas->GetState() != KOOPA_PARATROOPA_STATE_MOVING_SHELL)
 	{
+		// Create score effect
+		float koopasX, koopasY;
+		otherKoopas->GetPosition(koopasX, koopasY);
+		CEffectScore* scoreEffect = new CEffectScore(koopasX, koopasY, SCORE_400);
+
+		// Add the score effect to the scene
+		CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		if (scene) {
+			scene->GetObjectManager()->Add(scoreEffect);
+
+			// Update Mario's points
+			CMario* mario = dynamic_cast<CMario*>(scene->GetPlayer());
+			if (mario) {
+				mario->AddPoints(400);
+			}
+		}
+
 		if (otherKoopas->GetType() == KOOPAS_RED || otherKoopas->GetType() == KOOPAS_RED_WINGS)
 		{
 			otherKoopas->SetState(KOOPAS_STATE_SHELL);
@@ -338,7 +375,7 @@ void Koopas::OnCollisionWithOtherKoopas(LPCOLLISIONEVENT e)
 		{
 			otherKoopas->SetState(KOOPA_PARATROOPA_STATE_SHELL);
 		}
-		DebugOut(L">>> Koopa shell hit another Koopa! >>> \n");
+		DebugOut(L">>> Koopa shell hit another Koopa! +400 points >>> \n");
 	}
 }
 
@@ -347,9 +384,28 @@ void Koopas::OnCollisionWithCoinBrick(LPCOLLISIONEVENT e)
 	CCoinBrick* coinBrick = dynamic_cast<CCoinBrick*>(e->obj);
 	if (coinBrick->GetState() != BRICK_STATE_HIT)
 	{
+		// Create score effect
+		float brickX, brickY;
+		coinBrick->GetPosition(brickX, brickY);
+		CEffectScore* scoreEffect = new CEffectScore(brickX, brickY, SCORE_100);
+
+		// Add the score effect to the scene
+		CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+		if (scene) {
+			scene->GetObjectManager()->Add(scoreEffect);
+
+			// Update Mario's points
+			CMario* mario = dynamic_cast<CMario*>(scene->GetPlayer());
+			if (mario) {
+				mario->AddPoints(100);
+				// Also increment coin count as this is a coin brick
+				mario->AddCoin(1);
+			}
+		}
+
 		coinBrick->SpawnCoin();
 		coinBrick->SetState(BRICK_STATE_HIT);
-		DebugOut(L">>> Koopa shell hit Coin Brick! >>> \n");
+		DebugOut(L">>> Koopa shell hit Coin Brick! +100 points, +1 coin >>> \n");
 	}
 }
 

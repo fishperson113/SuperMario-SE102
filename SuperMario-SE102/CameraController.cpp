@@ -3,6 +3,8 @@
 #include "Collision.h"
 #include "debug.h"
 #include "Textures.h"
+#include "PlayScene.h"
+#include "Game.h"
 CameraController::CameraController(LPGAMEOBJECT player, CGame* game) : CGameObject()
 {
     this->player = player;
@@ -22,7 +24,8 @@ CameraController::CameraController(LPGAMEOBJECT player, CGame* game) : CGameObje
     pushSpeed = 0.02f;
     freeMovementSpeed = 0.2f;
     freeCameraDirection = 0;
-
+    stopPointX = 100.0f;
+    hasStopPoint = true;
     // Get initial screen dimensions
     screenWidth = game->GetBackBufferWidth();
     screenHeight = game->GetBackBufferHeight();
@@ -46,6 +49,14 @@ void CameraController::GetBoundingBox(float& left, float& top, float& right, flo
 
 void CameraController::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+    CPlayScene* currentScene = dynamic_cast<CPlayScene*>(CGame::GetInstance()->GetCurrentScene());
+    bool isPaused = currentScene && currentScene->IsPaused();
+    bool isGameOver = currentScene && currentScene->IsGameOver();
+
+    if ((isPaused || isGameOver) && mode == PUSH_FORWARD) {
+        game->SetCamPos(x, y); 
+        return;
+    }
     // Update screen dimensions in case they changed
     screenWidth = game->GetBackBufferWidth();
     screenHeight = game->GetBackBufferHeight();
@@ -92,10 +103,20 @@ void CameraController::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
         break;
 
     case PUSH_FORWARD:
-        // Move camera forward constantly
-        x += pushSpeed * dt;
-        y = screenHeight / 2-80;
+    {
+        // Check if camera has reached the stop point
+        if (hasStopPoint &&x>=stopPointX) {
+            // Switch to threshold mode when reaching the stop point
+            DebugOut(L"[CAMERA] Reached stop point at x = %.2f. Switching to threshold mode.\n", stopPointX);
+            SwitchToThresholdMode();
+        }
+        else {
+            // Move camera forward constantly
+            x += pushSpeed * dt;
+            y = screenHeight / 2 - 80;
+        }
         break;
+    }
 
     case THRESHOLD_BASED:
         // Handle horizontal camera movement

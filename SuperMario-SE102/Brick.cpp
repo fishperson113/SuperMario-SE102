@@ -59,21 +59,12 @@ void CBrick::SpawnBreakPiece()
 
 void CBrick::Break()
 {
-	if (this->IsBreakable() != 1)
+	if (!isBreakable)
 	{
 		return;
 	}
 
-	if (!ableToChangeToCoin)
-	{
-		this->Delete();
-		this->SpawnBreakPiece();
-	}
-	else if(!isCoin)
-	{
-		justTurnedToCoin = true;
-		TurnToCoin();
-	}
+	SetState(BRICK_STATE_HIT);
 }
 
 void CBrick::TurnToCoin()
@@ -81,9 +72,6 @@ void CBrick::TurnToCoin()
 	isCoin = true;
 }
 
-void CBrick::TurnBackToBrick()
-{
-}
 void CBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if (ableToChangeToCoin && !isCoin)
@@ -95,5 +83,34 @@ void CBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			TurnToCoin();
 		}
+	}
+}
+void CBrick::SetState(int state)
+{
+	this->state = state;
+
+	switch (state)
+	{
+	case BRICK_STATE_NORMAL:
+		break;
+
+	case BRICK_STATE_HIT:
+	{
+		if (!isCoin)
+		{
+			SpawnBreakPiece();
+		}
+		if (isBreakable && !ableToChangeToCoin)
+		{
+			this->Delete();
+		}
+		else if (ableToChangeToCoin && !isCoin)
+		{
+			// If it can turn to coin, do so
+			justTurnedToCoin = true;
+			TurnToCoin();
+		}
+		break;
+	}
 	}
 }

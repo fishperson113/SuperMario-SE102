@@ -10,6 +10,8 @@
 #define BRICK_WIDTH 16
 #define BRICK_BBOX_WIDTH 16
 #define BRICK_BBOX_HEIGHT 16
+#define BRICK_STATE_NORMAL 100
+#define BRICK_STATE_HIT 200
 
 class CBrick : public CGameObject {
 	int brickNumber; // Number of the brick
@@ -25,7 +27,18 @@ class CBrick : public CGameObject {
 	bool justTurnedToCoin = false;
 public:
 	CBrick(float x, float y, int brickNumber = 1, float offsetX = 0.0f, float offsetY = 0.0f, int aniId = ID_ANI_BRICK, int bboxWidth = BRICK_BBOX_WIDTH, int bboxHeight = BRICK_BBOX_HEIGHT, bool isBreakable = false, int coinCount = 0)
-		: CGameObject(x, y), brickNumber(brickNumber), offsetX(offsetX), offsetY(offsetY), aniId(aniId), bboxWidth(bboxWidth), bboxHeight(bboxHeight), isBreakable(isBreakable), coinCount(coinCount){
+		: CGameObject(x, y), brickNumber(brickNumber), offsetX(offsetX), offsetY(offsetY), aniId(aniId), bboxWidth(bboxWidth), bboxHeight(bboxHeight), isBreakable(isBreakable), coinCount(coinCount)
+	{
+		this->aniId = aniId;
+		this->isBreakable = isBreakable;
+		this->ableToChangeToCoin = ableToChangeToCoin;
+		this->isCoin = false;
+		this->justTurnedToCoin = false;
+		this->bboxWidth = bboxWidth;
+		this->bboxHeight = bboxHeight;
+		this->offsetX = offsetX;
+		this->offsetY = offsetY;
+		this->state = BRICK_STATE_NORMAL;
 	}
 
 	void Render();
@@ -40,8 +53,9 @@ public:
 	void SetAbleToChangeToCoin(bool able) { ableToChangeToCoin = able; }
 	bool IsAbleToChangeToCoin() { return ableToChangeToCoin; }
 	void TurnToCoin();
-	void TurnBackToBrick();
 	bool IsCoin() { return isCoin; }
 	bool JustTurnedToCoin() { return justTurnedToCoin; } 
 	void ResetJustTurnedToCoin() { justTurnedToCoin = false; } 
+	void SetState(int state);
+
 };

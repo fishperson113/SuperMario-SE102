@@ -672,6 +672,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line, ifstream& f)
 		}
 
 		CBrick* brick = new CBrick(x, y, brickNumber, offsetX, offsetY, aniId, bboxWidth, bboxHeight, isBreakable, coinCount);
+		brick->SetAbleToChangeToCoin(false); // Not a turn coin brick
 		obj = brick;
 		DebugOut(L"[INFO] Brick object has been created!\n");
 		break;

@@ -398,7 +398,7 @@ Koopas::Koopas(float x, float y, int type) :CGameObject(x, y)
 	shell_start = 0;
 	isBeingHeld = false;
 	fallSensor = nullptr;
-	DebugOut(L"[INFO] Koopas object type = %d!\n", this->type);
+	//DebugOut(L"[INFO] Koopas object type = %d!\n", this->type);
 	if (this->type == KOOPAS_RED)
 	{
 		fallSensor = new FallSensor(x, y, this);
@@ -418,7 +418,7 @@ Koopas::Koopas(float x, float y, int type) :CGameObject(x, y)
 		this->initialY = y;
 		this->floatTime = 0.0f;
 	}
-	DebugOut(L"[INFO] Koopas object type = %d!\n", this->type);
+	//DebugOut(L"[INFO] Koopas object type = %d!\n", this->type);
 	ResetSensors();
 }
 
@@ -515,7 +515,7 @@ void Koopas::ChangeDirection()
 	if (state == KOOPAS_STATE_WALKING)
 	{
 		vx = -vx; 
-		DebugOut(L">>> Koopas is now moving in the opposite direction: %f >>> \n", vx);
+		//DebugOut(L">>> Koopas is now moving in the opposite direction: %f >>> \n", vx);
 		ResetSensors();
 	}
 }

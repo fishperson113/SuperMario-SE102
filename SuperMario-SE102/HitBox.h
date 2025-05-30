@@ -14,6 +14,8 @@ class HitBox :  public CGameObject
     void OnCollisionWithBullet(LPCOLLISIONEVENT e);
     void OnCollisionWithBrick(LPCOLLISIONEVENT e);
 	void OnCollisionWithSwitchBrick(LPCOLLISIONEVENT e);
+	void OnCollisionWithCoinBrick(LPCOLLISIONEVENT e);
+	void OnCollisionWithMushroomBrick(LPCOLLISIONEVENT e);
 protected:
     ULONGLONG activate_start;
     CGameObject* owner;  // The owner of this hitbox (Mario)

@@ -19,6 +19,7 @@ public:
 	virtual void Update(DWORD dt) {}
 	virtual void GetBoundingBox(float& l, float& t, float& r, float& b);
 	virtual void SetState(int state);
+	int IsCollidable() { return 1; }
 	void SpawnMushroom();
 };
 

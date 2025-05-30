@@ -38,7 +38,6 @@ void CParaGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		isDeleted = true;
 		return;
 	}
-	DebugOut(L"ParaGoomba: %f, %f\n", x, y);
 	if (state == PARAGOOMBA_STATE_WALKING && GetTickCount64() - jump_start > 500) // Walk duration
 	{
 		SetState(PARAGOOMBA_STATE_JUMPING);

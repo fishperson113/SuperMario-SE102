@@ -11,6 +11,9 @@
 #include "CEffect.h"
 #include "CEffectScore.h"
 #include "SwitchBrick.h"
+#include "CoinBrick.h"
+#include "MushroomBrick.h"
+#include "SuperLeafBrick.h"
 
 HitBox::HitBox(CGameObject* owner):CGameObject(x,y)
 {
@@ -180,6 +183,7 @@ void HitBox::OnCollisionWithBrick(LPCOLLISIONEVENT e)
     if (brick->IsBreakable())
         brick->Break();
 }
+
 void HitBox::OnCollisionWithSwitchBrick(LPCOLLISIONEVENT e)
 {
 	CSwitchBrick* switchBrick = dynamic_cast<CSwitchBrick*>(e->obj);
@@ -193,6 +197,36 @@ void HitBox::OnCollisionWithSwitchBrick(LPCOLLISIONEVENT e)
     {
         DebugOut(L">>> Mario tried to hit a switch brick that is already activated! >>> \n");
     }
+}
+
+void HitBox::OnCollisionWithCoinBrick(LPCOLLISIONEVENT e)
+{
+	CCoinBrick* coinBrick = dynamic_cast<CCoinBrick*>(e->obj);
+	if (coinBrick && coinBrick->GetState() != BRICK_STATE_HIT)
+	{
+		coinBrick->SetState(BRICK_STATE_HIT);
+		coinBrick->SpawnCoin();
+		DebugOut(L">>> Mario hit a coin brick! >>> \n");
+	}
+	else
+	{
+		DebugOut(L">>> Mario tried to hit a coin brick that is already activated! >>> \n");
+	}
+}
+
+void HitBox::OnCollisionWithMushroomBrick(LPCOLLISIONEVENT e)
+{
+	CMushroomBrick* mushroomBrick = dynamic_cast<CMushroomBrick*>(e->obj);
+	if (mushroomBrick && mushroomBrick->GetState() != BRICK_STATE_HIT)
+	{
+        mushroomBrick->SpawnMushroom();
+		mushroomBrick->SetState(BRICK_STATE_HIT);
+		DebugOut(L">>> Mario hit a mushroom brick! >>> \n");
+	}
+	else
+	{
+		DebugOut(L">>> Mario tried to hit a mushroom brick that is already activated! >>> \n");
+	}
 }
 void HitBox::Render()
 {
@@ -281,4 +315,8 @@ void HitBox::OnCollisionWith(LPCOLLISIONEVENT e)
         OnCollisionWithBrick(e);
 	else if (dynamic_cast<CSwitchBrick*>(e->obj))
 		OnCollisionWithSwitchBrick(e);
+    else if (dynamic_cast<CCoinBrick*>(e->obj))
+        OnCollisionWithCoinBrick(e);
+    else if (dynamic_cast<CMushroomBrick*>(e->obj))
+        OnCollisionWithMushroomBrick(e);
 }

@@ -30,7 +30,7 @@
 #include "CEffectScore.h"
 #include "Switch.h"	
 #include "SwitchBrick.h"
-
+#include "CameraTest.h"
 CMario::~CMario()
 {
 	if (heldKoopas != NULL)
@@ -153,19 +153,15 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	if (this->y >= 320)
 	{
-		if (currentScene && currentScene->GetCameraController())
-		{
-			// Set the camera to FREEZE_MODE
-			currentScene->GetCameraController()->SwitchToFreezeMode();
-		}
+		// Use Camera singleton instead of CameraController
+		Camera::GetInstance()->SwitchToFreezeMode();
 		this->SetIsUnderground(true);
 	}
 	if (this->y <= 134 && this->isUnderground == true)
 	{
-		if (currentScene && currentScene->GetCameraController())
-		{
-			currentScene->GetCameraController()->SwitchToThresholdMode();
-		}
+		// Use Camera singleton instead of CameraController
+		Camera::GetInstance()->SwitchToThresholdMode();
+		this->SetIsUnderground(false); // Reset underground state
 	}
 }
 

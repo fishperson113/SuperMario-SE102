@@ -143,6 +143,7 @@
     <ClCompile Include="BrickPiece.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="CameraController.cpp" />
+    <ClCompile Include="CameraTest.cpp" />
     <ClCompile Include="Card.cpp" />
     <ClCompile Include="CBackgroundObject.cpp" />
     <ClCompile Include="CEffect.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="BrickPiece.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="CameraController.h" />
+    <ClInclude Include="CameraTest.h" />
     <ClInclude Include="Card.h" />
     <ClInclude Include="CBackgroundObject.h" />
     <ClInclude Include="CEffect.h" />

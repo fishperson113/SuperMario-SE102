@@ -34,7 +34,7 @@
 #include "Card.h"
 #include "Switch.h"
 #include "SwitchBrick.h"
-
+#include "CameraTest.h"
 using namespace std;
 
 CPlayScene::CPlayScene(int id, LPCWSTR filePath):
@@ -789,6 +789,25 @@ void CPlayScene::Load()
 		}
 	}
 	f.close();
+	// Get the camera singleton
+	Camera* camera = Camera::GetInstance();
+
+	if (player)
+		camera->SetTarget(player);
+
+	// Configure camera based on scene ID
+	if (id == 1) {  // First scene
+		// Setup for threshold-based camera
+		camera->SetMode(THRESHOLD_BASED_TEST);
+		camera->SetBoundaries(0, 6048.0f, 0, 2768.0f);
+		camera->SetThresholds(0.3f, 0.3f, 0.3f, 0.7f);
+	}
+	else if (id == 2) {  // Second scene
+
+		camera->SetMode(PUSH_FORWARD_TEST);
+		camera->SetPushSpeed(0.03f);
+		camera->SetStopPoint(1500.0f);
+	}
 	DebugOut(L"[INFO] Done loading scene  %s\n", sceneFilePath);
 }
 
@@ -807,26 +826,7 @@ void CPlayScene::Update(DWORD dt)
 	// Update all game objects first
 	objectManager.Update(dt);
 	HUD::GetInstance()->Update();
-
-	if (cameraController == NULL)
-	{
-		cameraController = new CameraController(player, CGame::GetInstance());
-		cameraController->SwitchToThresholdMode(); // Default mode
-		//cameraController->SwitchToFreeMove();
-		objectManager.Add(cameraController);
-		DebugOut(L"[INFO] Default camera controller created\n");
-	}
-
-	if (cameraController->IsInFreeMove())
-	{
-		CGame* game = CGame::GetInstance();
-
-		cameraController->SetFreeCameraDirection(FREE_CAM_LEFT, game->IsKeyDown(DIK_LEFT));
-		cameraController->SetFreeCameraDirection(FREE_CAM_LEFT, game->IsKeyDown(DIK_LEFT));
-		cameraController->SetFreeCameraDirection(FREE_CAM_RIGHT, game->IsKeyDown(DIK_RIGHT));
-		cameraController->SetFreeCameraDirection(FREE_CAM_UP, game->IsKeyDown(DIK_UP));
-		cameraController->SetFreeCameraDirection(FREE_CAM_DOWN, game->IsKeyDown(DIK_DOWN));
-	}
+	Camera::GetInstance()->Update(dt);
 
 	// Clean up deleted objects
 	PurgeDeletedObjects();
@@ -963,6 +963,12 @@ void CPlayScene::Reload()
 		HUD::initStart = false;
 		HUD::isAllowToRenderHudStart = false;
 	}
+	// Get camera instance before clearing the scene
+	Camera* camera = Camera::GetInstance();
+
+	// Reset camera position and settings
+	camera->SetPosition(0, 0);
+	camera->SetTarget(NULL);
 	Clear();
 
 	Unload();

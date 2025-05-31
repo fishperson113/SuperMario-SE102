@@ -805,6 +805,7 @@ void CPlayScene::Load()
 	else if (id == 2) {  // Second scene
 
 		camera->SetMode(PUSH_FORWARD_TEST);
+		camera->SetPosition(0, 0);
 		camera->SetPushSpeed(0.03f);
 		camera->SetStopPoint(1500.0f);
 	}

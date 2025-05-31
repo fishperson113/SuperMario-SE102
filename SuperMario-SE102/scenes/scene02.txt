@@ -230,7 +230,7 @@ assets\koopaparatroopa.txt
 21	2760	109
 
 #Camera
-17	0	0	1
+#17	0	0	1
 
 #Portal 
 

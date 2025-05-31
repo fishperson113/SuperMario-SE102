@@ -360,6 +360,8 @@ void CMario::OnCollisionWithPortal(LPCOLLISIONEVENT e)
 	hud->SetLastCoin(coin);
 	hud->SetLastPoints(points);
 	CGame::GetInstance()->InitiateSwitchScene(p->GetSceneId());
+	Camera::GetInstance()->SetPosition(0, 0);
+
 }
 
 void CMario::OnCollisionWithCoinBrick(LPCOLLISIONEVENT e)

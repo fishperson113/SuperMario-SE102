@@ -1524,30 +1524,34 @@ void CMario::HandleEnemyCollisionsInGodMode(LPCOLLISIONEVENT e)
 
 void CMario::UpdatePowerMeter(DWORD dt)
 {
-	if (isRunning && isOnPlatform && !isSitting)
+	if (isRunning && isOnPlatform)
 	{
-		float speedFactor = min(abs(vx) / MARIO_RUNNING_SPEED, 1.0f);
-		powerMeter += MARIO_PMETER_GAIN_RATE * speedFactor * dt;
-
-		if (powerMeter > MARIO_PMETER_MAX)
-			powerMeter = MARIO_PMETER_MAX;
+		if (GetTickCount64() - run_start > START_RUN_TIME_OUT)
+		{
+			if (GetTickCount64() - speed_bar_start > 115)
+			{
+				if (powerMeter < 7)
+				{
+					powerMeter += 1.0f;
+				}
+				speed_bar_start = GetTickCount64(); 
+			}
+		}
 	}
-	else if (isOnPlatform && abs(vx) < 0.01f && !isSitting && state == MARIO_STATE_IDLE)
+	else if (ax * vx < 0 || !isRunning || (isRunning && !isOnPlatform))
 	{
-		powerMeter -= (MARIO_PMETER_DECAY_RATE * 0.5f) * dt;
+		if (isFlying) return; 
 
-		if (powerMeter < 0)
-			powerMeter = 0;
+		if (GetTickCount64() - speed_bar_stop > 115)
+		{
+			if (powerMeter > 0)
+			{
+				powerMeter -= 1.0f;
+			}
+			speed_bar_stop = GetTickCount64(); 
+		}
 
-		if (powerMeter > 0 && powerMeter < 0.1f)
-			DebugOut(L">>> Mario's power meter almost depleted while idle >>> \n");
-	}
-	else
-	{
-		powerMeter -= MARIO_PMETER_DECAY_RATE * dt;
-
-		if (powerMeter < 0)
-			powerMeter = 0;
+		run_start = GetTickCount64();
 	}
 }
 
@@ -1609,15 +1613,12 @@ void CMario::UpdateFlyingState()
 {
 	if (!isFlying)
 		return;
-	if (powerMeter <= 0)
+	if (GetTickCount64() - fly_start > MARIO_FLY_TIMEOUT)
 	{
 		isFlying = false;
-		DebugOut(L">>> Mario flight ended due to depleted power meter! >>> \n");
+		DebugOut(L">>> Mario flight timed out after %d ms! >>> \n", MARIO_FLY_TIMEOUT);
 		return;
 	}
-
-	powerMeter -= 0.01f;  
-	if (powerMeter < 0) powerMeter = 0;
 
 	vy = MARIO_FLY_SPEED_Y;
 

@@ -197,19 +197,19 @@ void HUD::RenderSpeedBar()
     if (!mario) return;
 
     float powerMeter = mario->GetPowerMeter();
-    int barSegments = (powerMeter +1);
+    int barSegments = (powerMeter+1);
 
     // Draw speed bar segments
-    for (int i = 0; i < barSegments; i++)
+    for (int i = 1; i < barSegments; i++)
     {
-        if (i == 6) // P-meter full
+        if (i == 7) // P-meter full
         {
             sprites->Get(ID_P_BUTTON)->Draw(x - 10.0f, y - 5.0f, 1.2, 1.2);
         }
         else
         {
             // Draw regular speed bar segments
-            sprites->Get(ID_SPEED_BAR)->Draw(x - (73.0f - 9.0f * i), y - 6.0f, 1.2, 1.2);
+            sprites->Get(ID_SPEED_BAR)->Draw(x - (83.0f - 9.0f * i), y - 6.0f, 1.2, 1.2);
         }
     }
 }

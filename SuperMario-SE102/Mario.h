@@ -13,9 +13,7 @@
 
 #define MARIO_ACCEL_WALK_X	0.00025f
 #define MARIO_ACCEL_RUN_X	0.00025f
-#define MARIO_PMETER_MAX          6        
-#define MARIO_PMETER_GAIN_RATE    0.002f  
-#define MARIO_PMETER_DECAY_RATE   0.0008f
+#define MARIO_PMETER_MAX          6       
 
 #define MARIO_JUMP_SPEED_Y		0.5f
 #define MARIO_JUMP_RUN_SPEED_Y	0.6f
@@ -26,6 +24,7 @@
 
 #define MARIO_STATE_FLY 810
 #define MARIO_FLY_SPEED_Y -0.2f 
+#define MARIO_FLY_TIMEOUT 5000 
 
 #define MARIO_STATE_DIE				-10
 #define MARIO_STATE_IDLE			0
@@ -54,6 +53,8 @@
 #define MARIO_PIPE_ENTRY_TIME       800    // Time to enter pipe animation
 #define MARIO_PIPE_EXIT_TIME        800    // Time to exit pipe animation
 #define MARIO_PIPE_MOVE_SPEED       0.2f 
+
+#define START_RUN_TIME_OUT	900
 
 #pragma region ANIMATION_ID
 //BIG MARIO
@@ -216,7 +217,9 @@ class CMario : public CGameObject
 	float teleport_target_x, teleport_target_y;
 	PipeDirection teleport_exit_direction;
 	PipeDirection current_pipe_direction;
-
+	ULONGLONG run_start;
+	ULONGLONG speed_bar_start;	
+	ULONGLONG speed_bar_stop;
 	bool isUnderground = false;
 	bool isHitSwitch = false;
 
@@ -323,6 +326,9 @@ public:
 		points = HUD::GetInstance()->GetLastScore();
 		teleport_exit_start = 0;
 		current_pipe_direction = PipeDirection::UP;
+		run_start = 0;
+		speed_bar_start = 0;
+		speed_bar_stop = 0;
 	}
 	virtual ~CMario();
 

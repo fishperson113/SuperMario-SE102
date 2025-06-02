@@ -4,7 +4,7 @@
 void CCoinBrick::Render()
 {
 	CAnimations* animations = CAnimations::GetInstance();
-	if (this->state == BRICK_STATE_HIT)
+	if (this->state == COIN_BRICK_STATE_HIT)
 	{
 		animations->Get(ID_ANI_COINBRICK + 1)->Render(x, y);
 	}
@@ -17,7 +17,7 @@ void CCoinBrick::Render()
 void CCoinBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	if (this->breakCount == 0)
-		this->SetState(BRICK_STATE_HIT);
+		this->SetState(COIN_BRICK_STATE_HIT);
 	if (this->state == BRICK_STATE_HITTING)
 	{
 		if (this->y != this->min_pos)
@@ -26,9 +26,9 @@ void CCoinBrick::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (GetTickCount64() - this->jump_start > 100)
 	{
 		this->y = old_pos;
-		if (this->state != BRICK_STATE_HIT)
+		if (this->state != COIN_BRICK_STATE_HIT)
 		{
-			this->SetState(BRICK_STATE_NORMAL);
+			this->SetState(COIN_BRICK_STATE_NORMAL);
 		}
 		jump_start = GetTickCount64();
 	}
@@ -60,7 +60,7 @@ void CCoinBrick::SpawnCoin()
 void CCoinBrick::Bounce()
 {
 	jump_start = GetTickCount64();
-	if (this->breakCount != 0 && this->state != BRICK_STATE_HIT)
+	if (this->breakCount != 0 && this->state != COIN_BRICK_STATE_HIT)
 	{
 		this->y -= 4;
 	}

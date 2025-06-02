@@ -9,7 +9,6 @@
 #define BRICK_WIDTH 16
 #define BRICK_BBOX_WIDTH 16
 #define BRICK_BBOX_HEIGHT 16
-#define BRICK_STATE_HIT 100
 
 class CMushroomBrick : public CGameObject
 {
@@ -17,7 +16,7 @@ private:
 	bool isHitted;
 public:
 	CMushroomBrick(float x, float y, bool isHitted = false) : CGameObject(x, y) {
-		isHitted = isHitted;
+		this->isHitted = isHitted;
 	}
 	virtual void Render();
 	virtual void Update(DWORD dt) {}

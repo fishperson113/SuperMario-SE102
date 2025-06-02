@@ -9,9 +9,9 @@
 #define BRICK_WIDTH 16
 #define BRICK_BBOX_WIDTH 16
 #define BRICK_BBOX_HEIGHT 16
-#define BRICK_STATE_HIT 100
+#define COIN_BRICK_STATE_HIT 100
 #define BRICK_STATE_HITTING 101
-#define BRICK_STATE_NORMAL 102
+#define COIN_BRICK_STATE_NORMAL 102
 #define GOLD_BRICK_BOUNCING_SPEED 0.05f
 #define GOLD_BRICK_GRAVITY	0.05f
 
@@ -20,7 +20,7 @@ class CCoinBrick : public CGameObject
 private:
 	float isBreakable = false;
 	int breakCount = 1;
-	int initialY = y;
+	float initialY = y;
 	float old_pos, min_pos;
 	ULONGLONG jump_start;
 public:
@@ -28,7 +28,7 @@ public:
 		this->old_pos = y;
 		this->min_pos = y - 4;
 		this->jump_start = GetTickCount64();
-		this->state = BRICK_STATE_NORMAL;
+		this->state = COIN_BRICK_STATE_NORMAL;
 	}
 	virtual void Render();
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);

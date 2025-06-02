@@ -131,6 +131,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	// Handle untouchable state
 	UpdateUntouchableState();
 
+	HandleUntouchableDrawState();
+
 	UpdateHeldKoopas();
 	// Handle kicking timeout
 	UpdateKickingState();
@@ -1679,6 +1681,25 @@ void CMario::UpdateTeleportingState()
 	}
 }
 
+void CMario::HandleUntouchableDrawState()
+{
+	if (untouchable && GetTickCount64() - untouch_draw_0 >= UNTOUCH_DRAW_TIME && untouch_0)
+	{
+		untouch_0 = false;
+		untouch_1 = true;
+		untouch_draw_0 = 0;
+		untouch_draw_1 = GetTickCount64();
+	}
+	// Visible state
+	else if (untouchable && GetTickCount64() - untouch_draw_1 >= UNTOUCH_DRAW_TIME && untouch_1)
+	{
+		untouch_0 = true;
+		untouch_1 = false;
+		untouch_draw_0 = GetTickCount64();
+		untouch_draw_1 = 0;
+	}
+}
+
 
 //
 // Get animdation ID for big Mario
@@ -1717,6 +1738,9 @@ int CMario::GetAniIdBig()
 
 void CMario::Render()
 {
+	if (untouchable && untouch_1)
+		return;
+
 	CAnimations* animations = CAnimations::GetInstance();
 	int aniId = -1;
 

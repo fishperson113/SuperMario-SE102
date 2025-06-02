@@ -176,6 +176,7 @@
 
 
 #define MARIO_UNTOUCHABLE_TIME 2500
+#define UNTOUCH_DRAW_TIME 100 
 
 #define MARIO_STATE_PIPE 920
 #include"HUD.h"
@@ -222,6 +223,10 @@ class CMario : public CGameObject
 	ULONGLONG speed_bar_stop;
 	bool isUnderground = false;
 	bool isHitSwitch = false;
+	bool untouch_0;            
+	bool untouch_1;            
+	ULONGLONG untouch_draw_0;  
+	ULONGLONG untouch_draw_1;
 
 	void UpdateHeldKoopasPosition();
 	void OnCollisionWithGoomba(LPCOLLISIONEVENT e);
@@ -284,7 +289,7 @@ class CMario : public CGameObject
 	void UpdateGlidingState();
 	void UpdateFlyingState();
 	void UpdateTeleportingState();
-
+	void HandleUntouchableDrawState();
 	void AlignWithPipe(CPipe* pipe, PipeDirection direction);
 	void StartPipeMovement(PipeDirection direction, bool isEntry);
 	void UpdatePipeMovement();
@@ -329,6 +334,10 @@ public:
 		run_start = 0;
 		speed_bar_start = 0;
 		speed_bar_stop = 0;
+		untouch_0 = true;
+		untouch_1 = false;
+		untouch_draw_0 = 0;
+		untouch_draw_1 = 0;
 	}
 	virtual ~CMario();
 

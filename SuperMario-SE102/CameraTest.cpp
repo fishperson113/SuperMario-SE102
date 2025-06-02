@@ -8,7 +8,7 @@ Camera* Camera::__instance = NULL;
 Camera::Camera()
 {
     x = y = 0;
-    leftBoundary = -10000;
+    leftBoundary = -10;
     rightBoundary = 10000;
     topBoundary = -10000;
     bottomBoundary = 10000;

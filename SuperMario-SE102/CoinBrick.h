@@ -37,7 +37,7 @@ public:
 	void SpawnCoin();
 	void Bounce();
 	void OnNoCollision(DWORD dt);
-	int IsCollidable() { return 1; }
+	int IsCollidable() { return 0; }
 	virtual void OnCollisionWith(LPCOLLISIONEVENT e);
 	void OnCollisionWithKoopas(LPCOLLISIONEVENT e);
 	int GetBreakCount() { return breakCount; }

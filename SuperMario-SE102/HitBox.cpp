@@ -231,7 +231,7 @@ void HitBox::OnCollisionWithMushroomBrick(LPCOLLISIONEVENT e)
 void HitBox::Render()
 {
     //if (!isActivate) return;
-    //RenderBoundingBox();
+    RenderBoundingBox();
 }
 
 void HitBox::GetBoundingBox(float& left, float& top, float& right, float& bottom)
@@ -272,10 +272,6 @@ void HitBox::CheckOverlaps(vector<LPGAMEOBJECT>* coObjects)
 
         // Skip self, owner, and deleted objects
         if (obj == this || obj == owner || obj->IsDeleted() || !obj->IsActive())
-            continue;
-
-        // Skip non-collidable objects
-        if (!obj->IsCollidable())
             continue;
 
         // Get object bounds

@@ -47,7 +47,7 @@ public:
 	int IsBlocking() { return !isCoin; };
 	int IsDirectionColliable(float nx, float ny);
 	int IsBreakable() { return isBreakable; }
-	int IsCollidable() { return isBreakable; }
+	int IsCollidable() { return 0; }
 	void SpawnBreakPiece();
 	void Break();
 	void SetAbleToChangeToCoin(bool able) { ableToChangeToCoin = able; }

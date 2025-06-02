@@ -146,7 +146,8 @@ void Camera::Update(DWORD dt)
         }
         else {
             x += pushSpeed * dt;
-            y = targetY - screenHeight / 2;
+            //y = targetY - screenHeight / 2;
+            y = screenHeight / 2 - 80;
             PushTarget();
         }
         break;

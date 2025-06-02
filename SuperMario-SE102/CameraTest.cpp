@@ -17,7 +17,7 @@ Camera::Camera()
     leftThreshold = 0.3f;
     rightThreshold = 0.3f;
     topThreshold = 0.3f;
-    bottomThreshold = 0.7f;
+    bottomThreshold = 0.3f;
 
     pushSpeed = 0.03f;
     stopPointX = 0;
@@ -121,27 +121,39 @@ void Camera::Update(DWORD dt)
     switch (mode)
     {
     case THRESHOLD_BASED_TEST:
-        // Direct follow mode - simply center the camera on the player
+    {
         x = targetX - screenWidth / 2;
-        y = targetY - screenHeight / 2-40;
-        break;
 
+        float absoluteTopThreshold = y + (topThreshold * screenHeight);
+        float absoluteBottomThreshold = y + ((1.0f - bottomThreshold) * screenHeight);
+
+        if (targetY > absoluteBottomThreshold)
+        {
+            float moveAmount = (targetY - absoluteBottomThreshold);
+            y += moveAmount;
+        }
+        else if (targetY < absoluteTopThreshold)
+        {
+            float moveAmount = (absoluteTopThreshold - targetY);
+            y -= moveAmount;
+        }
+        break;
+    }
     case PUSH_FORWARD_TEST:
-        if (mario->IsTeleporting()) {
+        if (hasStopPoint && x >= stopPointX) {
             DebugOut(L"[CAMERA] Reached stop point at x = %.2f. Switching to threshold mode.\n", stopPointX);
             SwitchToThresholdMode();
         }
         else {
             x += pushSpeed * dt;
-
             y = targetY - screenHeight / 2;
             PushTarget();
-
         }
         break;
+
     case FREEZE_MODE_TEST:
         x = 2054;  // Fixed X position
-        y = 200;
+        y = 200;   // Fixed Y position
         if (mario && targetY <= 134 && mario->GetIsUnderground()) {
             // Switch back to threshold mode
             mode = THRESHOLD_BASED_TEST;
@@ -152,6 +164,7 @@ void Camera::Update(DWORD dt)
 
     // Apply boundaries
     x = max(leftBoundary, min(x, rightBoundary - screenWidth));
+    y = max(topBoundary, min(y, bottomBoundary - screenHeight));
 
     if (y > bottomBoundary - screenHeight)
         y = bottomBoundary - screenHeight;

@@ -798,9 +798,7 @@ void CPlayScene::Load()
 	// Configure camera based on scene ID
 	if (id == 1) {  // First scene
 		// Setup for threshold-based camera
-		camera->SetMode(THRESHOLD_BASED_TEST);
-		camera->SetBoundaries(0, 6048.0f, 0, 2768.0f);
-		camera->SetThresholds(0.3f, 0.3f, 0.3f, 0.7f);
+		camera->SwitchToThresholdMode();
 	}
 	else if (id == 2) {  // Second scene
 

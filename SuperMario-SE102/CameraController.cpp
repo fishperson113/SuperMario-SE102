@@ -213,7 +213,6 @@ void CameraController::RenderBoundingBox()
 
     LPTEXTURE bbox = CTextures::GetInstance()->Get(ID_TEX_BBOX);
 
-    // ✅ Đây mới là cách đúng: dịch theo camera
     CGame::GetInstance()->Draw(x - cx, y - cy, bbox, &rect, BBOX_ALPHA);
 }
 

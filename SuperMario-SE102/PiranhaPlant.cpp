@@ -1,13 +1,41 @@
 #include "PiranhaPlant.h"
 
+void CPiranhaPlant::HandlePlantDeadEffect()
+{
+	die_start = GetTickCount64();
+
+	float effectY = this->y;
+	if (this->type == 0)
+		effectY = y - PIRANHA_PLANT_BBOX_HEIGHT / 2 + 3.0f;
+	else
+		effectY = y - GREEN_FIRE_TRAP_BBOX_HEIGHT / 2 + 3.0f;
+
+	eff_die = new CEffectHit(x, effectY, die_start, EFF_COL_TYPE_SMOKE_EVOLVE);
+
+	CPlayScene* current_scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+	current_scene->GetObjectManager()->Add(eff_die);
+}
+
 CPiranhaPlant::CPiranhaPlant(float x, float y)
 {
 	this->spawnTime = GetTickCount64();
-
+	this->die_start = 0;
+	this->eff_die = nullptr;
 	this->x = x;
 	this->y = y;
 }
+void CPiranhaPlant::SetState(int state)
+{
+	switch (state)
+	{
+	case PIRANHA_PLANT_STATE_DIE:
+		this->Delete();
+		HandlePlantDeadEffect();
+		break;
+	}
 
+	CGameObject::SetState(state);
+}
 void CPiranhaPlant::Render()
 {
 	CAnimations::GetInstance()->Get(aniId)->Render(x, y);

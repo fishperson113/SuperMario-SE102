@@ -143,7 +143,9 @@ void HitBox::OnCollisionWithKoopaParatroopa(LPCOLLISIONEVENT e)
 void HitBox::OnCollisionWithPiranhaPlant(LPCOLLISIONEVENT e)
 {
     CPiranhaPlant* plant = dynamic_cast<CPiranhaPlant*>(e->obj);
-    plant->Delete();
+    CMario* mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+	mario->SpawnHitEffect(e, this, EFF_COL_TYPE_NORMAL);
+    plant->SetState(PIRANHA_PLANT_STATE_DIE);
 }
 
 void HitBox::OnCollisionWithBullet(LPCOLLISIONEVENT e)

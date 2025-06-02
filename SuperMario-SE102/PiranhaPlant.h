@@ -4,7 +4,7 @@
 #include "Game.h"
 #include "PlayScene.h"
 #include "Bullet.h"
-
+#include"EffectHit.h"
 #define PIRANHA_PLANT_BBOX_WIDTH 17
 #define PIRANHA_PLANT_BBOX_HEIGHT 30
 #define GREEN_FIRE_TRAP_BBOX_WIDTH 17
@@ -16,9 +16,15 @@
 #define ID_ANI_PIRANHA_GREEN_ABOVE 200012
 
 #define SHOOTING_TIME 5000
+#define PIRANHA_PLANT_STATE_DIE 100
 
 class CPiranhaPlant : public CGameObject
 {
+private:
+	ULONGLONG die_start;
+	CEffectHit* eff_die;
+
+	void HandlePlantDeadEffect();
 public:
 	CPiranhaPlant(float x, float y);
 	void Render();
@@ -29,6 +35,7 @@ public:
 	int IsBlocking() { return 0; }
 	int IsCollidable() { return 1; }
 	void SetAnimationId(int aniId) { this->aniId = aniId; }
+	void SetState(int state);
 protected:
 	ULONGLONG spawnTime;
 	int aniId = ID_ANI_PIRANHA_LONG_LEFT;

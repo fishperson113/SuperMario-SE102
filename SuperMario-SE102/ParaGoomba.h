@@ -18,6 +18,7 @@
 #define PARAGOOMBA_STATE_WALKING2 250
 
 #define PARAGOOMBA_DIE_TIMEOUT 500
+#define PARAGOOMBA_STEPS_BEFORE_JUMP 60
 
 #define ID_ANI_PARAGOOMBA_WALKING 4999
 #define ID_ANI_PARAGOOMBA_DIE 4998
@@ -32,6 +33,8 @@ protected:
 
 	ULONGLONG die_start;
 	ULONGLONG jump_start;
+	int count_steps;
+	int jump_count;
 
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);

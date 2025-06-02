@@ -386,22 +386,7 @@ void CMario::OnCollisionWithCoinBrick(LPCOLLISIONEVENT e)
 
 void CMario::OnCollisionWithMushroom(LPCOLLISIONEVENT e)
 {
-	float mushroomX, mushroomY;
-	e->obj->GetPosition(mushroomX, mushroomY);
-	CEffectScore* levelUpEffect = new CEffectScore(mushroomX, mushroomY, SCORE_LEVEL_UP);
-
-	CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-	if (scene) {
-		scene->GetObjectManager()->Add(levelUpEffect);
-	}
-
-	// Add points to Mario's score
-	points += 1000;
-	e->obj->Delete();
-	if (this->GetLevel() == MARIO_LEVEL_SMALL)
-		this->SetLevel(MARIO_LEVEL_BIG);
-	else if (this->GetLevel() == MARIO_LEVEL_BIG)
-		this->SetLevel(MARIO_LEVEL_TAIL);		
+	dynamic_cast<CMushroom*>(e->obj)->BeCollected();
 }
 
 void CMario::OnCollisionWithMushroomBrick(LPCOLLISIONEVENT e)
@@ -503,25 +488,7 @@ void CMario::OnCollisionWithPiranhaPlant(LPCOLLISIONEVENT e)
 
 void CMario::OnCollisionWithSuperLeaf(LPCOLLISIONEVENT e)
 {
-	float leafX, leafY;
-	e->obj->GetPosition(leafX, leafY);
-	CEffectScore* levelUpEffect = new CEffectScore(leafX, leafY, SCORE_LEVEL_UP);
-
-	CPlayScene* scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-	if (scene) {
-		scene->GetObjectManager()->Add(levelUpEffect);
-	}
-
-	// Add points to Mario's score
-	points += 1000;
-	e->obj->Delete();
-	if (level == MARIO_LEVEL_SMALL)
-	{
-		this->SetLevel(MARIO_LEVEL_BIG);
-	}
-	else {
-		this->SetLevel(MARIO_LEVEL_TAIL);
-	}
+	dynamic_cast<CSuperLeaf*>(e->obj)->BeCollected();
 }
 
 void CMario::OnCollisionWithSuperLeafBrick(LPCOLLISIONEVENT e)

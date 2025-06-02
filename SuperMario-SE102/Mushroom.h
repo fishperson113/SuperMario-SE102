@@ -13,6 +13,7 @@
 
 class CMushroom : public CGameObject
 {
+	bool isCollected;
 protected:
 	float ax;
 	float ay;
@@ -32,6 +33,9 @@ protected:
 public:
 	CMushroom(float x, float y);
 	virtual void SetState(int state);
+	bool IsCollected() const { return isCollected; }
+	void SetCollected(bool collected) { isCollected = collected; }
+	void BeCollected();
 };
 
 

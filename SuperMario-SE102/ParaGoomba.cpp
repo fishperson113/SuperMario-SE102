@@ -38,9 +38,23 @@ void CParaGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		isDeleted = true;
 		return;
 	}
-	if (state == PARAGOOMBA_STATE_WALKING && GetTickCount64() - jump_start > 500) // Walk duration
+
+	// Step counting logic for walking state
+	if (state == PARAGOOMBA_STATE_WALKING)
 	{
-		SetState(PARAGOOMBA_STATE_JUMPING);
+		count_steps++;
+
+		// When we've walked enough steps, switch to jumping state
+		if (count_steps >= PARAGOOMBA_STEPS_BEFORE_JUMP)
+		{
+			count_steps = 0;
+			SetState(PARAGOOMBA_STATE_JUMPING);
+		}
+	}
+	// Return to walking state after jumping animation finishes
+	else if (state == PARAGOOMBA_STATE_JUMPING && GetTickCount64() - jump_start > 500)
+	{
+		SetState(PARAGOOMBA_STATE_WALKING);
 	}
 }
 
@@ -82,6 +96,10 @@ void CParaGoomba::OnCollisionWith(LPCOLLISIONEVENT e)
 	else if (e->nx != 0)
 	{
 		vx = -vx;
+		if (vx > 0)
+			this->nx = 1;
+		else
+			this->nx = -1;
 	}
 	if (dynamic_cast<CFallPitch*>(e->obj))
 		OnCollisionWithFallPitch(e);
@@ -98,6 +116,7 @@ CParaGoomba::CParaGoomba(float x, float y) :CGameObject(x, y)
 	this->ay = PARAGOOMBA_GRAVITY;
 	die_start = -1;
 	jump_start = -1;
+	nx = -1;
 	SetState(PARAGOOMBA_STATE_WALKING);
 }
 
@@ -114,7 +133,7 @@ void CParaGoomba::SetState(int state)
 		ay = 0;
 		break;
 	case PARAGOOMBA_STATE_WALKING:
-		vx = -PARAGOOMBA_WALKING_SPEED;
+		vx = GetDirection() < 0 ? -PARAGOOMBA_WALKING_SPEED : PARAGOOMBA_WALKING_SPEED;
 		break;
 	case PARAGOOMBA_STATE_JUMPING:
 		vy = PARAGOOMBA_JUMP_SPEED;

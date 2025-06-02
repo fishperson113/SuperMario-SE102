@@ -3,7 +3,6 @@
 #define BRICK_WIDTH 16
 #define BRICK_BBOX_WIDTH 16
 #define BRICK_BBOX_HEIGHT 16
-#define BRICK_STATE_HIT 100
 void CSuperLeafBrick::Render()
 {
 	CAnimations* animations = CAnimations::GetInstance();
@@ -32,7 +31,7 @@ void CSuperLeafBrick::SetState(int state)
 
 void CSuperLeafBrick::SpawnSuperLeaf()
 {
-	CSuperLeaf* superLeaf = new CSuperLeaf(x, y - 64);
+	CSuperLeaf* superLeaf = new CSuperLeaf(x, y);
 
 	CPlayScene* currentScene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
 

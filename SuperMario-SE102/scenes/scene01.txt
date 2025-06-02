@@ -20,6 +20,7 @@ assets\Hud.txt
 assets\card.txt
 assets\score.txt
 assets\switch.txt
+assets\effect_hit.txt
 
 #
 [OBJECTS]

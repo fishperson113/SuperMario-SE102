@@ -298,7 +298,9 @@ void Koopas::OnCollisionWith(LPCOLLISIONEVENT e)
 		}
 	}
 
-	if (state != KOOPAS_STATE_SHELL_MOVING && state != KOOPA_PARATROOPA_STATE_MOVING_SHELL)
+	if (state != KOOPAS_STATE_SHELL_MOVING &&
+		state != KOOPA_PARATROOPA_STATE_MOVING_SHELL &&
+		state != KOOPAS_STATE_UPSIDE_DOWN)
 		return;
 
 	if (dynamic_cast<CGoomba*>(e->obj))
@@ -520,6 +522,7 @@ void Koopas::SetState(int state)
 
 		shell_start = GetTickCount64();
 		break;
+	case KOOPAS_STATE_UPSIDE_DOWN:
 	case KOOPAS_STATE_SHELL:
 		vx = 0;
 		ay = KOOPAS_GRAVITY;

@@ -383,4 +383,5 @@ public:
 	bool GetIsHitSwitch() { return isHitSwitch; }
 	void AddPoints(int p) { points += p; }
 	void AddCoin(int c) { coin += c; }
+	void SpawnHitEffect(LPCOLLISIONEVENT e, LPGAMEOBJECT obj, int eff_type);
 };

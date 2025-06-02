@@ -124,5 +124,6 @@ public:
 	int GetDirection() { return this->lastDirection; }
 
 	FallSensor* GetFallSensor() { return fallSensor; }
+	void SetType(int type) { this->type = type; }
 };
 

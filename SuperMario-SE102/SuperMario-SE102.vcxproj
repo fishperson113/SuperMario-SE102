@@ -156,6 +156,7 @@
     <ClCompile Include="CoinBrick.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="debug.cpp" />
+    <ClCompile Include="EffectHit.cpp" />
     <ClCompile Include="FallPitch.cpp" />
     <ClCompile Include="FallSensor.cpp" />
     <ClCompile Include="FireTrap.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="CoinBrick.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="debug.h" />
+    <ClInclude Include="EffectHit.h" />
     <ClInclude Include="FallPitch.h" />
     <ClInclude Include="FallSensor.h" />
     <ClInclude Include="FireTrap.h" />

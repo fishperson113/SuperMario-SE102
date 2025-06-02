@@ -14,6 +14,7 @@
 #include "CoinBrick.h"
 #include "MushroomBrick.h"
 #include "SuperLeafBrick.h"
+#include"EffectHit.h"
 
 HitBox::HitBox(CGameObject* owner):CGameObject(x,y)
 {
@@ -44,16 +45,20 @@ void HitBox::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 void HitBox::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
 {
     CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
+    CMario* mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
     if (goomba->GetState() != GOOMBA_STATE_DIE)
         goomba->SetState(GOOMBA_STATE_DIE);
+    mario->SpawnHitEffect(e, this, EFF_COL_TYPE_NORMAL);
     DebugOut(L">>> Hitbox hit Goomba! >>> \n");
 }
 
 void HitBox::OnCollisionWithParaGoomba(LPCOLLISIONEVENT e)
 {
     CParaGoomba* paraGoomba = dynamic_cast<CParaGoomba*>(e->obj);
+    CMario* mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
     if (paraGoomba->GetState() != PARAGOOMBA_STATE_DIE)
         paraGoomba->SetState(PARAGOOMBA_STATE_DIE);
+    mario->SpawnHitEffect(e, this, EFF_COL_TYPE_NORMAL);
 }
 
 void HitBox::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
@@ -61,66 +66,37 @@ void HitBox::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
     Koopas* koopas = dynamic_cast<Koopas*>(e->obj);
     if (!koopas) return;
 
-    // Get Mario's direction to determine shell direction
-    CMario* mario = dynamic_cast<CMario*>(owner);
-    float shellDirection = mario ? mario->GetDirection() : 1.0f;
+    // Get Mario to spawn effect and get direction
+    CMario* mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+    float kickDirection = mario ? mario->GetDirection() : 1.0f;
 
-    // Handle Red Koopas
+    // Handle based on Koopas type
     if (koopas->GetType() == KOOPAS_RED)
     {
-        if (koopas->GetState() == KOOPAS_STATE_WALKING)
-        {
-            // Turn normal Koopas into shell
-            koopas->SetState(KOOPAS_STATE_SHELL);
-            DebugOut(L">>> Hitbox turned Red Koopa into shell! >>> \n");
-        }
-        else if (koopas->GetState() == KOOPAS_STATE_SHELL || koopas->GetState() == KOOPAS_STATE_UPSIDE_DOWN)
-        {
-            // If Koopas is already in shell state, kick it
-            koopas->SetState(KOOPAS_STATE_SHELL_MOVING);
-            koopas->SetSpeed(shellDirection * KOOPAS_SHELL_SPEED, 0);
-            DebugOut(L">>> Hitbox kicked Red Koopa shell! >>> \n");
-        }
-        else if (koopas->GetState() == KOOPAS_STATE_SHELL_MOVING)
-        {
-            // If shell is already moving, reverse its direction
-            float vx, vy;
-            koopas->GetSpeed(vx, vy);
-            koopas->SetSpeed(-vx, vy);
-            DebugOut(L">>> Hitbox reversed Red Koopa shell direction! >>> \n");
-        }
+        // Turn Koopas upside down (use the proper state constant that exists in your code)
+        koopas->SetState(KOOPAS_STATE_UPSIDE_DOWN);
+
+        // Kick it away
+        koopas->SetSpeed(kickDirection * KOOPAS_SHELL_SPEED, 0);
+
+        // Spawn hit effect
+        mario->SpawnHitEffect(e, this, EFF_COL_TYPE_NORMAL);
+
+        DebugOut(L">>> Hitbox turned Red Koopa upside down and kicked it! >>> \n");
     }
     // Handle Green Koopas
     else if (koopas->GetType() == KOOPAS_GREEN || koopas->GetType() == KOOPAS_GREEN_NO_WINGS)
     {
-        if (koopas->GetState() == KOOPA_PARATROOPA_STATE_WALKING_WINGS ||
-            koopas->GetState() == KOOPA_PARATROOPA_STATE_JUMPING_WINGS)
-        {
-            // Remove wings from winged koopas
-            koopas->SetState(KOOPA_PARATROOPA_STATE_WALKING);
-            DebugOut(L">>> Hitbox removed Green Koopa wings! >>> \n");
-        }
-        else if (koopas->GetState() == KOOPA_PARATROOPA_STATE_WALKING)
-        {
-            // Turn normal Koopas into shell
-            koopas->SetState(KOOPA_PARATROOPA_STATE_SHELL);
-            DebugOut(L">>> Hitbox turned Green Koopa into shell! >>> \n");
-        }
-        else if (koopas->GetState() == KOOPA_PARATROOPA_STATE_SHELL)
-        {
-            // If Koopas is already in shell state, kick it
-            koopas->SetState(KOOPA_PARATROOPA_STATE_MOVING_SHELL);
-            koopas->SetSpeed(shellDirection * KOOPAS_SHELL_SPEED, 0);
-            DebugOut(L">>> Hitbox kicked Green Koopa shell! >>> \n");
-        }
-        else if (koopas->GetState() == KOOPA_PARATROOPA_STATE_MOVING_SHELL)
-        {
-            // If shell is already moving, reverse its direction
-            float vx, vy;
-            koopas->GetSpeed(vx, vy);
-            koopas->SetSpeed(-vx, vy);
-            DebugOut(L">>> Hitbox reversed Green Koopa shell direction! >>> \n");
-        }
+        if (koopas->GetType() == KOOPAS_GREEN)
+            koopas->SetType(KOOPAS_GREEN_NO_WINGS);
+
+        koopas->SetState(KOOPAS_STATE_UPSIDE_DOWN);
+
+        // Kick it away
+        koopas->SetSpeed(kickDirection * KOOPAS_SHELL_SPEED, 0);
+
+        // Spawn hit effect
+        mario->SpawnHitEffect(e, this, EFF_COL_TYPE_NORMAL);
     }
 }
 

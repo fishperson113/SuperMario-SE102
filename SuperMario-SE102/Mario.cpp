@@ -31,6 +31,7 @@
 #include "Switch.h"	
 #include "SwitchBrick.h"
 #include "CameraTest.h"
+#include"EffectHit.h"
 CMario::~CMario()
 {
 	if (heldKoopas != NULL)
@@ -95,7 +96,6 @@ void CMario::ReleaseKoopas()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	DebugOut(L">>> Mario position %f, %f! >>> \n", this->x, this->y);
 
 	bool wasPreviouslyOnPlatform = isOnPlatform;
 	CPlatform* previousPlatform = platform;
@@ -783,7 +783,7 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 				koopas->SetState(KOOPAS_STATE_SHELL);
 				vy = -MARIO_JUMP_DEFLECT_SPEED;
 			}
-			else if (koopas->GetState() == KOOPAS_STATE_SHELL)
+			else if (koopas->GetState() == KOOPAS_STATE_SHELL|| koopas->GetState() == KOOPAS_STATE_UPSIDE_DOWN)
 			{
 				// Create score effect (more points for kicking a shell)
 				float koopasX, koopasY;
@@ -839,7 +839,7 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 		else if (e->nx != 0) // Side collision
 		{
 			// Check if we can hold the Koopa shell (only when running with A pressed)
-			if (koopas->GetState() == KOOPAS_STATE_SHELL &&
+			if ((koopas->GetState() == KOOPAS_STATE_SHELL|| koopas->GetState() == KOOPAS_STATE_UPSIDE_DOWN) &&
 				(abs(vx) >= MARIO_WALKING_SPEED) &&
 				CGame::GetInstance()->IsKeyDown(DIK_A) &&
 				!isHolding)
@@ -847,7 +847,7 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 				HoldKoopas(koopas);
 				DebugOut(L">>> Mario picked up Koopa shell! >>> \n");
 			}
-			else if (koopas->GetState() == KOOPAS_STATE_SHELL)
+			else if (koopas->GetState() == KOOPAS_STATE_SHELL|| koopas->GetState() == KOOPAS_STATE_UPSIDE_DOWN)
 			{
 				// Create score effect for kicking
 				float koopasX, koopasY;
@@ -935,7 +935,7 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 				koopas->SetState(KOOPA_PARATROOPA_STATE_SHELL);
 				vy = -MARIO_JUMP_DEFLECT_SPEED;
 			}
-			else if (koopas->GetState() == KOOPA_PARATROOPA_STATE_SHELL)
+			else if (koopas->GetState() == KOOPA_PARATROOPA_STATE_SHELL || koopas->GetState() == KOOPAS_STATE_UPSIDE_DOWN)
 			{
 				// Create score effect
 				float koopasX, koopasY;
@@ -991,7 +991,7 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 		else if (e->nx != 0) // Side collision
 		{
 			// Check if we can hold the Koopa shell (only when running with A pressed)
-			if (koopas->GetState() == KOOPA_PARATROOPA_STATE_SHELL &&
+			if ((koopas->GetState() == KOOPA_PARATROOPA_STATE_SHELL|| koopas->GetState() == KOOPAS_STATE_UPSIDE_DOWN) &&
 				(abs(vx) >= MARIO_WALKING_SPEED) &&
 				CGame::GetInstance()->IsKeyDown(DIK_A) &&
 				!isHolding)
@@ -999,7 +999,7 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 				HoldKoopas(koopas);
 				DebugOut(L">>> Mario picked up Koopa shell! >>> \n");
 			}
-			else if (koopas->GetState() == KOOPA_PARATROOPA_STATE_SHELL)
+			else if (koopas->GetState() == KOOPA_PARATROOPA_STATE_SHELL|| koopas->GetState() == KOOPAS_STATE_UPSIDE_DOWN)
 			{
 				// Create score effect for kicking
 				float koopasX, koopasY;
@@ -1027,7 +1027,7 @@ void CMario::OnCollisionWithKoopas(LPCOLLISIONEVENT e)
 			{
 				if (untouchable == 0)
 				{
-					if (koopas->GetState() != KOOPA_PARATROOPA_STATE_SHELL)
+					if (koopas->GetState() != KOOPA_PARATROOPA_STATE_SHELL && koopas->GetState() != KOOPAS_STATE_UPSIDE_DOWN)
 					{
 						if (level > MARIO_LEVEL_SMALL)
 						{
@@ -1944,6 +1944,31 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 		right = left + MARIO_SMALL_BBOX_WIDTH;
 		bottom = top + MARIO_SMALL_BBOX_HEIGHT;
 	}
+}
+
+void CMario::SpawnHitEffect(LPCOLLISIONEVENT e, LPGAMEOBJECT obj, int eff_type)
+{
+	float x = -1;
+	float y = -1;
+	float obj_x, obj_y;
+	obj->GetPosition(obj_x, obj_y);
+	if (eff_type != EFF_COL_TYPE_SMOKE_EVOLVE)
+	{
+		if (e->nx > 0)
+			x = obj_x - 15.0f;
+		else
+			x = obj_x + 15.0f;
+		y = obj_y;
+	}
+	else 
+	{
+		x = this->x;
+		y = this->y;
+	}
+
+	CEffectHit* eff_col = new CEffectHit(x, y, GetTickCount64(), eff_type);
+	CPlayScene* current_scene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
+	current_scene->GetObjectManager()->Add(eff_col);
 }
 
 void CMario::StartPipeMovement(PipeDirection direction, bool isEntry)

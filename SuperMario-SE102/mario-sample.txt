@@ -22,6 +22,7 @@ height	240
 40	textures\background_item.png
 50	textures\enemies_sprites_trans.png
 60	textures\ItemCard.png
+70	textures\effect_hit.png
 100	textures\Hud.png
 110	textures\Hud_2.png
 120	textures\Hud_Start & Hud_End.png

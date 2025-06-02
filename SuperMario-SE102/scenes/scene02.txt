@@ -22,7 +22,7 @@ assets\card.txt
 assets\score.txt
 assets\switch.txt
 assets\koopaparatroopa.txt
-
+assets\effect_hit.txt
 #
 [OBJECTS]
 # type	x	y	extra_settings per object type

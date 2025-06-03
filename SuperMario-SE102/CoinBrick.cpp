@@ -53,7 +53,9 @@ void CCoinBrick::SpawnCoin()
 	coin->SetState(COIN_STATE_JUMP);
 
 	CPlayScene* currentScene = (CPlayScene*)CGame::GetInstance()->GetCurrentScene();
-
+	CMario* mario = (CMario*)((LPPLAYSCENE)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
+	mario->AddCoin(1); 
+	mario->AddPoints(10);
 	currentScene->GetObjectManager()->Add(coin);
 }
 

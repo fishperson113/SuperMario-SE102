@@ -209,7 +209,7 @@ void HitBox::OnCollisionWithMushroomBrick(LPCOLLISIONEVENT e)
 void HitBox::Render()
 {
     //if (!isActivate) return;
-    RenderBoundingBox();
+    //RenderBoundingBox();
 }
 
 void HitBox::GetBoundingBox(float& left, float& top, float& right, float& bottom)
@@ -231,7 +231,7 @@ void HitBox::OnNoCollision(DWORD dt)
     CMario* mario = dynamic_cast<CMario*>(owner);    
     mario->GetPosition(mario_x, mario_y);
 
-    float offsetX = mario->GetDirection() > 0 ? HITBOX_WIDTH / 2 : -HITBOX_WIDTH / 2;
+    float offsetX = mario->GetDirection() > 0 ? HITBOX_WIDTH : -HITBOX_WIDTH;
     float offsetY = (mario->GetLevel() == MARIO_LEVEL_SMALL) ? 0 : 5;
     x = mario_x + offsetX;
     y = mario_y+offsetY;

@@ -379,9 +379,6 @@ void CMario::OnCollisionWithCoinBrick(LPCOLLISIONEVENT e)
 			coinBrick->SetState(BRICK_STATE_HITTING);
 			coinBrick->Bounce();
 			coinBrick->SetBreakCOunt(coinBrick->GetBreakCount() - 1);
-
-			coin++;
-			points += 10;
 		}
 	}
 }

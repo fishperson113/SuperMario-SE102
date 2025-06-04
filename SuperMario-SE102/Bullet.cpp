@@ -5,6 +5,7 @@ CBullet::CBullet(float x, float y)
 {
 	this->x = x;
 	this->y = y;
+	spawnTime = GetTickCount64();
 }
 
 void CBullet::GetBoundingBox(float& left, float& top, float& right, float& bottom)
@@ -18,7 +19,11 @@ void CBullet::GetBoundingBox(float& left, float& top, float& right, float& botto
 
 void CBullet::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-
+	if (GetTickCount64() - spawnTime > BULLET_TIMEOUT)
+	{
+		isDeleted = true;
+		return;
+	}
 }
 
 void CBullet::Render()

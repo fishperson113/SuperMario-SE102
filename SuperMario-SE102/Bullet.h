@@ -3,6 +3,7 @@
 #define ID_ANI_BULLET_FLYING 4995
 #define BULLET_BBOX_WIDTH 9
 #define BULLET_BBOX_HEIGHT 9
+#define BULLET_TIMEOUT 5000 // 3 seconds
 
 class CBullet : public CGameObject
 {

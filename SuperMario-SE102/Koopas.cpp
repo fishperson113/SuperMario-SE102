@@ -6,6 +6,7 @@
 #include "Mario.h"
 #include "PlayScene.h"
 #include "CEffectScore.h"
+#include "FallPitch.h"
 
 void Koopas::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
@@ -315,6 +316,8 @@ void Koopas::OnCollisionWith(LPCOLLISIONEVENT e)
 		OnCollisionWithLeafBrick(e);
 	else if (dynamic_cast<CBrick*>(e->obj))
 		OnCollisionWithBrick(e);
+	else if (dynamic_cast<CFallPitch*>(e->obj))
+		OnCollisionWithFallPitch(e);
 }
 
 void Koopas::OnCollisionWithGoomba(LPCOLLISIONEVENT e)
@@ -444,6 +447,12 @@ void Koopas::OnCollisionWithBrick(LPCOLLISIONEVENT e)
 			brick->Break();
 		}
 	}
+}
+
+void Koopas::OnCollisionWithFallPitch(LPCOLLISIONEVENT e)
+{
+	isDeleted = true; // Koopas falls into the pit
+	return;
 }
 
 

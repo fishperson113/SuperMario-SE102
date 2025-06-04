@@ -103,6 +103,7 @@ protected:
 	void OnCollisionWithMushroomBrick(LPCOLLISIONEVENT e);
 	void OnCollisionWithLeafBrick(LPCOLLISIONEVENT e);
 	void OnCollisionWithBrick(LPCOLLISIONEVENT e);
+	void OnCollisionWithFallPitch(LPCOLLISIONEVENT e);
 
 public:
 	Koopas(float x, float y, int type);

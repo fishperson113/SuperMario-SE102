@@ -8,7 +8,7 @@
 #include "KoopaParatroopa.h"
 
 
-#define MARIO_WALKING_SPEED		0.07f
+#define MARIO_WALKING_SPEED		0.09f
 #define MARIO_RUNNING_SPEED		0.16f
 
 #define MARIO_ACCEL_WALK_X	0.00025f
@@ -24,7 +24,7 @@
 
 #define MARIO_STATE_FLY 810
 #define MARIO_FLY_SPEED_Y -0.2f 
-#define MARIO_FLY_TIMEOUT 5000 
+#define MARIO_FLY_TIMEOUT 4000 
 
 #define MARIO_STATE_DIE				-10
 #define MARIO_STATE_IDLE			0
@@ -48,7 +48,7 @@
 
 #define MARIO_STATE_GLIDE 800
 #define MARIO_GLIDE_SPEED_Y 0.05f  // Slower falling speed while gliding
-#define MARIO_GLIDE_TIMEOUT 5000   // Max glide time in milliseconds
+#define MARIO_GLIDE_TIMEOUT 3000   // Max glide time in milliseconds
 
 #define MARIO_PIPE_ENTRY_TIME       800    // Time to enter pipe animation
 #define MARIO_PIPE_EXIT_TIME        800    // Time to exit pipe animation

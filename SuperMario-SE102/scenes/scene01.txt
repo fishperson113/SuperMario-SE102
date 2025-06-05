@@ -204,8 +204,8 @@ assets\effect_hit.txt
 4	2176	244
 
 #MARIO
-#0	0	20	#Beginning spawn
-0	2290	-200	#Underground spawn
+0	0	20	#Beginning spawn
+#0	2290	-200	#Underground spawn
 
 #Platform
 7	-16	500

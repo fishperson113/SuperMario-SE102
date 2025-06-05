@@ -180,7 +180,6 @@ void CBoomerangBro::Render()
     }
 
     CAnimations::GetInstance()->Get(aniId)->Render(x, y);
-    RenderBoundingBox();
 }
 
 void CBoomerangBro::SetState(int state)

@@ -805,7 +805,7 @@ void CPlayScene::Load()
 		camera->SetMode(PUSH_FORWARD_TEST);
 		camera->SetPosition(0, 0);
 		camera->SetPushSpeed(0.03f);
-		camera->SetStopPoint(1500.0f);
+		camera->SetStopPoint(1650.0f);
 	}
 	DebugOut(L"[INFO] Done loading scene  %s\n", sceneFilePath);
 }
@@ -824,8 +824,8 @@ void CPlayScene::Update(DWORD dt)
 	}
 	// Update all game objects first
 	objectManager.Update(dt);
-	HUD::GetInstance()->Update();
 	Camera::GetInstance()->Update(dt);
+	HUD::GetInstance()->Update();
 
 	// Clean up deleted objects
 	PurgeDeletedObjects();

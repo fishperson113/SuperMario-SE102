@@ -1814,6 +1814,7 @@ void CMario::SetState(int state)
 	case MARIO_STATE_FLY:
 		isFlying = true;
 		isGliding = false;
+		isOnPlatform = false;
 		fly_start = GetTickCount64();
 		vy = MARIO_FLY_SPEED_Y;
 		DebugOut(L">>> Mario started flying! >>> \n");

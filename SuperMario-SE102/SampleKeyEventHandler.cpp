@@ -35,8 +35,10 @@ void CSampleKeyHandler::OnKeyDown(int KeyCode)
 		break;
 	case DIK_S:
 		if (mario->GetLevel() == MARIO_LEVEL_TAIL &&
-			mario->IsOnPlatform() &&
-			mario->GetPowerMeter() >= MARIO_PMETER_MAX)
+			mario->GetPowerMeter() >= MARIO_PMETER_MAX &&
+			(mario->IsOnPlatform() ||
+				(CGame::GetInstance()->IsKeyDown(DIK_RIGHT)
+				|| CGame::GetInstance()->IsKeyDown(DIK_LEFT))))
 		{
 			mario->SetState(MARIO_STATE_FLY);
 		}
@@ -112,7 +114,7 @@ void CSampleKeyHandler::KeyState(BYTE *states)
 		float vx,vy;
 		mario->GetSpeed(vx, vy);
 
-		if (!mario->IsOnPlatform() && vy > 0 && !mario->IsFlying())
+		if (!mario->IsOnPlatform() && !mario->IsFlying())
 		{
 			mario->SetState(MARIO_STATE_GLIDE);
 		}
